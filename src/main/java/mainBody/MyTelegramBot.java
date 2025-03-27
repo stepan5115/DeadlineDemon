@@ -1,21 +1,36 @@
-package com.example.demo;
+package mainBody;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
+import sqlTables.AssignmentRepository;
+import sqlTables.GroupRepository;
+import sqlTables.SubjectRepository;
+import sqlTables.UserRepository;
 
 @Component
 public class MyTelegramBot extends TelegramLongPollingBot {
+    private final UserRepository userRepository;
+    private final SubjectRepository subjectRepository;
+    private final GroupRepository groupRepository;
+    private final AssignmentRepository assignmentRepository;
 
     private final String botUsername = "DeadlineDemonBot"; // Имя твоего бота
     private final String botToken = "8054120880:AAF78Qz9kPvwR3p2OhN4GEFCVznCw-Kf2No"; // Токен бота
     final int RECONNECT_PAUSE =10000;
+
+    public MyTelegramBot(UserRepository userRepository,
+                         SubjectRepository subjectRepository,
+                         GroupRepository groupRepository,
+                         AssignmentRepository assignmentRepository) {
+        this.userRepository = userRepository;
+        this.subjectRepository = subjectRepository;
+        this.groupRepository = groupRepository;
+        this.assignmentRepository = assignmentRepository;
+    }
 
     @Override
     public void onUpdateReceived(Update update) {
