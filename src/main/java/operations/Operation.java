@@ -1,8 +1,14 @@
 package operations;
+import mainBody.MyTelegramBot;
 
 abstract public class Operation implements Runnable {
-    private final String chatId;
-    public Operation(String chatId) {
+    protected final String chatId;
+    protected final MyTelegramBot bot;
+    protected final String message;
+
+    public Operation(String chatId, MyTelegramBot bot, String message) {
         this.chatId = chatId;
+        this.bot = bot;
+        this.message = message;
     }
 }

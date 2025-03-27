@@ -1,6 +1,8 @@
 package sqlTables;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,12 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Проверить, существует ли пользователь с таким именем
     boolean existsByUsername(String username);
 
-    // Найти всех пользователей, относящихся к определённой группе
-    List<User> findByGroupsContaining(String groupName);
-
-    // Найти всех пользователей, которые могут редактировать задания
-    List<User> findByCanEditTasksTrue();
-
-    // Найти всех пользователей, у которых включены уведомления
-    List<User> findByAllowNotificationsTrue();
+    @Query("SELECT u.password FROM User u WHERE u.username = :username")
+    Optional<String> findPasswordByUsername(String username);
 }

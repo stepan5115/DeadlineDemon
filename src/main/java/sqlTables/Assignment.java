@@ -2,6 +2,8 @@ package sqlTables;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,9 +25,8 @@ public class Assignment {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ElementCollection
-    @CollectionTable(name = "task_groups", joinColumns = @JoinColumn(name = "task_id"))
-    @Column(name = "group_name")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
     private List<String> targetGroups;
 
     @Column(nullable = false)

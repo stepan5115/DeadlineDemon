@@ -9,11 +9,13 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "subject_id")
+    private Long id;  // Переименовано в camelCase
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 }

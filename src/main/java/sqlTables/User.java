@@ -2,6 +2,9 @@ package sqlTables;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 
@@ -14,7 +17,7 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long user_id;
 
     @Column(nullable = false, unique = true)
     private String username;
@@ -22,14 +25,13 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @ElementCollection
-    @CollectionTable(name = "user_groups", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "group_name")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
     private List<String> groups;
 
-    @Column(nullable = false)
+    @Column(name = "can_edit_assignments", nullable = false)
     private boolean canEditTasks;
 
-    @Column(nullable = false)
+    @Column(name = "allow_notifications", nullable = false)
     private boolean allowNotifications;
 }
