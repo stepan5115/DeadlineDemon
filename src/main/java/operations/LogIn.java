@@ -5,6 +5,7 @@ import mainBody.State;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.User;
 import sqlTables.UserRepository;
+import utils.PasswordEncryptor;
 
 import java.util.Optional;
 
@@ -32,13 +33,18 @@ public class LogIn extends Operation {
                     bot.getLogInUserStates().remove(chatId);
                 }
             } else if (state.getType() == State.StateType.WAITING_PASSWORD) {
-                Optional<String> password = userRepository.findPasswordByUsername(state.getUsername());
                 Optional<User> user = userRepository.findByUsername(state.getUsername());
-                if (password.isPresent() && password.get().equals(message)
-                    && user.isPresent()) {
+                if (user.isPresent() && user.get().getPassword().equals(PasswordEncryptor.encrypt(message))) {
                     bot.getLogInUserStates().remove(chatId);
                     bot.getAuthorizedUsers().put(chatId, user.get());
                     sendMessage.setText("You logged in!");
+                } else if(user.isPresent() && !user.get().getPassword().equals(PasswordEncryptor.encrypt(message))) {
+                    sendMessage.setText("Incorrect password");
+                    bot.getLogInUserStates().remove(chatId);
+                }
+                else {
+                    sendMessage.setText("Something went wrong!");
+                    bot.getLogInUserStates().remove(chatId);
                 }
             }
         } else {

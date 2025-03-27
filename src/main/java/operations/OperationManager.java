@@ -13,6 +13,9 @@ public class OperationManager {
         if (message.trim().equals("/register")) {
             return new SignIn(chatId, bot, message, bot.getUserRepository());
         }
+        if (message.trim().equals("/logout")) {
+            return new LogOut(chatId, bot, message);
+        }
         return new MisUnderstand(chatId, bot, message);
     }
 }
