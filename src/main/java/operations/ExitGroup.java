@@ -22,11 +22,13 @@ public class ExitGroup extends Operation {
     public void run() {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
+        User user = bot.getAuthorizedUsers().get(chatId);
         if (!bot.getAuthorizedUsers().containsKey(chatId))
             sendMessage.setText("You must login first");
+        else if (user.getGroups().isEmpty())
+            sendMessage.setText("You are not in any group");
         else if (bot.getExitGroupUsers().contains(chatId)) {
             Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
-            User user = bot.getAuthorizedUsers().get(chatId);
             if (group.isPresent() &&
                     user.getGroups().contains(group.get().getName())) {
                 user.removeGroup(group.get().getName());
@@ -39,7 +41,11 @@ public class ExitGroup extends Operation {
                 sendMessage.setText("Group not found");
             bot.getExitGroupUsers().remove(chatId);
         } else {
-            sendMessage.setText("Please enter a name of group");
+            StringBuilder allGroups = new StringBuilder();
+            for (String group : user.getGroups()) {
+                allGroups.append("\n").append(group);
+            }
+            sendMessage.setText("Please enter a name of group from list:" + allGroups);
             bot.getExitGroupUsers().add(chatId);
         }
         try {

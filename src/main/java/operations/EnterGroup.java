@@ -7,6 +7,7 @@ import sqlTables.GroupRepository;
 import sqlTables.User;
 import sqlTables.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public class EnterGroup extends Operation {
@@ -22,8 +23,11 @@ public class EnterGroup extends Operation {
     public void run() {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
+        List<Group> allDBGroups = groupRepository.findAll();
         if (!bot.getAuthorizedUsers().containsKey(chatId))
             sendMessage.setText("You must login first");
+        else if (allDBGroups.isEmpty())
+            sendMessage.setText("There are no groups in system");
         else if (bot.getEnterGroupUsers().contains(chatId)) {
             Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
             User user = bot.getAuthorizedUsers().get(chatId);
@@ -39,7 +43,11 @@ public class EnterGroup extends Operation {
                 sendMessage.setText("Group not found");
             bot.getEnterGroupUsers().remove(chatId);
         } else {
-            sendMessage.setText("Please enter a name of group");
+            StringBuilder allGroups = new StringBuilder();
+            for (Group group : groupRepository.findAll()) {
+                allGroups.append("\n").append(group.getName());
+            }
+            sendMessage.setText("Please enter a name of group from list:" + allGroups);
             bot.getEnterGroupUsers().add(chatId);
         }
         try {
