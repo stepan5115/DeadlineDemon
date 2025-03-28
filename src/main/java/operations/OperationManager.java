@@ -22,6 +22,10 @@ public class OperationManager {
             return new ExitGroup(chatId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
         if (message.trim().equals("/exitGroup"))
             return new ExitGroup(chatId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
+        if (message.trim().equals("/enableNotifications"))
+            return new EnableAutoMailing(chatId, bot, message, bot.getUserRepository());
+        if (message.trim().equals("/disableNotifications"))
+            return new DisableAutoMailing(chatId, bot, message, bot.getUserRepository());
         return new MisUnderstand(chatId, bot, message);
     }
     public static Operation getShutDownOperation(MyTelegramBot bot, String chatId, String message) {
