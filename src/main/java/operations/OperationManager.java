@@ -26,6 +26,14 @@ public class OperationManager {
             return new EnableAutoMailing(chatId, bot, message, bot.getUserRepository());
         if (message.trim().equals("/disableNotifications"))
             return new DisableAutoMailing(chatId, bot, message, bot.getUserRepository());
+        if (message.trim().equals("/generateToken"))
+            return new GenerateToken(chatId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+        if (message.trim().equals("/getAdminRights"))
+            return new GetAdminRights(chatId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+        if (bot.getEnterTokenUsers().contains(chatId))
+            return new GetAdminRights(chatId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+        if (message.trim().equals("/getMyTokens"))
+            return new GetTokens(chatId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
         return new MisUnderstand(chatId, bot, message);
     }
     public static Operation getShutDownOperation(MyTelegramBot bot, String chatId, String message) {

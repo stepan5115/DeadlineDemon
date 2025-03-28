@@ -23,6 +23,8 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     @Getter
     private final GroupRepository groupRepository;
     @Getter
+    private final AdminTokenRepository adminTokenRepository;
+    @Getter
     private final AssignmentRepository assignmentRepository;
     final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
@@ -40,15 +42,19 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     private final ConcurrentLinkedQueue<String> enterGroupUsers = new ConcurrentLinkedQueue<>();
     @Getter
     private final ConcurrentLinkedQueue<String> exitGroupUsers = new ConcurrentLinkedQueue<>();
+    @Getter
+    private final ConcurrentLinkedQueue<String> enterTokenUsers = new ConcurrentLinkedQueue<>();
 
     public MyTelegramBot(UserRepository userRepository,
                          SubjectRepository subjectRepository,
                          GroupRepository groupRepository,
-                         AssignmentRepository assignmentRepository) {
+                         AssignmentRepository assignmentRepository,
+                         AdminTokenRepository adminTokenRepository) {
         this.userRepository = userRepository;
         this.subjectRepository = subjectRepository;
         this.groupRepository = groupRepository;
         this.assignmentRepository = assignmentRepository;
+        this.adminTokenRepository = adminTokenRepository;
     }
 
     @Override
