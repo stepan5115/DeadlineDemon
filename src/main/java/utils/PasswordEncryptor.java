@@ -1,17 +1,15 @@
 package utils;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 public class PasswordEncryptor {
-    private static final String SECRET_KEY = "019127421895";
+    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public static String encrypt(String password) {
-        char[] key = SECRET_KEY.toCharArray();
-        char[] input = password.toCharArray();
-        char[] result = new char[input.length];
+        return encoder.encode(password);
+    }
 
-        for (int i = 0; i < input.length; i++) {
-            result[i] = (char) (input[i] ^ key[i % key.length]);
-        }
-
-        return new String(result);
+    public static boolean matches(String rawPassword, String encodedPassword) {
+        return encoder.matches(rawPassword, encodedPassword);
     }
 }

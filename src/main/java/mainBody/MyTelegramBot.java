@@ -5,10 +5,7 @@ import operations.Operation;
 import operations.OperationManager;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import sqlTables.*;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,9 +32,9 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     @Getter
     private final ConcurrentHashMap<String, User> authorizedUsers = new ConcurrentHashMap<>(); // Храним вошедших пользователей
     @Getter
-    private final ConcurrentHashMap<String, State> logInUserStates = new ConcurrentHashMap<>(); // Храним этап ввода
+    private final ConcurrentHashMap<String, NamePasswordState> logInUserStates = new ConcurrentHashMap<>(); // Храним этап ввода
     @Getter
-    private final ConcurrentHashMap<String, State> signInUserStates = new ConcurrentHashMap<>(); // Храним этап ввода
+    private final ConcurrentHashMap<String, NamePasswordState> signInUserStates = new ConcurrentHashMap<>(); // Храним этап ввода
 
     public MyTelegramBot(UserRepository userRepository,
                          SubjectRepository subjectRepository,

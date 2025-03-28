@@ -1,13 +1,7 @@
 package operations;
 
 import mainBody.MyTelegramBot;
-import mainBody.State;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import sqlTables.User;
-import sqlTables.UserRepository;
-import utils.PasswordEncryptor;
-
-import java.util.Optional;
 
 public class LogOut extends Operation {
 

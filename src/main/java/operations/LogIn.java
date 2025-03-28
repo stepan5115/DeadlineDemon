@@ -1,7 +1,7 @@
 package operations;
 
 import mainBody.MyTelegramBot;
-import mainBody.State;
+import mainBody.NamePasswordState;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.User;
 import sqlTables.UserRepository;
@@ -23,22 +23,26 @@ public class LogIn extends Operation {
             sendMessage.setText("You already logged in!");
         }
         else if (bot.getLogInUserStates().containsKey(chatId)) {
-            State state = bot.getLogInUserStates().get(chatId);
-            if (state.getType() == State.StateType.WAITING_USERNAME) {
+            NamePasswordState state = bot.getLogInUserStates().get(chatId);
+            if (state.getType() == NamePasswordState.StateType.WAITING_USERNAME) {
                 if (userRepository.existsByUsername(message)) {
                     sendMessage.setText("Now, enter your password");
-                    bot.getLogInUserStates().put(chatId, new State(State.StateType.WAITING_PASSWORD, message));
+                    bot.getLogInUserStates().put(chatId, new NamePasswordState(NamePasswordState.StateType.WAITING_PASSWORD, message));
                 } else {
                     sendMessage.setText("Can't find your name");
                     bot.getLogInUserStates().remove(chatId);
                 }
-            } else if (state.getType() == State.StateType.WAITING_PASSWORD) {
+            } else if (state.getType() == NamePasswordState.StateType.WAITING_PASSWORD) {
                 Optional<User> user = userRepository.findByUsername(state.getUsername());
-                if (user.isPresent() && user.get().getPassword().equals(PasswordEncryptor.encrypt(message))) {
+                if (message.length() > 15) {
+                    sendMessage.setText("Incorrect password");
+                    bot.getLogInUserStates().remove(chatId);
+                }
+                else if (user.isPresent() && PasswordEncryptor.matches(message, user.get().getPassword())) {
                     bot.getLogInUserStates().remove(chatId);
                     bot.getAuthorizedUsers().put(chatId, user.get());
                     sendMessage.setText("You logged in!");
-                } else if(user.isPresent() && !user.get().getPassword().equals(PasswordEncryptor.encrypt(message))) {
+                } else if(user.isPresent() && !PasswordEncryptor.matches(message, user.get().getPassword())) {
                     sendMessage.setText("Incorrect password");
                     bot.getLogInUserStates().remove(chatId);
                 }
@@ -49,7 +53,7 @@ public class LogIn extends Operation {
             }
         } else {
             sendMessage.setText("First, enter your name");
-            bot.getLogInUserStates().put(chatId, new State(State.StateType.WAITING_USERNAME, null));
+            bot.getLogInUserStates().put(chatId, new NamePasswordState(NamePasswordState.StateType.WAITING_USERNAME, null));
         }
         try {
             bot.execute(sendMessage);
