@@ -18,4 +18,7 @@ public class OperationManager {
         }
         return new MisUnderstand(chatId, bot, message);
     }
+    public static Operation getShutDownOperation(MyTelegramBot bot, String chatId, String message) {
+        return new ShutDownOperation(chatId, bot, message);
+    }
 }

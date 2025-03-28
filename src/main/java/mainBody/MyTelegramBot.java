@@ -26,7 +26,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     private final GroupRepository groupRepository;
     @Getter
     private final AssignmentRepository assignmentRepository;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+    final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
     private final String botUsername = "DeadlineDemonBot"; // Имя твоего бота
     private final String botToken = "8054120880:AAF78Qz9kPvwR3p2OhN4GEFCVznCw-Kf2No"; // Токен бота
