@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface GroupRepository extends JpaRepository<Group, Long> {
     // Найти группу по названию
     Optional<Group> findByName(String name);
+    Optional<Group> findByNameIgnoreCase(String name);
 
     // Проверить, существует ли группа с таким названием
     boolean existsByName(String name);

@@ -25,6 +25,16 @@ public class LogIn extends Operation {
         else if (bot.getLogInUserStates().containsKey(chatId)) {
             NamePasswordState state = bot.getLogInUserStates().get(chatId);
             if (state.getType() == NamePasswordState.StateType.WAITING_USERNAME) {
+                for (User user : bot.getAuthorizedUsers().values())
+                    if (user.getUsername().equals(message)) {
+                        sendMessage.setText("This account is busy by other user!");
+                        try {
+                            bot.execute(sendMessage);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return;
+                    }
                 if (userRepository.existsByUsername(message)) {
                     sendMessage.setText("Now, enter your password");
                     bot.getLogInUserStates().put(chatId, new NamePasswordState(NamePasswordState.StateType.WAITING_PASSWORD, message));
@@ -34,22 +44,16 @@ public class LogIn extends Operation {
                 }
             } else if (state.getType() == NamePasswordState.StateType.WAITING_PASSWORD) {
                 Optional<User> user = userRepository.findByUsername(state.getUsername());
-                if (message.length() > 15) {
+                if (message.length() > 15)
                     sendMessage.setText("Incorrect password");
-                    bot.getLogInUserStates().remove(chatId);
-                }
                 else if (user.isPresent() && PasswordEncryptor.matches(message, user.get().getPassword())) {
-                    bot.getLogInUserStates().remove(chatId);
                     bot.getAuthorizedUsers().put(chatId, user.get());
                     sendMessage.setText("You logged in!");
-                } else if(user.isPresent() && !PasswordEncryptor.matches(message, user.get().getPassword())) {
+                } else if(user.isPresent() && !PasswordEncryptor.matches(message, user.get().getPassword()))
                     sendMessage.setText("Incorrect password");
-                    bot.getLogInUserStates().remove(chatId);
-                }
-                else {
+                else
                     sendMessage.setText("Something went wrong!");
-                    bot.getLogInUserStates().remove(chatId);
-                }
+                bot.getLogInUserStates().remove(chatId);
             }
         } else {
             sendMessage.setText("First, enter your name");

@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import sqlTables.*;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -35,6 +36,10 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     private final ConcurrentHashMap<String, NamePasswordState> logInUserStates = new ConcurrentHashMap<>(); // Храним этап ввода
     @Getter
     private final ConcurrentHashMap<String, NamePasswordState> signInUserStates = new ConcurrentHashMap<>(); // Храним этап ввода
+    @Getter
+    private final ConcurrentLinkedQueue<String> enterGroupUsers = new ConcurrentLinkedQueue<>();
+    @Getter
+    private final ConcurrentLinkedQueue<String> exitGroupUsers = new ConcurrentLinkedQueue<>();
 
     public MyTelegramBot(UserRepository userRepository,
                          SubjectRepository subjectRepository,

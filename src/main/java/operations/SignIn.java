@@ -35,23 +35,19 @@ public class SignIn extends Operation {
                     bot.getSignInUserStates().remove(chatId);
                 }
             } else if (state.getType() == NamePasswordState.StateType.WAITING_PASSWORD) {
-                if (message.length() > 15) {
+                if (message.length() > 15)
                     sendMessage.setText("Too long password!");
-                    bot.getSignInUserStates().remove(chatId);
-                }
                 else if (!userRepository.existsByUsername(state.getUsername())) {
                     User newUser = new User();
                     newUser.setUsername(state.getUsername());
                     newUser.setPassword(PasswordEncryptor.encrypt(message));
                     userRepository.save(newUser);
 
-                    bot.getSignInUserStates().remove(chatId);
                     bot.getAuthorizedUsers().put(chatId, newUser);
                     sendMessage.setText("Successfully sign in!");
-                } else {
+                } else
                     sendMessage.setText("Something went wrong!");
-                    bot.getSignInUserStates().remove(chatId);
-                }
+                bot.getSignInUserStates().remove(chatId);
             }
         } else {
             sendMessage.setText("First, enter your name");

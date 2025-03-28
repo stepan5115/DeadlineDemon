@@ -6,6 +6,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,4 +35,19 @@ public class User {
 
     @Column(name = "allow_notifications", nullable = false)
     private boolean allowNotifications;
+
+    public void addGroup(String groupName) {
+        if (this.groups == null) {
+            this.groups = new ArrayList<>();
+        }
+        if (!this.groups.contains(groupName)) {
+            this.groups.add(groupName);
+        }
+    }
+
+    public void removeGroup(String groupName) {
+        if (this.groups != null) {
+            this.groups.remove(groupName);
+        }
+    }
 }
