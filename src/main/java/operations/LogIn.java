@@ -21,6 +21,7 @@ public class LogIn extends Operation {
         sendMessage.setChatId(chatId);
         if (bot.getAuthorizedUsers().containsKey(chatId)) {
             sendMessage.setText("You already logged in!");
+            bot.getLogInUserStates().remove(chatId);
         }
         else if (bot.getLogInUserStates().containsKey(chatId)) {
             NamePasswordState state = bot.getLogInUserStates().get(chatId);

@@ -23,10 +23,14 @@ public class ExitGroup extends Operation {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         User user = bot.getAuthorizedUsers().get(chatId);
-        if (!bot.getAuthorizedUsers().containsKey(chatId))
+        if (!bot.getAuthorizedUsers().containsKey(chatId)) {
             sendMessage.setText("You must login first");
-        else if (user.getGroups().isEmpty())
+            bot.getExitGroupUsers().remove(chatId);
+        }
+        else if (user.getGroups().isEmpty()) {
             sendMessage.setText("You are not in any group");
+            bot.getExitGroupUsers().remove(chatId);
+        }
         else if (bot.getExitGroupUsers().contains(chatId)) {
             Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
             if (group.isPresent() &&

@@ -24,10 +24,14 @@ public class EnterGroup extends Operation {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         List<Group> allDBGroups = groupRepository.findAll();
-        if (!bot.getAuthorizedUsers().containsKey(chatId))
+        if (!bot.getAuthorizedUsers().containsKey(chatId)) {
             sendMessage.setText("You must login first");
-        else if (allDBGroups.isEmpty())
+            bot.getEnterGroupUsers().remove(chatId);
+        }
+        else if (allDBGroups.isEmpty()) {
             sendMessage.setText("There are no groups in system");
+            bot.getEnterGroupUsers().remove(chatId);
+        }
         else if (bot.getEnterGroupUsers().contains(chatId)) {
             Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
             User user = bot.getAuthorizedUsers().get(chatId);

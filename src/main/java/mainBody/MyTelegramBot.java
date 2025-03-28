@@ -1,6 +1,7 @@
 package mainBody;
 
 import lombok.Getter;
+import operations.DeleteToken;
 import operations.Operation;
 import operations.OperationManager;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,8 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     private final ConcurrentLinkedQueue<String> exitGroupUsers = new ConcurrentLinkedQueue<>();
     @Getter
     private final ConcurrentLinkedQueue<String> enterTokenUsers = new ConcurrentLinkedQueue<>();
+    @Getter
+    private final ConcurrentLinkedQueue<String> deleteTokenUsers = new ConcurrentLinkedQueue<>();
 
     public MyTelegramBot(UserRepository userRepository,
                          SubjectRepository subjectRepository,

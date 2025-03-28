@@ -25,10 +25,14 @@ public class GetAdminRights extends Operation {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         User user = bot.getAuthorizedUsers().get(chatId);
-        if (!bot.getAuthorizedUsers().containsKey(chatId))
+        if (!bot.getAuthorizedUsers().containsKey(chatId)) {
             sendMessage.setText("You must login first");
-        else if (user.isCanEditTasks())
+            bot.getEnterTokenUsers().remove(chatId);
+        }
+        else if (user.isCanEditTasks()) {
             sendMessage.setText("You already have the admin rights");
+            bot.getEnterTokenUsers().remove(chatId);
+        }
         else if (bot.getEnterTokenUsers().contains(chatId)) {
             if (userRepository.existsByUsername(user.getUsername())) {
                 adminTokenRepository.deleteExpiredTokens(LocalDateTime.now());
