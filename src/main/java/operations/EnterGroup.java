@@ -35,8 +35,8 @@ public class EnterGroup extends Operation {
         else if (bot.getEnterGroupUsers().contains(chatId)) {
             Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
             User user = bot.getAuthorizedUsers().get(chatId);
-            if (group.isPresent() &&
-                    !user.getGroups().contains(group.get().getName())) {
+            if (group.isPresent() && ((user.getGroups() == null)     ||
+                    !user.getGroups().contains(group.get().getName()))) {
                 user.addGroup(group.get().getName());
                 userRepository.save(user);
                 sendMessage.setText("Successfully entered group");
