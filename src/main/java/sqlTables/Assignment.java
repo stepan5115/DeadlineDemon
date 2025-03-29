@@ -17,6 +17,7 @@ import java.util.List;
 public class Assignment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "assignment_id")
     private Long id;
 
     @Column(nullable = false)
@@ -26,7 +27,7 @@ public class Assignment {
     private String description;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
+    @Column(name = "groups", columnDefinition = "jsonb")
     private List<String> targetGroups;
 
     @Column(nullable = false)

@@ -34,11 +34,11 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     final int RECONNECT_PAUSE =10000;
 
     @Getter
-    private final ConcurrentHashMap<String, User> authorizedUsers = new ConcurrentHashMap<>(); // Храним вошедших пользователей
+    private final ConcurrentHashMap<String, User> authorizedUsers = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentHashMap<String, NamePasswordState> logInUserStates = new ConcurrentHashMap<>(); // Храним этап ввода
+    private final ConcurrentHashMap<String, NamePasswordState> logInUserStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentHashMap<String, NamePasswordState> signInUserStates = new ConcurrentHashMap<>(); // Храним этап ввода
+    private final ConcurrentHashMap<String, NamePasswordState> signInUserStates = new ConcurrentHashMap<>();
     @Getter
     private final ConcurrentLinkedQueue<String> enterGroupUsers = new ConcurrentLinkedQueue<>();
     @Getter
@@ -47,6 +47,12 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     private final ConcurrentLinkedQueue<String> enterTokenUsers = new ConcurrentLinkedQueue<>();
     @Getter
     private final ConcurrentLinkedQueue<String> deleteTokenUsers = new ConcurrentLinkedQueue<>();
+    @Getter
+    private final ConcurrentLinkedQueue<String> createGroupUsers = new ConcurrentLinkedQueue<>();
+    @Getter
+    private final ConcurrentLinkedQueue<String> deleteGroupUsers = new ConcurrentLinkedQueue<>();
+    @Getter
+    private final ConcurrentHashMap<String, TitDesGroDeaSubState> createAssignmentUsers = new ConcurrentHashMap<>();
 
     public MyTelegramBot(UserRepository userRepository,
                          SubjectRepository subjectRepository,

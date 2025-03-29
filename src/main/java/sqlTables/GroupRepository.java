@@ -18,4 +18,6 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     // Проверить, существует ли группа с таким названием
     boolean existsByName(String name);
+
+    boolean existsByNameIgnoreCase(String message);
 }

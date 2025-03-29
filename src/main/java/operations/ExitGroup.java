@@ -27,6 +27,10 @@ public class ExitGroup extends Operation {
             sendMessage.setText("You must login first");
             bot.getExitGroupUsers().remove(chatId);
         }
+        else if (user.getGroups() == null) {
+            sendMessage.setText("You are not in any group");
+            bot.getExitGroupUsers().remove(chatId);
+        }
         else if (user.getGroups().isEmpty()) {
             sendMessage.setText("You are not in any group");
             bot.getExitGroupUsers().remove(chatId);
@@ -44,7 +48,8 @@ public class ExitGroup extends Operation {
             else
                 sendMessage.setText("Group not found");
             bot.getExitGroupUsers().remove(chatId);
-        } else {
+        }
+        else {
             StringBuilder allGroups = new StringBuilder();
             for (String group : user.getGroups()) {
                 allGroups.append("\n").append(group);

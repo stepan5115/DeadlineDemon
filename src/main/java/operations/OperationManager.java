@@ -16,6 +16,14 @@ public class OperationManager {
             return new GetAdminRights(chatId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
         if (bot.getDeleteTokenUsers().contains(chatId))
             return new DeleteToken(chatId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+        if (bot.getDeleteGroupUsers().contains(chatId))
+            return new DeleteGroup(chatId, bot, message, bot.getGroupRepository(), bot.getUserRepository());
+        if (bot.getCreateGroupUsers().contains(chatId))
+            return new CreateGroup(chatId, bot, message, bot.getGroupRepository(), bot.getUserRepository());
+        if (bot.getCreateAssignmentUsers().containsKey(chatId))
+            return new CreateAssignment(chatId, bot, message, bot.getUserRepository(),
+                    bot.getAssignmentRepository(), bot.getGroupRepository(),
+                    bot.getSubjectRepository());
 
         if (message.trim().equals("/login"))
             return new LogIn(chatId, bot, message, bot.getUserRepository());
@@ -39,6 +47,14 @@ public class OperationManager {
             return new GetTokens(chatId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
         if (message.trim().equals("/deleteToken"))
             return new DeleteToken(chatId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+        if (message.trim().equals("/createGroup"))
+            return new CreateGroup(chatId, bot, message, bot.getGroupRepository(), bot.getUserRepository());
+        if (message.trim().equals("/deleteGroup"))
+            return new DeleteGroup(chatId, bot, message, bot.getGroupRepository(), bot.getUserRepository());
+        if (message.trim().equals("/createAssignment"))
+            return new CreateAssignment(chatId, bot, message, bot.getUserRepository(),
+                    bot.getAssignmentRepository(), bot.getGroupRepository(),
+                    bot.getSubjectRepository());
         return new MisUnderstand(chatId, bot, message);
     }
     public static Operation getShutDownOperation(MyTelegramBot bot, String chatId, String message) {
