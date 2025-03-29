@@ -2,6 +2,7 @@ package mainBody;
 
 import lombok.Getter;
 import operations.DeleteToken;
+import operations.ExitOperation;
 import operations.Operation;
 import operations.OperationManager;
 import org.springframework.stereotype.Component;
@@ -78,6 +79,14 @@ public class MyTelegramBot extends TelegramLongPollingBot {
             String messageText = update.getMessage().getText();
             Long chatId = update.getMessage().getChatId();
             executorService.execute(OperationManager.getRightOperation(this, chatId.toString(), messageText));
+        }
+        if (update.hasCallbackQuery()) {
+            String data = update.getCallbackQuery().getData();
+            String chatId = update.getCallbackQuery().getMessage().getChatId().toString();
+            if (data.equals("/breakOperation"))
+                executorService.execute(new ExitOperation(chatId, this, data));
+            else
+                executorService.execute(OperationManager.getRightOperation(this, chatId, data));
         }
     }
 

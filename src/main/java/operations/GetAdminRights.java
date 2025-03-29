@@ -1,5 +1,6 @@
 package operations;
 
+import keyboards.StartKeyboard;
 import mainBody.MyTelegramBot;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -47,6 +48,7 @@ public class GetAdminRights extends Operation {
             } else {
                 sendMessage.setText("Something went wrong, login again");
                 bot.getAuthorizedUsers().remove(chatId);
+                sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard());
             }
             bot.getEnterTokenUsers().remove(chatId);
         } else {

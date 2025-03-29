@@ -67,6 +67,8 @@ public class OperationManager {
             return new CreateSubject(chatId, bot, message, bot.getSubjectRepository());
         if (message.trim().equals("/deleteSubject"))
             return new DeleteSubject(chatId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
+        if (message.trim().equals("/start"))
+            return new Start(chatId, bot, message);
         return new MisUnderstand(chatId, bot, message);
     }
     public static Operation getShutDownOperation(MyTelegramBot bot, String chatId, String message) {

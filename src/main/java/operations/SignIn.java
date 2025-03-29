@@ -1,5 +1,6 @@
 package operations;
 
+import keyboards.UserKeyboard;
 import mainBody.MyTelegramBot;
 import mainBody.NamePasswordState;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -17,9 +18,8 @@ public class SignIn extends Operation {
     public void run() {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        if (bot.getAuthorizedUsers().containsKey(chatId)) {
+        if (bot.getAuthorizedUsers().containsKey(chatId))
             sendMessage.setText("You already logged in!");
-        }
         else if (bot.getSignInUserStates().containsKey(chatId)) {
             NamePasswordState state = bot.getSignInUserStates().get(chatId);
             if (state.getType() == NamePasswordState.StateType.WAITING_USERNAME) {
@@ -45,6 +45,7 @@ public class SignIn extends Operation {
 
                     bot.getAuthorizedUsers().put(chatId, newUser);
                     sendMessage.setText("Successfully sign in!");
+                    sendMessage.setReplyMarkup(UserKeyboard.getInlineKeyboard());
                 } else
                     sendMessage.setText("Something went wrong!");
                 bot.getSignInUserStates().remove(chatId);

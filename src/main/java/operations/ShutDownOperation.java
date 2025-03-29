@@ -11,6 +11,7 @@ public class ShutDownOperation extends Operation {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(message);
+        sendMessage.setReplyMarkup(null);
         try {
             bot.execute(sendMessage);
         } catch (Exception e) {

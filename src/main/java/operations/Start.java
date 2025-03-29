@@ -1,24 +1,25 @@
 package operations;
 
 import keyboards.StartKeyboard;
+import keyboards.UserKeyboard;
 import mainBody.MyTelegramBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import sqlTables.UserRepository;
 
-public class LogOut extends Operation {
-
-    public LogOut(String chatId, MyTelegramBot bot, String message) {
+public class Start extends Operation {
+    public Start(String chatId, MyTelegramBot bot, String message) {
         super(chatId, bot, message);
     }
     public void run() {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         if (bot.getAuthorizedUsers().containsKey(chatId)) {
-            sendMessage.setText("Success logged out!");
-            bot.getAuthorizedUsers().remove(chatId);
+            sendMessage.setText("Hello, " + bot.getAuthorizedUsers().get(chatId).getUsername() + "!");
+            sendMessage.setReplyMarkup(UserKeyboard.getInlineKeyboard());
+        } else {
+            sendMessage.setText("Hello, stranger!");
             sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard());
         }
-        else
-            sendMessage.setText("You are not authorized to log out!");
         try {
             bot.execute(sendMessage);
         } catch (Exception e) {
