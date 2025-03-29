@@ -3,28 +3,22 @@ package operations;
 import mainBody.MyTelegramBot;
 import mainBody.TitDesGroDeaSubState;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.generics.TelegramBot;
 import sqlTables.*;
 import utils.DateParser;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
-
-import static utils.DateParser.parseDeadline;
 
 public class CreateAssignment extends Operation {
-    private final UserRepository userRepository;
     private final AssignmentRepository assignmentRepository;
     private final GroupRepository groupRepository;
     private final SubjectRepository subjectRepository;
 
     public CreateAssignment(String chatId, MyTelegramBot bot, String message,
-                            UserRepository userRepository, AssignmentRepository assignmentRepository,
+                            AssignmentRepository assignmentRepository,
                             GroupRepository groupRepository, SubjectRepository subjectRepository) {
         super(chatId, bot, message);
-        this.userRepository = userRepository;
         this.assignmentRepository = assignmentRepository;
         this.groupRepository = groupRepository;
         this.subjectRepository = subjectRepository;
@@ -54,7 +48,7 @@ public class CreateAssignment extends Operation {
             TitDesGroDeaSubState status = bot.getCreateAssignmentUsers().get(chatId);
             switch (status.getState()) {
                 case TitDesGroDeaSubState.StateType.WAITING_TITLE: {
-                    if (assignmentRepository.existsAssignmentByTitle(message))
+                    if (assignmentRepository.existsAssignmentByTitleIgnoreCase(message))
                         sendMessage.setText("This title already exists, choose a different title");
                     else {
                         sendMessage.setText("Now, enter the description");

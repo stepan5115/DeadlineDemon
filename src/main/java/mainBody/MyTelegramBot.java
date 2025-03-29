@@ -53,6 +53,12 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     private final ConcurrentLinkedQueue<String> deleteGroupUsers = new ConcurrentLinkedQueue<>();
     @Getter
     private final ConcurrentHashMap<String, TitDesGroDeaSubState> createAssignmentUsers = new ConcurrentHashMap<>();
+    @Getter
+    private final ConcurrentLinkedQueue<String> deleteAssignmentUsers = new ConcurrentLinkedQueue<>();
+    @Getter
+    private final ConcurrentLinkedQueue<String> createSubjectUsers = new ConcurrentLinkedQueue<>();
+    @Getter
+    private final ConcurrentLinkedQueue<String> deleteSubjectUsers = new ConcurrentLinkedQueue<>();
 
     public MyTelegramBot(UserRepository userRepository,
                          SubjectRepository subjectRepository,

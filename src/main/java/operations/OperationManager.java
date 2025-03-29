@@ -21,9 +21,15 @@ public class OperationManager {
         if (bot.getCreateGroupUsers().contains(chatId))
             return new CreateGroup(chatId, bot, message, bot.getGroupRepository(), bot.getUserRepository());
         if (bot.getCreateAssignmentUsers().containsKey(chatId))
-            return new CreateAssignment(chatId, bot, message, bot.getUserRepository(),
+            return new CreateAssignment(chatId, bot, message,
                     bot.getAssignmentRepository(), bot.getGroupRepository(),
                     bot.getSubjectRepository());
+        if (bot.getDeleteAssignmentUsers().contains(chatId))
+            return new DeleteAssignment(chatId, bot, message, bot.getAssignmentRepository());
+        if (bot.getCreateSubjectUsers().contains(chatId))
+            return new CreateSubject(chatId, bot, message, bot.getSubjectRepository());
+        if (bot.getDeleteSubjectUsers().contains(chatId))
+            return new DeleteSubject(chatId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
 
         if (message.trim().equals("/login"))
             return new LogIn(chatId, bot, message, bot.getUserRepository());
@@ -52,9 +58,15 @@ public class OperationManager {
         if (message.trim().equals("/deleteGroup"))
             return new DeleteGroup(chatId, bot, message, bot.getGroupRepository(), bot.getUserRepository());
         if (message.trim().equals("/createAssignment"))
-            return new CreateAssignment(chatId, bot, message, bot.getUserRepository(),
+            return new CreateAssignment(chatId, bot, message,
                     bot.getAssignmentRepository(), bot.getGroupRepository(),
                     bot.getSubjectRepository());
+        if (message.trim().equals("/deleteAssignment"))
+            return new DeleteAssignment(chatId, bot, message, bot.getAssignmentRepository());
+        if (message.trim().equals("/createSubject"))
+            return new CreateSubject(chatId, bot, message, bot.getSubjectRepository());
+        if (message.trim().equals("/deleteSubject"))
+            return new DeleteSubject(chatId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
         return new MisUnderstand(chatId, bot, message);
     }
     public static Operation getShutDownOperation(MyTelegramBot bot, String chatId, String message) {

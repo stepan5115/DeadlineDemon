@@ -33,8 +33,12 @@ public class DeleteGroup extends Operation {
         else if (bot.getDeleteGroupUsers().contains(chatId)) {
             Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
             if (group.isPresent()) {
-                groupRepository.delete(group.get());
-                sendMessage.setText("Success delete group!");
+                if (userRepository.existsByGroupName(group.get().getName()))
+                    sendMessage.setText("You can't delete a group because it has users.");
+                else {
+                    groupRepository.delete(group.get());
+                    sendMessage.setText("Success delete group!");
+                }
             }
             else
                 sendMessage.setText("Can't find group");

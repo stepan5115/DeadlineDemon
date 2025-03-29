@@ -18,4 +18,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u.password FROM User u WHERE u.username = :username")
     Optional<String> findPasswordByUsername(String username);
+
+    @Query(value = """
+    SELECT EXISTS (
+        SELECT 1 FROM users 
+        WHERE groups::jsonb @> to_jsonb(:groupName::text) 
+    )
+    """, nativeQuery = true)
+    boolean existsByGroupName(@Param("groupName") String groupName);
 }

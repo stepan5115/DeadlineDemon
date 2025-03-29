@@ -17,4 +17,16 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     void deleteExpiredAssignments(@Param("now") LocalDateTime now);
 
     boolean existsAssignmentByTitle(String title);
+
+    @Modifying
+    @Transactional
+    void deleteAssignmentsByTitle(String title);
+
+    boolean existsAssignmentByTitleIgnoreCase(String title);
+
+    @Modifying
+    @Transactional
+    void deleteAssignmentsByTitleIgnoreCase(String title);
+
+    boolean existsBySubjectId(Long subjectId);
 }
