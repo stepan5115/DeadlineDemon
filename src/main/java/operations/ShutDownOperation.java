@@ -1,5 +1,6 @@
 package operations;
 
+import keyboards.StartKeyboard;
 import mainBody.MyTelegramBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
@@ -11,7 +12,7 @@ public class ShutDownOperation extends Operation {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(message);
-        sendMessage.setReplyMarkup(null);
+        sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard());
         try {
             bot.execute(sendMessage);
         } catch (Exception e) {
