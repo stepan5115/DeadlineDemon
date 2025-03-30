@@ -38,19 +38,28 @@ public class ExitGroup extends Operation {
         }
         else if (bot.getExitGroupUsers().contains(chatId)) {
             Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
+            String tmp = "";
             if (group.isPresent() &&
                     user.getGroups().contains(group.get().getName())) {
                 user.removeGroup(group.get().getName());
                 userRepository.save(user);
-                sendMessage.setText("Successfully exit group");
+                tmp = "Successfully exit group";
             } else if (group.isPresent() &&
                     !user.getGroups().contains(group.get().getName())) {
-                sendMessage.setText("You not in this group. Try again!");
+                tmp = "You not in this group. Try again!";
                 sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
             }
             else {
-                sendMessage.setText("Group not found. Try again!");
+                tmp = "Group not found. Try again!";
                 sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
+            }
+            if ((user.getGroups() == null) || (user.getGroups().isEmpty())) {
+                sendMessage.setText(tmp + "\nNow, you are not in any group");
+                bot.getExitGroupUsers().remove(chatId);
+            } else {
+                sendMessage.setText(tmp);
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
+                        user.getGroups().toArray(new String[0])));
             }
         }
         else {

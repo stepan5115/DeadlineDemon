@@ -49,7 +49,6 @@ public class EnterGroup extends Operation {
                 sendMessage.setText("You already have this group");
             else
                 sendMessage.setText("Group not found");
-            bot.getEnterGroupUsers().remove(chatId);
         } else {
             List<String> names = new LinkedList<>();
             for (Group group : allDBGroups) {
