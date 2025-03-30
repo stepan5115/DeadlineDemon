@@ -26,6 +26,7 @@ public class StartKeyboard {
         rows.add(row2);
 
         markup.setKeyboard(rows);
+        markup.setOneTimeKeyboard(false);
         return markup;
     }
 }
