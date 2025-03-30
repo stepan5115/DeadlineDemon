@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InstanceKeyboardBuilder {
-    public static InlineKeyboardMarkup getInlineKeyboard(String ... args) {
+    public static InlineKeyboardMarkup getInlineKeyboard(boolean breakButton, String ... args) {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
@@ -19,9 +19,16 @@ public class InstanceKeyboardBuilder {
             i++;
             if (i < args.length) {
                 InlineKeyboardButton button2 = new InlineKeyboardButton(args[i]);
-                button1.setCallbackData(args[i]);
+                button2.setCallbackData(args[i]);
                 row.add(button2);
             }
+            rows.add(row);
+        }
+        if (breakButton) {
+            List<InlineKeyboardButton> row = new ArrayList<>();
+            InlineKeyboardButton button = new InlineKeyboardButton("Закончить");
+            button.setCallbackData("/breakOperation");
+            row.add(button);
             rows.add(row);
         }
         markup.setKeyboard(rows);

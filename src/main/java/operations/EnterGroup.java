@@ -1,5 +1,6 @@
 package operations;
 
+import keyboards.InstanceKeyboardBuilder;
 import mainBody.MyTelegramBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.Group;
@@ -7,6 +8,9 @@ import sqlTables.GroupRepository;
 import sqlTables.User;
 import sqlTables.UserRepository;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,11 +51,13 @@ public class EnterGroup extends Operation {
                 sendMessage.setText("Group not found");
             bot.getEnterGroupUsers().remove(chatId);
         } else {
-            StringBuilder allGroups = new StringBuilder();
-            for (Group group : groupRepository.findAll()) {
-                allGroups.append("\n").append(group.getName());
+            List<String> names = new LinkedList<>();
+            for (Group group : allDBGroups) {
+                names.add(group.getName());
             }
-            sendMessage.setText("Please enter a name of group from list:" + allGroups);
+            sendMessage.setText("Please enter a name of group from list");
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
+                    names.toArray(new String[0])));
             bot.getEnterGroupUsers().add(chatId);
         }
         try {

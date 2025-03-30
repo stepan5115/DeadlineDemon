@@ -1,5 +1,6 @@
 package operations;
 
+import keyboards.InstanceKeyboardBuilder;
 import mainBody.MyTelegramBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.Group;
@@ -43,18 +44,19 @@ public class ExitGroup extends Operation {
                 userRepository.save(user);
                 sendMessage.setText("Successfully exit group");
             } else if (group.isPresent() &&
-                    !user.getGroups().contains(group.get().getName()))
-                sendMessage.setText("You not in this group");
-            else
-                sendMessage.setText("Group not found");
-            bot.getExitGroupUsers().remove(chatId);
+                    !user.getGroups().contains(group.get().getName())) {
+                sendMessage.setText("You not in this group. Try again!");
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
+            }
+            else {
+                sendMessage.setText("Group not found. Try again!");
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
+            }
         }
         else {
-            StringBuilder allGroups = new StringBuilder();
-            for (String group : user.getGroups()) {
-                allGroups.append("\n").append(group);
-            }
-            sendMessage.setText("Please enter a name of group from list:" + allGroups);
+            sendMessage.setText("Please enter a name of group from list");
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
+                    user.getGroups().toArray(new String[0])));
             bot.getExitGroupUsers().add(chatId);
         }
         try {
