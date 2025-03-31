@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -27,6 +28,14 @@ public class BotShutdownListener implements ApplicationListener<ContextClosedEve
             executorService.execute(OperationManager.getShutDownOperation(telegramBot, chatId,
                     "⚡ Бот будет отключен для технического обслуживания. " +
                             "Приносим извинения за временные неудобства."));
+        try {
+            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
         telegramBot.executorService.shutdown();
     }
 }
