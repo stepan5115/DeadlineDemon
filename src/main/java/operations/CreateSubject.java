@@ -1,5 +1,6 @@
 package operations;
 
+import keyboards.InstanceKeyboardBuilder;
 import mainBody.MyTelegramBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.AssignmentRepository;
@@ -29,18 +30,21 @@ public class CreateSubject extends Operation {
             bot.getCreateSubjectUsers().remove(chatId);
         }
         else if (bot.getCreateSubjectUsers().contains(chatId)) {
-            if (subjectRepository.existsByNameIgnoreCase(message))
-                sendMessage.setText("Subject already exists");
+            if (subjectRepository.existsByNameIgnoreCase(message)) {
+                sendMessage.setText("Subject already exists. Try again");
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
+            }
             else {
                 Subject subject = new Subject();
                 subject.setName(message);
                 subjectRepository.save(subject);
+                bot.getCreateSubjectUsers().remove(chatId);
                 sendMessage.setText("Subject created");
             }
-            bot.getCreateSubjectUsers().remove(chatId);
         }
         else {
             sendMessage.setText("Enter subject name");
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
             bot.getCreateSubjectUsers().add(chatId);
         }
         try {

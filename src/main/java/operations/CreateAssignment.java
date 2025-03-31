@@ -1,5 +1,6 @@
 package operations;
 
+import keyboards.InstanceKeyboardBuilder;
 import mainBody.MyTelegramBot;
 import mainBody.TitDesGroDeaSubState;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -35,16 +36,6 @@ public class CreateAssignment extends Operation {
             sendMessage.setText("You haven't right to create assignment");
             bot.getCreateAssignmentUsers().remove(chatId);
         } else if (bot.getCreateAssignmentUsers().containsKey(chatId)) {
-            if (message.trim().equals("/exitCreateAssignment")) {
-                bot.getCreateAssignmentUsers().remove(chatId);
-                sendMessage.setText("Break creating assignment");
-                try {
-                    bot.execute(sendMessage);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return;
-            }
             TitDesGroDeaSubState status = bot.getCreateAssignmentUsers().get(chatId);
             switch (status.getState()) {
                 case TitDesGroDeaSubState.StateType.WAITING_TITLE: {
@@ -55,6 +46,7 @@ public class CreateAssignment extends Operation {
                         status.setState(TitDesGroDeaSubState.StateType.WAITING_DESCRIPTION);
                         status.setTitle(message);
                     }
+                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
                     break;
                 }
                 case TitDesGroDeaSubState.StateType.WAITING_DESCRIPTION: {
@@ -75,6 +67,7 @@ public class CreateAssignment extends Operation {
                     for (Group group : groups)
                         text.append("\n").append(group.getName());
                     sendMessage.setText(text.toString());
+                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
                     break;
                 }
                 case TitDesGroDeaSubState.StateType.WAITING_GROUP: {
@@ -100,6 +93,7 @@ public class CreateAssignment extends Operation {
                             text.append("Cannot find group");
                         sendMessage.setText(text.toString());
                     }
+                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
                     break;
                 }
                 case TitDesGroDeaSubState.StateType.WAITING_DEADLINE: {
@@ -128,6 +122,7 @@ public class CreateAssignment extends Operation {
                             text.append("\n").append(subject.getName());
                         sendMessage.setText(text.toString());
                     }
+                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
                     break;
                 }
                 case TitDesGroDeaSubState.StateType.WAITING_SUBJECT: {
@@ -139,17 +134,29 @@ public class CreateAssignment extends Operation {
                         newAssignment.setDescription(status.getDescription());
                         newAssignment.setDeadline(status.getDeadline());
                         newAssignment.setTargetGroups(status.getGroup());
-
+                        if (assignmentRepository.existsAssignmentByTitleIgnoreCase(status.getTitle())) {
+                            sendMessage.setText("Something went wrong");
+                            bot.getCreateAssignmentUsers().remove(chatId);
+                            bot.getAuthorizedUsers().remove(chatId);
+                            try {
+                                bot.execute(sendMessage);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return;
+                        }
                         assignmentRepository.save(newAssignment);
                         sendMessage.setText("Success added assignment!");
-                    } else
-                        sendMessage.setText("Subject not found");
+                    } else {
+                        sendMessage.setText("Subject not found. Try again");
+                        sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
+                    }
                     break;
                 }
             }
         } else {
-            sendMessage.setText("You can exit in any moment. Just enter '/exitCreateAssignment' to exit\n" +
-                    "First, enter title of assignment");
+            sendMessage.setText("First, enter title of assignment");
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
             bot.getCreateAssignmentUsers().put(chatId, new TitDesGroDeaSubState(TitDesGroDeaSubState.StateType.WAITING_TITLE));
         }
         try {

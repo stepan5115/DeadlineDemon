@@ -1,5 +1,6 @@
 package operations;
 
+import keyboards.InstanceKeyboardBuilder;
 import mainBody.MyTelegramBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.Group;
@@ -33,13 +34,16 @@ public class CreateGroup extends Operation {
                 Group newGroup = new Group();
                 newGroup.setName(message);
                 groupRepository.save(newGroup);
+                bot.getCreateGroupUsers().remove(chatId);
                 sendMessage.setText("Success add group!");
             }
-            else
-                sendMessage.setText("This group already exists");
-            bot.getCreateGroupUsers().remove(chatId);
+            else {
+                sendMessage.setText("This group already exists. Try again");
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
+            }
         } else {
             sendMessage.setText("Enter name of group");
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
             bot.getCreateGroupUsers().add(chatId);
         }
         try {
