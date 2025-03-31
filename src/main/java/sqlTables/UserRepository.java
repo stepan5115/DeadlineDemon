@@ -22,8 +22,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = """
     SELECT EXISTS (
         SELECT 1 FROM users 
-        WHERE groups::jsonb @> to_jsonb(:groupName::text) 
+        WHERE groups::jsonb @> to_jsonb(:name) 
     )
     """, nativeQuery = true)
-    boolean existsByGroupName(@Param("groupName") String groupName);
+    boolean existsByGroupName(@Param("name") String name);
+
 }
