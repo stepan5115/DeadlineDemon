@@ -1,6 +1,8 @@
 package operations;
 
 import mainBody.MyTelegramBot;
+import sqlTables.Assignment;
+import sqlTables.NotificationSentRepository;
 
 public class OperationManager {
     public static Operation getRightOperation(MyTelegramBot bot, String chatId, String message) {
@@ -77,5 +79,10 @@ public class OperationManager {
     }
     public static Operation getShutDownOperation(MyTelegramBot bot, String chatId, String message) {
         return new ShutDownOperation(chatId, bot, message);
+    }
+    public static Operation getNotificationOperation(MyTelegramBot bot, String chatId, String message,
+                                                     Assignment assignment,
+                                                     NotificationSentRepository notificationSentRepository) {
+        return new NotifyOperation(chatId, bot, message, assignment, notificationSentRepository);
     }
 }

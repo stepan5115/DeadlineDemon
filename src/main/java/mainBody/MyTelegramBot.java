@@ -28,6 +28,9 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     private final AdminTokenRepository adminTokenRepository;
     @Getter
     private final AssignmentRepository assignmentRepository;
+    @Getter
+    private final NotificationSentRepository notificationSentRepository;
+
     final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
     private final String botUsername = "DeadlineDemonBot"; // Имя твоего бота
@@ -65,12 +68,18 @@ public class MyTelegramBot extends TelegramLongPollingBot {
                          SubjectRepository subjectRepository,
                          GroupRepository groupRepository,
                          AssignmentRepository assignmentRepository,
-                         AdminTokenRepository adminTokenRepository) {
+                         AdminTokenRepository adminTokenRepository,
+                         NotificationSentRepository notificationSentRepository) {
         this.userRepository = userRepository;
         this.subjectRepository = subjectRepository;
         this.groupRepository = groupRepository;
         this.assignmentRepository = assignmentRepository;
         this.adminTokenRepository = adminTokenRepository;
+        this.notificationSentRepository = notificationSentRepository;
+        NotificationThread notificationThread = new NotificationThread(this, assignmentRepository, notificationSentRepository);
+        Thread notifyThread = new Thread(notificationThread);
+        notifyThread.setDaemon(true);
+        notifyThread.start();
     }
 
     @Override
