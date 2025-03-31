@@ -29,6 +29,8 @@ public class AdminKeyboard {
         KeyboardRow row5 = new KeyboardRow();
         row5.add("/deleteSubject");
         row5.add("/start");
+        KeyboardRow row6 = new KeyboardRow();
+        row6.add("/helpAdmin");
 
 
         rows.add(row1);
@@ -36,6 +38,7 @@ public class AdminKeyboard {
         rows.add(row3);
         rows.add(row4);
         rows.add(row5);
+        rows.add(row6);
 
         markup.setKeyboard(rows);
         markup.setOneTimeKeyboard(false);

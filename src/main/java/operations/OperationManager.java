@@ -75,6 +75,12 @@ public class OperationManager {
             return new SetAdminKeyboard(chatId, bot, message);
         if (message.trim().equals("/info"))
             return new GetInfo(chatId, bot, message, bot.getAssignmentRepository());
+        if (message.trim().equals("/about"))
+            return new AboutOperation(chatId, bot, message);
+        if (message.trim().equals("/help"))
+            return new HelpUser(chatId, bot, message);
+        if (message.trim().equals("/helpAdmin"))
+            return new HelpAdmin(chatId, bot, message);
         return new MisUnderstand(chatId, bot, message);
     }
     public static Operation getShutDownOperation(MyTelegramBot bot, String chatId, String message) {

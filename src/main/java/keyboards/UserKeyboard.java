@@ -27,10 +27,13 @@ public class UserKeyboard {
         KeyboardRow row4 = new KeyboardRow();
         row4.add("/info");
         row4.add("/logout");
+        KeyboardRow row5 = new KeyboardRow();
+        row5.add("/help");
         rows.add(row1);
         rows.add(row2);
         rows.add(row3);
         rows.add(row4);
+        rows.add(row5);
         markup.setKeyboard(rows);
         markup.setOneTimeKeyboard(false);
         return markup;

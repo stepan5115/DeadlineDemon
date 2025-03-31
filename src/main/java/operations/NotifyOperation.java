@@ -29,7 +29,6 @@ public class NotifyOperation extends Operation {
         if (!user.isAllowNotifications())
             return;
         Optional<NotificationSent> notificationSent = notificationSentRepository.findByUserAndAssignment(user, assignment);
-        System.out.println(assignment.getId() + " " + user.getUser_id());
         if (notificationSent.isEmpty()) {
             NotificationSent newNotificationSent = new NotificationSent();
             newNotificationSent.setUser(user);
@@ -49,7 +48,7 @@ public class NotifyOperation extends Operation {
         List<String> targetGroups = new LinkedList<String>();
         List<String> userGroups = user.getGroups();
         for (String group : assignment.getTargetGroups())
-            if (userGroups.contains(group))
+            if ((userGroups != null) && userGroups.contains(group))
                 targetGroups.add(group);
         if (targetGroups.isEmpty())
             return;
