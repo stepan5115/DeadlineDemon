@@ -30,6 +30,7 @@ public class LogIn extends Operation {
                 for (User user : bot.getAuthorizedUsers().values())
                     if (user.getUsername().equals(message)) {
                         sendMessage.setText("This account is busy by other user!");
+                        bot.getLogInUserStates().remove(chatId);
                         try {
                             bot.execute(sendMessage);
                         } catch (Exception e) {

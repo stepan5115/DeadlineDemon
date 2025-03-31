@@ -18,7 +18,7 @@ public class SetAdminKeyboard extends Operation {
             bot.getDeleteGroupUsers().remove(chatId);
         }
         else if (!user.isCanEditTasks()) {
-            sendMessage.setText("You haven't right to delete group");
+            sendMessage.setText("You haven't right to see admin operations");
             bot.getDeleteGroupUsers().remove(chatId);
         }
         else {

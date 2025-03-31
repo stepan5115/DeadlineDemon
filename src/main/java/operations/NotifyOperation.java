@@ -59,7 +59,6 @@ public class NotifyOperation extends Operation {
                 ".\nDescription: " + assignment.getDescription() + "\nThis assignment applies to your groups:");
         for (String group : targetGroups)
             text.append('\n').append(group);
-        System.out.println(assignment.getId() + " " + user.getUser_id());
         sendMessage.setText(text.toString());
         try {
             bot.execute(sendMessage);
