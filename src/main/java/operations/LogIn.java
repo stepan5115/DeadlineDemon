@@ -4,6 +4,8 @@ import keyboards.UserKeyboard;
 import mainBody.MyTelegramBot;
 import mainBody.NamePasswordState;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import sqlTables.User;
 import sqlTables.UserRepository;
 import utils.PasswordEncryptor;
@@ -12,10 +14,13 @@ import java.util.Optional;
 
 public class LogIn extends Operation {
     private UserRepository userRepository;
+    private String messageId;
 
-    public LogIn(String chatId, MyTelegramBot bot, String message, UserRepository userRepository) {
+    public LogIn(String chatId, MyTelegramBot bot, String message,
+                 UserRepository userRepository, String messageId) {
         super(chatId, bot, message);
         this.userRepository = userRepository;
+        this.messageId = messageId;
     }
     public void run() {
         SendMessage sendMessage = new SendMessage();
@@ -58,6 +63,17 @@ public class LogIn extends Operation {
                 else
                     sendMessage.setText("Something went wrong!");
                 bot.getLogInUserStates().remove(chatId);
+                DeleteMessage deleteMessage = new DeleteMessage();
+                deleteMessage.setChatId(chatId);
+                deleteMessage.setMessageId(Integer.parseInt(messageId));
+                //Add delete password in group
+                try {
+                    bot.execute(deleteMessage);
+                } catch (TelegramApiException e) {
+                    SendMessage tmp = new SendMessage();
+                    tmp.setChatId(chatId);
+                    tmp.setText("If I'm in a chat, give me admin rights! This way I can delete the passwords you entered for privacy! This is very important!");
+                }
             }
         } else {
             sendMessage.setText("First, enter your name");

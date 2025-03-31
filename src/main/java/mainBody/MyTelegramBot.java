@@ -87,7 +87,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
             Long chatId = update.getMessage().getChatId();
-            executorService.execute(OperationManager.getRightOperation(this, chatId.toString(), messageText));
+            executorService.execute(OperationManager.getRightOperation(this, chatId.toString(), messageText, update.getMessage().getMessageId().toString()));
         }
         if (update.hasCallbackQuery()) {
             String data = update.getCallbackQuery().getData();
@@ -95,7 +95,7 @@ public class MyTelegramBot extends TelegramLongPollingBot {
             if (data.equals("/breakOperation"))
                 executorService.execute(new ExitOperation(chatId, this, data));
             else
-                executorService.execute(OperationManager.getRightOperation(this, chatId, data));
+                executorService.execute(OperationManager.getRightOperation(this, chatId, data, update.getCallbackQuery().getInlineMessageId()));
         }
     }
 

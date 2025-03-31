@@ -5,11 +5,11 @@ import sqlTables.Assignment;
 import sqlTables.NotificationSentRepository;
 
 public class OperationManager {
-    public static Operation getRightOperation(MyTelegramBot bot, String chatId, String message) {
+    public static Operation getRightOperation(MyTelegramBot bot, String chatId, String message, String messageId) {
         if (bot.getLogInUserStates().containsKey(chatId))
-            return new LogIn(chatId, bot, message, bot.getUserRepository());
+            return new LogIn(chatId, bot, message, bot.getUserRepository(), messageId);
         if (bot.getSignInUserStates().containsKey(chatId))
-            return new SignIn(chatId, bot, message, bot.getUserRepository());
+            return new SignIn(chatId, bot, message, bot.getUserRepository(), messageId);
         if (bot.getEnterGroupUsers().contains(chatId))
             return new EnterGroup(chatId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
         if (bot.getExitGroupUsers().contains(chatId))
@@ -34,9 +34,9 @@ public class OperationManager {
             return new DeleteSubject(chatId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
 
         if (message.trim().equals("/login"))
-            return new LogIn(chatId, bot, message, bot.getUserRepository());
+            return new LogIn(chatId, bot, message, bot.getUserRepository(), messageId);
         if (message.trim().equals("/register"))
-            return new SignIn(chatId, bot, message, bot.getUserRepository());
+            return new SignIn(chatId, bot, message, bot.getUserRepository(), messageId);
         if (message.trim().equals("/logout"))
             return new LogOut(chatId, bot, message);
         if (message.trim().equals("/enterGroup"))
