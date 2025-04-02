@@ -11,34 +11,32 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class CreateAssignment extends Operation {
     private final AssignmentRepository assignmentRepository;
     private final GroupRepository groupRepository;
     private final SubjectRepository subjectRepository;
 
-    public CreateAssignment(String chatId, MyTelegramBot bot, String message,
+    public CreateAssignment(String chatId, String userId, String messageId,
+                            MyTelegramBot bot, String message,
                             AssignmentRepository assignmentRepository,
                             GroupRepository groupRepository, SubjectRepository subjectRepository) {
-        super(chatId, bot, message);
+        super(chatId, userId, messageId, bot, message);
         this.assignmentRepository = assignmentRepository;
         this.groupRepository = groupRepository;
         this.subjectRepository = subjectRepository;
     }
     public void run() {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        User user = bot.getAuthorizedUsers().get(chatId);
-        if (!bot.getAuthorizedUsers().containsKey(chatId)) {
+        User user = bot.getAuthorizedUsers().get(userId);
+        if (!bot.getAuthorizedUsers().containsKey(userId)) {
             sendMessage.setText("You must login first");
-            bot.getCreateAssignmentUsers().remove(chatId);
+            bot.getCreateAssignmentUsers().remove(userId);
         }
         else if (!user.isCanEditTasks()) {
             sendMessage.setText("You haven't right to create assignment");
-            bot.getCreateAssignmentUsers().remove(chatId);
-        } else if (bot.getCreateAssignmentUsers().containsKey(chatId)) {
-            TitDesGroDeaSubState status = bot.getCreateAssignmentUsers().get(chatId);
+            bot.getCreateAssignmentUsers().remove(userId);
+        } else if (bot.getCreateAssignmentUsers().containsKey(userId)) {
+            TitDesGroDeaSubState status = bot.getCreateAssignmentUsers().get(userId);
             switch (status.getState()) {
                 case TitDesGroDeaSubState.StateType.WAITING_TITLE: {
                     if (assignmentRepository.existsAssignmentByTitleIgnoreCase(message))
@@ -59,12 +57,8 @@ public class CreateAssignment extends Operation {
                     List<String> groupNames = new LinkedList<>();
                     if (groups.isEmpty()) {
                         sendMessage.setText("There are no groups in system! Try add assignment when they appear");
-                        bot.getCreateAssignmentUsers().remove(chatId);
-                        try {
-                            bot.execute(sendMessage);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                        bot.getCreateAssignmentUsers().remove(userId);
+                        sendReply();
                         return;
                     }
                     for (Group group : groups)
@@ -75,10 +69,13 @@ public class CreateAssignment extends Operation {
                     break;
                 }
                 case TitDesGroDeaSubState.StateType.WAITING_GROUP: {
+                    String[] array = {"/toDeadline"};
+                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true, array));
                     if (message.trim().equals("/toDeadline")) {
                         if (status.getGroup().isEmpty())
                             sendMessage.setText("You must choose at list one group");
                         else {
+                            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
                             sendMessage.setText("Now, enter the Deadline in this format: " +
                                     DateParser.DATE_FORMAT);
                             status.setGroup(status.getGroup());
@@ -97,8 +94,6 @@ public class CreateAssignment extends Operation {
                             text.append("Cannot find group");
                         sendMessage.setText(text.toString());
                     }
-                    String[] array = {"/toDeadline"};
-                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true, array));
                     break;
                 }
                 case TitDesGroDeaSubState.StateType.WAITING_DEADLINE: {
@@ -118,12 +113,8 @@ public class CreateAssignment extends Operation {
                         if (subjects.isEmpty()) {
                             sendMessage.setText("There are no subjects in system! Try add assignment when they appear");
                             sendMessage.setReplyMarkup(null);
-                            bot.getCreateAssignmentUsers().remove(chatId);
-                            try {
-                                bot.execute(sendMessage);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            bot.getCreateAssignmentUsers().remove(userId);
+                            sendReply();
                             return;
                         }
                         for (Subject subject : subjects)
@@ -144,18 +135,14 @@ public class CreateAssignment extends Operation {
                         newAssignment.setTargetGroups(status.getGroup());
                         if (assignmentRepository.existsAssignmentByTitleIgnoreCase(status.getTitle())) {
                             sendMessage.setText("Something went wrong");
-                            bot.getCreateAssignmentUsers().remove(chatId);
-                            bot.getAuthorizedUsers().remove(chatId);
-                            try {
-                                bot.execute(sendMessage);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            bot.getCreateAssignmentUsers().remove(userId);
+                            bot.getAuthorizedUsers().remove(userId);
+                            sendReply();
                             return;
                         }
                         assignmentRepository.save(newAssignment);
                         sendMessage.setText("Success added assignment!");
-                        bot.getCreateAssignmentUsers().remove(chatId);
+                        bot.getCreateAssignmentUsers().remove(userId);
                     } else {
                         sendMessage.setText("Subject not found. Try again");
                         sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
@@ -166,12 +153,8 @@ public class CreateAssignment extends Operation {
         } else {
             sendMessage.setText("First, enter title of assignment");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
-            bot.getCreateAssignmentUsers().put(chatId, new TitDesGroDeaSubState(TitDesGroDeaSubState.StateType.WAITING_TITLE));
+            bot.getCreateAssignmentUsers().put(userId, new TitDesGroDeaSubState(TitDesGroDeaSubState.StateType.WAITING_TITLE));
         }
-        try {
-            bot.execute(sendMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendReply();
     }
 }

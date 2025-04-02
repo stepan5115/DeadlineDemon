@@ -87,15 +87,21 @@ public class MyTelegramBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
             Long chatId = update.getMessage().getChatId();
-            executorService.execute(OperationManager.getRightOperation(this, chatId.toString(), messageText, update.getMessage().getMessageId().toString()));
+            Long userId = update.getMessage().getFrom().getId();
+            Integer messageId = update.getMessage().getMessageId();
+            executorService.execute(OperationManager.getRightOperation(this, chatId.toString(), userId.toString(),
+                    messageId.toString(), messageText));
         }
         if (update.hasCallbackQuery()) {
             String data = update.getCallbackQuery().getData();
-            String chatId = update.getCallbackQuery().getMessage().getChatId().toString();
+            Long chatId = update.getCallbackQuery().getMessage().getChatId();
+            Long userId = update.getCallbackQuery().getMessage().getFrom().getId();
+            Integer messageId = update.getMessage().getMessageId();
             if (data.equals("/breakOperation"))
-                executorService.execute(new ExitOperation(chatId, this, data));
+                executorService.execute(new ExitOperation(chatId.toString(), userId.toString(), messageId.toString(),this, data));
             else
-                executorService.execute(OperationManager.getRightOperation(this, chatId, data, update.getCallbackQuery().getInlineMessageId()));
+                executorService.execute(OperationManager.getRightOperation(this, chatId.toString(), userId.toString(),
+                        messageId.toString(), data));
         }
     }
 

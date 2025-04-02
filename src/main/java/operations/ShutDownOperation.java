@@ -2,21 +2,14 @@ package operations;
 
 import keyboards.StartKeyboard;
 import mainBody.MyTelegramBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 public class ShutDownOperation extends Operation {
-    public ShutDownOperation(String chatId, MyTelegramBot bot, String message) {
-        super(chatId, bot, message);
+    public ShutDownOperation(String chatId, String userId, String messageId,
+                             MyTelegramBot bot, String message) {
+        super(chatId, userId, messageId, bot, message);
     }
     public void run() {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
         sendMessage.setText(message);
-        sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard());
-        try {
-            bot.execute(sendMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendReply();
     }
 }

@@ -1,7 +1,6 @@
 package operations;
 
 import mainBody.MyTelegramBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.*;
 
 import java.time.LocalDateTime;
@@ -12,17 +11,16 @@ import java.util.Optional;
 public class NotifyOperation extends Operation {
     private Assignment assignment;
     private NotificationSentRepository notificationSentRepository;
-    public NotifyOperation(String chatId, MyTelegramBot bot, String message, Assignment assignment,
+    public NotifyOperation(String chatId, String userId, String messageId,
+                           MyTelegramBot bot, String message, Assignment assignment,
                            NotificationSentRepository notificationSentRepository) {
-        super(chatId, bot, message);
+        super(chatId, userId, messageId, bot, message);
         this.assignment = assignment;
         this.notificationSentRepository = notificationSentRepository;
     }
     public void run() {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        User user = bot.getAuthorizedUsers().get(chatId);
-        if (!bot.getAuthorizedUsers().containsKey(chatId))
+        User user = bot.getAuthorizedUsers().get(userId);
+        if (!bot.getAuthorizedUsers().containsKey(userId))
             throw new IllegalArgumentException("notify for not authorized user");
         if (assignment == null)
             throw new IllegalArgumentException("assignment is null");
@@ -59,10 +57,6 @@ public class NotifyOperation extends Operation {
         for (String group : targetGroups)
             text.append('\n').append(group);
         sendMessage.setText(text.toString());
-        try {
-            bot.execute(sendMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendReply();
     }
 }

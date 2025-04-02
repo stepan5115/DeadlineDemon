@@ -2,8 +2,6 @@ package operations;
 
 import keyboards.StartKeyboard;
 import mainBody.MyTelegramBot;
-import org.springframework.beans.factory.annotation.Value;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.AdminToken;
 import sqlTables.AdminTokenRepository;
 import sqlTables.User;
@@ -16,25 +14,24 @@ public class GetAdminRights extends Operation {
     private UserRepository userRepository;
     private AdminTokenRepository adminTokenRepository;
 
-    public GetAdminRights(String chatId, MyTelegramBot bot, String message,
+    public GetAdminRights(String chatId, String userId, String messageId,
+                          MyTelegramBot bot, String message,
                           UserRepository userRepository, AdminTokenRepository adminTokenRepository) {
-        super(chatId, bot, message);
+        super(chatId, userId, messageId, bot, message);
         this.userRepository = userRepository;
         this.adminTokenRepository = adminTokenRepository;
     }
     public void run() {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        User user = bot.getAuthorizedUsers().get(chatId);
-        if (!bot.getAuthorizedUsers().containsKey(chatId)) {
+        User user = bot.getAuthorizedUsers().get(userId);
+        if (!bot.getAuthorizedUsers().containsKey(userId)) {
             sendMessage.setText("You must login first");
-            bot.getEnterTokenUsers().remove(chatId);
+            bot.getEnterTokenUsers().remove(userId);
         }
         else if (user.isCanEditTasks()) {
             sendMessage.setText("You already have the admin rights");
-            bot.getEnterTokenUsers().remove(chatId);
+            bot.getEnterTokenUsers().remove(userId);
         }
-        else if (bot.getEnterTokenUsers().contains(chatId)) {
+        else if (bot.getEnterTokenUsers().contains(userId)) {
             if (userRepository.existsByUsername(user.getUsername())) {
                 adminTokenRepository.deleteExpiredTokens(LocalDateTime.now());
                 Optional<AdminToken> adminToken = adminTokenRepository.findByToken(message);
@@ -47,18 +44,14 @@ public class GetAdminRights extends Operation {
                     sendMessage.setText("Doesn't find that token. May be it's outdated");
             } else {
                 sendMessage.setText("Something went wrong, login again");
-                bot.getAuthorizedUsers().remove(chatId);
+                bot.getAuthorizedUsers().remove(userId);
                 sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard());
             }
-            bot.getEnterTokenUsers().remove(chatId);
+            bot.getEnterTokenUsers().remove(userId);
         } else {
             sendMessage.setText("Enter token");
-            bot.getEnterTokenUsers().add(chatId);
+            bot.getEnterTokenUsers().add(userId);
         }
-        try {
-            bot.execute(sendMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendReply();
     }
 }

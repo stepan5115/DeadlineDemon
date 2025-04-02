@@ -2,7 +2,6 @@ package operations;
 
 import keyboards.StartKeyboard;
 import mainBody.MyTelegramBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.AdminToken;
 import sqlTables.AdminTokenRepository;
 import sqlTables.User;
@@ -13,17 +12,16 @@ public class GenerateToken extends Operation {
     private UserRepository userRepository;
     private AdminTokenRepository adminTokenRepository;
 
-    public GenerateToken(String chatId, MyTelegramBot bot, String message,
-                          UserRepository userRepository, AdminTokenRepository adminTokenRepository) {
-        super(chatId, bot, message);
+    public GenerateToken(String chatId, String userId, String messageId,
+                         MyTelegramBot bot, String message,
+                         UserRepository userRepository, AdminTokenRepository adminTokenRepository) {
+        super(chatId, userId, messageId, bot, message);
         this.userRepository = userRepository;
         this.adminTokenRepository = adminTokenRepository;
     }
     public void run() {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        User user = bot.getAuthorizedUsers().get(chatId);
-        if (!bot.getAuthorizedUsers().containsKey(chatId))
+        User user = bot.getAuthorizedUsers().get(userId);
+        if (!bot.getAuthorizedUsers().containsKey(userId))
             sendMessage.setText("You must login first");
         else if (!user.isCanEditTasks())
             sendMessage.setText("You haven't right to generate token");
@@ -39,13 +37,9 @@ public class GenerateToken extends Operation {
                     Срок действия %d дней""", token, AdminToken.durabilityInDays));
         } else {
             sendMessage.setText("Something went wrong, login again");
-            bot.getAuthorizedUsers().remove(chatId);
+            bot.getAuthorizedUsers().remove(userId);
             sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard());
         }
-        try {
-            bot.execute(sendMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendReply();
     }
 }

@@ -1,7 +1,6 @@
 package operations;
 
 import mainBody.MyTelegramBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.*;
 
 import java.time.format.DateTimeFormatter;
@@ -10,15 +9,14 @@ import java.util.List;
 public class GetInfo extends Operation {
     private AssignmentRepository assignmentRepository;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-    public GetInfo(String chatId, MyTelegramBot bot, String message, AssignmentRepository assignmentRepository) {
-        super(chatId, bot, message);
+    public GetInfo(String chatId, String userId, String messageId,
+                   MyTelegramBot bot, String message, AssignmentRepository assignmentRepository) {
+        super(chatId, userId, messageId, bot, message);
         this.assignmentRepository = assignmentRepository;
     }
     public void run() {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        User user = bot.getAuthorizedUsers().get(chatId);
-        if (!bot.getAuthorizedUsers().containsKey(chatId))
+        User user = bot.getAuthorizedUsers().get(userId);
+        if (!bot.getAuthorizedUsers().containsKey(userId))
             sendMessage.setText("You are a stranger");
         else {
             StringBuilder text = new StringBuilder("Username: " + user.getUsername());
@@ -49,11 +47,6 @@ public class GetInfo extends Operation {
             }
             sendMessage.setText(text.toString());
         }
-
-        try {
-            bot.execute(sendMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendReply();
     }
 }

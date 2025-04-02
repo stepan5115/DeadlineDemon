@@ -23,9 +23,9 @@ public class NotificationThread implements Runnable {
     public void run() {
         while (true) {
             assignmentRepository.deleteExpiredAssignments(LocalDateTime.now());
-            for (String chatId : bot.getAuthorizedUsers().keySet())
+            for (String userId : bot.getAuthorizedUsers().keySet())
                 for (Assignment assignment : assignmentRepository.findAll())
-                    bot.executorService.execute(OperationManager.getNotificationOperation(bot, chatId, "", assignment,
+                    bot.executorService.execute(OperationManager.getNotificationOperation(bot, userId, null, userId,"", assignment,
                             notificationSentRepository));
             try {
                 Thread.sleep(MILLI_BETWEEN_MESSAGES);

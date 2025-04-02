@@ -2,7 +2,6 @@ package operations;
 
 import keyboards.InstanceKeyboardBuilder;
 import mainBody.MyTelegramBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.Group;
 import sqlTables.GroupRepository;
 import sqlTables.User;
@@ -16,32 +15,31 @@ public class DeleteGroup extends Operation {
     private GroupRepository groupRepository;
     private UserRepository userRepository;
 
-    public DeleteGroup(String chatId, MyTelegramBot bot, String message, GroupRepository groupRepository, UserRepository userRepository) {
-        super(chatId, bot, message);
+    public DeleteGroup(String chatId, String userId, String messageId,
+                       MyTelegramBot bot, String message, GroupRepository groupRepository, UserRepository userRepository) {
+        super(chatId, userId, messageId, bot, message);
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
     }
     public void run() {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        User user = bot.getAuthorizedUsers().get(chatId);
+        User user = bot.getAuthorizedUsers().get(userId);
         List<Group> groups = groupRepository.findAll();
         List<String> groupsNames = new ArrayList<>();
         for (Group group : groups)
             groupsNames.add(group.getName());
-        if (!bot.getAuthorizedUsers().containsKey(chatId)) {
+        if (!bot.getAuthorizedUsers().containsKey(userId)) {
             sendMessage.setText("You must login first");
-            bot.getDeleteGroupUsers().remove(chatId);
+            bot.getDeleteGroupUsers().remove(userId);
         }
         else if (!user.isCanEditTasks()) {
             sendMessage.setText("You haven't right to delete group");
-            bot.getDeleteGroupUsers().remove(chatId);
+            bot.getDeleteGroupUsers().remove(userId);
         }
         else if (groups.isEmpty()) {
             sendMessage.setText("No groups in system");
-            bot.getDeleteGroupUsers().remove(chatId);
+            bot.getDeleteGroupUsers().remove(userId);
         }
-        else if (bot.getDeleteGroupUsers().contains(chatId)) {
+        else if (bot.getDeleteGroupUsers().contains(userId)) {
             StringBuilder text = new StringBuilder();
             Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
             if (group.isPresent()) {
@@ -57,7 +55,7 @@ public class DeleteGroup extends Operation {
                 sendMessage.setText("Can't find group");
             if (groupsNames.isEmpty()) {
                 text.append("\nNo groups in system");
-                bot.getDeleteGroupUsers().remove(chatId);
+                bot.getDeleteGroupUsers().remove(userId);
             } else {
                 text.append("\nEnter group name from list");
                 sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
@@ -68,12 +66,8 @@ public class DeleteGroup extends Operation {
             sendMessage.setText("Enter name of group from list");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
                     groupsNames.toArray(new String[0])));
-            bot.getDeleteGroupUsers().add(chatId);
+            bot.getDeleteGroupUsers().add(userId);
         }
-        try {
-            bot.execute(sendMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendReply();
     }
 }

@@ -24,8 +24,9 @@ public class BotShutdownListener implements ApplicationListener<ContextClosedEve
             telegramBot.executorService.shutdown();
             return;
         }
-        for (String chatId : telegramBot.getAuthorizedUsers().keySet())
-            executorService.execute(OperationManager.getShutDownOperation(telegramBot, chatId,
+        for (String userId : telegramBot.getAuthorizedUsers().keySet())
+            executorService.execute(OperationManager.getShutDownOperation(telegramBot, userId,
+                    null, userId,
                     "⚡ Бот будет отключен для технического обслуживания. " +
                             "Приносим извинения за временные неудобства."));
         try {

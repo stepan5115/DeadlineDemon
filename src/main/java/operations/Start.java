@@ -3,27 +3,20 @@ package operations;
 import keyboards.StartKeyboard;
 import keyboards.UserKeyboard;
 import mainBody.MyTelegramBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import sqlTables.UserRepository;
 
 public class Start extends Operation {
-    public Start(String chatId, MyTelegramBot bot, String message) {
-        super(chatId, bot, message);
+    public Start(String chatId, String userId, String messageId,
+                 MyTelegramBot bot, String message) {
+        super(chatId, userId, messageId, bot, message);
     }
     public void run() {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        if (bot.getAuthorizedUsers().containsKey(chatId)) {
-            sendMessage.setText("Hello, " + bot.getAuthorizedUsers().get(chatId).getUsername() + "!");
+        if (bot.getAuthorizedUsers().containsKey(userId)) {
+            sendMessage.setText("Hello, " + bot.getAuthorizedUsers().get(userId).getUsername() + "!");
             sendMessage.setReplyMarkup(UserKeyboard.getInlineKeyboard());
         } else {
             sendMessage.setText("Hello, stranger!");
             sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard());
         }
-        try {
-            bot.execute(sendMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendReply();
     }
 }

@@ -2,7 +2,6 @@ package operations;
 
 import keyboards.InstanceKeyboardBuilder;
 import mainBody.MyTelegramBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.*;
 
 import java.util.ArrayList;
@@ -11,32 +10,31 @@ import java.util.List;
 public class DeleteAssignment extends Operation {
     private final AssignmentRepository assignmentRepository;
 
-    public DeleteAssignment(String chatId, MyTelegramBot bot, String message, AssignmentRepository assignmentRepository) {
-        super(chatId, bot, message);
+    public DeleteAssignment(String chatId, String userId, String messageId,
+                            MyTelegramBot bot, String message, AssignmentRepository assignmentRepository) {
+        super(chatId, userId, messageId, bot, message);
         this.assignmentRepository = assignmentRepository;
     }
 
     public void run() {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        User user = bot.getAuthorizedUsers().get(chatId);
+        User user = bot.getAuthorizedUsers().get(userId);
         List<Assignment> assignments = assignmentRepository.findAll();
         List<String> assignmentsNames = new ArrayList<String>();
         for (Assignment assignment : assignments)
             assignmentsNames.add(assignment.getTitle());
-        if (!bot.getAuthorizedUsers().containsKey(chatId)) {
+        if (!bot.getAuthorizedUsers().containsKey(userId)) {
             sendMessage.setText("You must login first");
-            bot.getDeleteAssignmentUsers().remove(chatId);
+            bot.getDeleteAssignmentUsers().remove(userId);
         }
         else if (!user.isCanEditTasks()) {
             sendMessage.setText("You haven't right to create assignment");
-            bot.getDeleteAssignmentUsers().remove(chatId);
+            bot.getDeleteAssignmentUsers().remove(userId);
         }
         else if (assignmentsNames.isEmpty()) {
             sendMessage.setText("No subjects in system");
-            bot.getDeleteAssignmentUsers().remove(chatId);
+            bot.getDeleteAssignmentUsers().remove(userId);
         }
-        else if (bot.getDeleteAssignmentUsers().contains(chatId)) {
+        else if (bot.getDeleteAssignmentUsers().contains(userId)) {
             StringBuilder text = new StringBuilder();
             if (assignmentRepository.existsAssignmentByTitle(message)) {
                 assignmentRepository.deleteAssignmentsByTitle(message);
@@ -46,7 +44,7 @@ public class DeleteAssignment extends Operation {
                 text.append("Assignment not exists");
             if (assignmentsNames.isEmpty()) {
                 text.append("\nNo subjects in system");
-                bot.getDeleteAssignmentUsers().remove(chatId);
+                bot.getDeleteAssignmentUsers().remove(userId);
             } else {
                 text.append("\nEnter title of assignment");
                 sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
@@ -57,12 +55,8 @@ public class DeleteAssignment extends Operation {
             sendMessage.setText("Enter title of assignment to delete from list");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
                     assignmentsNames.toArray(new String[0])));
-            bot.getDeleteAssignmentUsers().add(chatId);
+            bot.getDeleteAssignmentUsers().add(userId);
         }
-        try {
-            bot.execute(sendMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendReply();
     }
 }

@@ -6,35 +6,31 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.Group;
 import sqlTables.GroupRepository;
 import sqlTables.User;
-import sqlTables.UserRepository;
 
 public class CreateGroup extends Operation {
     private GroupRepository groupRepository;
-    private UserRepository userRepository;
 
-    public CreateGroup(String chatId, MyTelegramBot bot, String message, GroupRepository groupRepository, UserRepository userRepository) {
-        super(chatId, bot, message);
+    public CreateGroup(String chatId,String userId, String messageId,
+                       MyTelegramBot bot, String message, GroupRepository groupRepository) {
+        super(chatId, userId, messageId, bot, message);
         this.groupRepository = groupRepository;
-        this.userRepository = userRepository;
     }
     public void run() {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        User user = bot.getAuthorizedUsers().get(chatId);
-        if (!bot.getAuthorizedUsers().containsKey(chatId)) {
+        User user = bot.getAuthorizedUsers().get(userId);
+        if (!bot.getAuthorizedUsers().containsKey(userId)) {
             sendMessage.setText("You must login first");
-            bot.getCreateGroupUsers().remove(chatId);
+            bot.getCreateGroupUsers().remove(userId);
         }
         else if (!user.isCanEditTasks()) {
             sendMessage.setText("You haven't right to create group");
-            bot.getCreateGroupUsers().remove(chatId);
+            bot.getCreateGroupUsers().remove(userId);
         }
-        else if (bot.getCreateGroupUsers().contains(chatId)) {
+        else if (bot.getCreateGroupUsers().contains(userId)) {
             if (!groupRepository.existsByNameIgnoreCase(message)) {
                 Group newGroup = new Group();
                 newGroup.setName(message);
                 groupRepository.save(newGroup);
-                bot.getCreateGroupUsers().remove(chatId);
+                bot.getCreateGroupUsers().remove(userId);
                 sendMessage.setText("Success add group!");
             }
             else {
@@ -44,12 +40,8 @@ public class CreateGroup extends Operation {
         } else {
             sendMessage.setText("Enter name of group");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true));
-            bot.getCreateGroupUsers().add(chatId);
+            bot.getCreateGroupUsers().add(userId);
         }
-        try {
-            bot.execute(sendMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendReply();
     }
 }

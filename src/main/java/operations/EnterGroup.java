@@ -2,14 +2,11 @@ package operations;
 
 import keyboards.InstanceKeyboardBuilder;
 import mainBody.MyTelegramBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.Group;
 import sqlTables.GroupRepository;
 import sqlTables.User;
 import sqlTables.UserRepository;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -18,27 +15,26 @@ public class EnterGroup extends Operation {
     private UserRepository userRepository;
     private GroupRepository groupRepository;
 
-    public EnterGroup(String chatId, MyTelegramBot bot, String message,
+    public EnterGroup(String chatId, String userId, String messageId,
+                      MyTelegramBot bot, String message,
                       UserRepository userRepository, GroupRepository groupRepository) {
-        super(chatId, bot, message);
+        super(chatId, userId, messageId, bot, message);
         this.userRepository = userRepository;
         this.groupRepository = groupRepository;
     }
     public void run() {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
         List<Group> allDBGroups = groupRepository.findAll();
-        if (!bot.getAuthorizedUsers().containsKey(chatId)) {
+        if (!bot.getAuthorizedUsers().containsKey(userId)) {
             sendMessage.setText("You must login first");
-            bot.getEnterGroupUsers().remove(chatId);
+            bot.getEnterGroupUsers().remove(userId);
         }
         else if (allDBGroups.isEmpty()) {
             sendMessage.setText("There are no groups in system");
-            bot.getEnterGroupUsers().remove(chatId);
+            bot.getEnterGroupUsers().remove(userId);
         }
-        else if (bot.getEnterGroupUsers().contains(chatId)) {
+        else if (bot.getEnterGroupUsers().contains(userId)) {
             Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
-            User user = bot.getAuthorizedUsers().get(chatId);
+            User user = bot.getAuthorizedUsers().get(userId);
             if (group.isPresent() && ((user.getGroups() == null)     ||
                     !user.getGroups().contains(group.get().getName()))) {
                 user.addGroup(group.get().getName());
@@ -57,12 +53,8 @@ public class EnterGroup extends Operation {
             sendMessage.setText("Please enter a name of group from list");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
                     names.toArray(new String[0])));
-            bot.getEnterGroupUsers().add(chatId);
+            bot.getEnterGroupUsers().add(userId);
         }
-        try {
-            bot.execute(sendMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendReply();
     }
 }

@@ -2,7 +2,6 @@ package operations;
 
 import keyboards.InstanceKeyboardBuilder;
 import mainBody.MyTelegramBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import sqlTables.Group;
 import sqlTables.GroupRepository;
 import sqlTables.User;
@@ -14,29 +13,28 @@ public class ExitGroup extends Operation {
     private UserRepository userRepository;
     private GroupRepository groupRepository;
 
-    public ExitGroup(String chatId, MyTelegramBot bot, String message,
+    public ExitGroup(String chatId, String userId, String messageId,
+                     MyTelegramBot bot, String message,
                      UserRepository userRepository, GroupRepository groupRepository) {
-        super(chatId, bot, message);
+        super(chatId, userId, messageId, bot, message);
         this.userRepository = userRepository;
         this.groupRepository = groupRepository;
     }
     public void run() {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        User user = bot.getAuthorizedUsers().get(chatId);
-        if (!bot.getAuthorizedUsers().containsKey(chatId)) {
+        User user = bot.getAuthorizedUsers().get(userId);
+        if (!bot.getAuthorizedUsers().containsKey(userId)) {
             sendMessage.setText("You must login first");
-            bot.getExitGroupUsers().remove(chatId);
+            bot.getExitGroupUsers().remove(userId);
         }
         else if (user.getGroups() == null) {
             sendMessage.setText("You are not in any group");
-            bot.getExitGroupUsers().remove(chatId);
+            bot.getExitGroupUsers().remove(userId);
         }
         else if (user.getGroups().isEmpty()) {
             sendMessage.setText("You are not in any group");
-            bot.getExitGroupUsers().remove(chatId);
+            bot.getExitGroupUsers().remove(userId);
         }
-        else if (bot.getExitGroupUsers().contains(chatId)) {
+        else if (bot.getExitGroupUsers().contains(userId)) {
             Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
             String tmp = "";
             if (group.isPresent() &&
@@ -55,7 +53,7 @@ public class ExitGroup extends Operation {
             }
             if ((user.getGroups() == null) || (user.getGroups().isEmpty())) {
                 sendMessage.setText(tmp + "\nNow, you are not in any group");
-                bot.getExitGroupUsers().remove(chatId);
+                bot.getExitGroupUsers().remove(userId);
             } else {
                 sendMessage.setText(tmp);
                 sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
@@ -66,12 +64,8 @@ public class ExitGroup extends Operation {
             sendMessage.setText("Please enter a name of group from list");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
                     user.getGroups().toArray(new String[0])));
-            bot.getExitGroupUsers().add(chatId);
+            bot.getExitGroupUsers().add(userId);
         }
-        try {
-            bot.execute(sendMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendReply();
     }
 }

@@ -1,16 +1,14 @@
 package operations;
 
 import mainBody.MyTelegramBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 public class HelpUser extends Operation {
-    public HelpUser(String chatId, MyTelegramBot bot, String message) {
-        super(chatId, bot, message);
+    public HelpUser(String chatId, String userId, String messageId,
+                    MyTelegramBot bot, String message) {
+        super(chatId, userId, messageId, bot, message);
     }
     public void run() {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        if (!bot.getAuthorizedUsers().containsKey(chatId))
+        if (!bot.getAuthorizedUsers().containsKey(userId))
             sendMessage.setText("You must login first");
         else
             sendMessage.setText(
@@ -26,10 +24,6 @@ public class HelpUser extends Operation {
                     /logout - выйти из аккаунта
                     /help - вывести эту шпаргалку
                     """);
-        try {
-            bot.execute(sendMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        sendReply();
     }
 }
