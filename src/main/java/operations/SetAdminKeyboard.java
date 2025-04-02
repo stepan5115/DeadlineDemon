@@ -1,27 +1,28 @@
 package operations;
 
 import keyboards.AdminKeyboard;
+import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 import sqlTables.User;
 
 public class SetAdminKeyboard extends Operation {
-    public SetAdminKeyboard(String chatId, String userId, String messageId,
+    public SetAdminKeyboard(IdPair id, String messageId,
                             MyTelegramBot bot, String message) {
-        super(chatId, userId, messageId, bot, message);
+        super(id, messageId, bot, message);
     }
     public void run() {
-        User user = bot.getAuthorizedUsers().get(userId);
-        if (!bot.getAuthorizedUsers().containsKey(userId)) {
+        User user = bot.getAuthorizedUsers().get(id);
+        if (!bot.getAuthorizedUsers().containsKey(id)) {
             sendMessage.setText("You must login first");
-            bot.getDeleteGroupUsers().remove(userId);
+            bot.getDeleteGroupUsers().remove(id);
         }
         else if (!user.isCanEditTasks()) {
             sendMessage.setText("You haven't right to see admin operations");
-            bot.getDeleteGroupUsers().remove(userId);
+            bot.getDeleteGroupUsers().remove(id);
         }
         else {
             sendMessage.setText("Have fun :)");
-            sendMessage.setReplyMarkup(AdminKeyboard.getInlineKeyboard());
+            sendMessage.setReplyMarkup(AdminKeyboard.getInlineKeyboard(id));
         }
         sendReply();
     }

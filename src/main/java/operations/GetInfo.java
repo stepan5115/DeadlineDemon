@@ -1,5 +1,6 @@
 package operations;
 
+import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 import sqlTables.*;
 
@@ -7,16 +8,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class GetInfo extends Operation {
-    private AssignmentRepository assignmentRepository;
+    private final AssignmentRepository assignmentRepository;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-    public GetInfo(String chatId, String userId, String messageId,
+    public GetInfo(IdPair id, String messageId,
                    MyTelegramBot bot, String message, AssignmentRepository assignmentRepository) {
-        super(chatId, userId, messageId, bot, message);
+        super(id, messageId, bot, message);
         this.assignmentRepository = assignmentRepository;
     }
     public void run() {
-        User user = bot.getAuthorizedUsers().get(userId);
-        if (!bot.getAuthorizedUsers().containsKey(userId))
+        User user = bot.getAuthorizedUsers().get(id);
+        if (!bot.getAuthorizedUsers().containsKey(id))
             sendMessage.setText("You are a stranger");
         else {
             StringBuilder text = new StringBuilder("Username: " + user.getUsername());

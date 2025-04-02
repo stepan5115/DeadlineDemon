@@ -1,6 +1,7 @@
 package operations;
 
 import keyboards.InstanceKeyboardBuilder;
+import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 import sqlTables.Group;
 import sqlTables.GroupRepository;
@@ -12,34 +13,34 @@ import java.util.List;
 import java.util.Optional;
 
 public class DeleteGroup extends Operation {
-    private GroupRepository groupRepository;
-    private UserRepository userRepository;
+    private final GroupRepository groupRepository;
+    private final UserRepository userRepository;
 
-    public DeleteGroup(String chatId, String userId, String messageId,
+    public DeleteGroup(IdPair id, String messageId,
                        MyTelegramBot bot, String message, GroupRepository groupRepository, UserRepository userRepository) {
-        super(chatId, userId, messageId, bot, message);
+        super(id, messageId, bot, message);
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
     }
     public void run() {
-        User user = bot.getAuthorizedUsers().get(userId);
+        User user = bot.getAuthorizedUsers().get(id);
         List<Group> groups = groupRepository.findAll();
         List<String> groupsNames = new ArrayList<>();
         for (Group group : groups)
             groupsNames.add(group.getName());
-        if (!bot.getAuthorizedUsers().containsKey(userId)) {
+        if (!bot.getAuthorizedUsers().containsKey(id)) {
             sendMessage.setText("You must login first");
-            bot.getDeleteGroupUsers().remove(userId);
+            bot.getDeleteGroupUsers().remove(id);
         }
         else if (!user.isCanEditTasks()) {
             sendMessage.setText("You haven't right to delete group");
-            bot.getDeleteGroupUsers().remove(userId);
+            bot.getDeleteGroupUsers().remove(id);
         }
         else if (groups.isEmpty()) {
             sendMessage.setText("No groups in system");
-            bot.getDeleteGroupUsers().remove(userId);
+            bot.getDeleteGroupUsers().remove(id);
         }
-        else if (bot.getDeleteGroupUsers().contains(userId)) {
+        else if (bot.getDeleteGroupUsers().contains(id)) {
             StringBuilder text = new StringBuilder();
             Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
             if (group.isPresent()) {
@@ -55,18 +56,18 @@ public class DeleteGroup extends Operation {
                 sendMessage.setText("Can't find group");
             if (groupsNames.isEmpty()) {
                 text.append("\nNo groups in system");
-                bot.getDeleteGroupUsers().remove(userId);
+                bot.getDeleteGroupUsers().remove(id);
             } else {
                 text.append("\nEnter group name from list");
-                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true,
                         groupsNames.toArray(new String[0])));
             }
             sendMessage.setText(text.toString());
         } else {
             sendMessage.setText("Enter name of group from list");
-            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,
                     groupsNames.toArray(new String[0])));
-            bot.getDeleteGroupUsers().add(userId);
+            bot.getDeleteGroupUsers().add(id);
         }
         sendReply();
     }

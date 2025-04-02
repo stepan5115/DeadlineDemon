@@ -1,9 +1,7 @@
 package mainBody;
 
 import lombok.Getter;
-import operations.DeleteToken;
 import operations.ExitOperation;
-import operations.Operation;
 import operations.OperationManager;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -14,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.Map.Entry;
 
 @Component
 public class MyTelegramBot extends TelegramLongPollingBot {
@@ -38,31 +37,31 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     final int RECONNECT_PAUSE =10000;
 
     @Getter
-    private final ConcurrentHashMap<String, User> authorizedUsers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<IdPair, User> authorizedUsers = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentHashMap<String, NamePasswordState> logInUserStates = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<IdPair, NamePasswordState> logInUserStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentHashMap<String, NamePasswordState> signInUserStates = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<IdPair, NamePasswordState> signInUserStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<String> enterGroupUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<IdPair> enterGroupUsers = new ConcurrentLinkedQueue<>();
     @Getter
-    private final ConcurrentLinkedQueue<String> exitGroupUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<IdPair> exitGroupUsers = new ConcurrentLinkedQueue<>();
     @Getter
-    private final ConcurrentLinkedQueue<String> enterTokenUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<IdPair> enterTokenUsers = new ConcurrentLinkedQueue<>();
     @Getter
-    private final ConcurrentLinkedQueue<String> deleteTokenUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<IdPair> deleteTokenUsers = new ConcurrentLinkedQueue<>();
     @Getter
-    private final ConcurrentLinkedQueue<String> createGroupUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<IdPair> createGroupUsers = new ConcurrentLinkedQueue<>();
     @Getter
-    private final ConcurrentLinkedQueue<String> deleteGroupUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<IdPair> deleteGroupUsers = new ConcurrentLinkedQueue<>();
     @Getter
-    private final ConcurrentHashMap<String, TitDesGroDeaSubState> createAssignmentUsers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<IdPair, TitDesGroDeaSubState> createAssignmentUsers = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<String> deleteAssignmentUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<IdPair> deleteAssignmentUsers = new ConcurrentLinkedQueue<>();
     @Getter
-    private final ConcurrentLinkedQueue<String> createSubjectUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<IdPair> createSubjectUsers = new ConcurrentLinkedQueue<>();
     @Getter
-    private final ConcurrentLinkedQueue<String> deleteSubjectUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<IdPair> deleteSubjectUsers = new ConcurrentLinkedQueue<>();
 
     public MyTelegramBot(UserRepository userRepository,
                          SubjectRepository subjectRepository,
@@ -93,15 +92,18 @@ public class MyTelegramBot extends TelegramLongPollingBot {
                     messageId.toString(), messageText));
         }
         if (update.hasCallbackQuery()) {
-            String data = update.getCallbackQuery().getData();
+            String callbackData = update.getCallbackQuery().getData();
+            int lastUnderscore = callbackData.lastIndexOf("_");
+            if (lastUnderscore == -1)
+                return;
+            String actualData = callbackData.substring(0, lastUnderscore);
+            String replyId = callbackData.substring(lastUnderscore + 1);
             Long chatId = update.getCallbackQuery().getMessage().getChatId();
-            Long userId = update.getCallbackQuery().getMessage().getFrom().getId();
-            Integer messageId = update.getMessage().getMessageId();
-            if (data.equals("/breakOperation"))
-                executorService.execute(new ExitOperation(chatId.toString(), userId.toString(), messageId.toString(),this, data));
-            else
-                executorService.execute(OperationManager.getRightOperation(this, chatId.toString(), userId.toString(),
-                        messageId.toString(), data));
+            Long userId = update.getCallbackQuery().getFrom().getId();
+            if (!replyId.equals(userId.toString()))
+                return;
+            executorService.execute(OperationManager.getRightOperation(this, chatId.toString(), userId.toString(),
+                    null, actualData));
         }
     }
 
@@ -113,13 +115,5 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         return botToken;
-    }
-
-    //MULTI THREAD LOGIC
-    public void execute(Operation operation) {
-        executorService.submit(operation);
-    }
-    public void shutdown() {
-        executorService.shutdown();
     }
 }

@@ -2,20 +2,22 @@ package operations;
 
 import keyboards.StartKeyboard;
 import keyboards.UserKeyboard;
+import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 
+
 public class Start extends Operation {
-    public Start(String chatId, String userId, String messageId,
+    public Start(IdPair id, String messageId,
                  MyTelegramBot bot, String message) {
-        super(chatId, userId, messageId, bot, message);
+        super(id, messageId, bot, message);
     }
     public void run() {
-        if (bot.getAuthorizedUsers().containsKey(userId)) {
-            sendMessage.setText("Hello, " + bot.getAuthorizedUsers().get(userId).getUsername() + "!");
-            sendMessage.setReplyMarkup(UserKeyboard.getInlineKeyboard());
+        if (bot.getAuthorizedUsers().containsKey(id)) {
+            sendMessage.setText("Hello, " + bot.getAuthorizedUsers().get(id).getUsername() + "!");
+            sendMessage.setReplyMarkup(UserKeyboard.getInlineKeyboard(id));
         } else {
             sendMessage.setText("Hello, stranger!");
-            sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard());
+            sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard(id));
         }
         sendReply();
     }

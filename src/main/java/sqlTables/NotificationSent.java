@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "notifications_sent",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"assignment_id", "user_id"})}
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"assignment_id", "chat_id"})}
 )
 @Getter
 @Setter
@@ -23,9 +23,8 @@ public class NotificationSent {
     @JoinColumn(name = "assignment_id", nullable = false)
     private Assignment assignment;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "chat_id", nullable = false)
+    private Long chatId;  // Теперь просто ID чата без связи с User
 
     private int stage;
 

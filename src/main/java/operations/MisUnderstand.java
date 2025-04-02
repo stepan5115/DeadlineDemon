@@ -1,11 +1,12 @@
 package operations;
 
+import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 
 public class MisUnderstand extends Operation {
-    public MisUnderstand(String chatId, String userId, String messageId,
+    public MisUnderstand(IdPair id, String messageId,
                          MyTelegramBot bot, String message) {
-        super(chatId, userId, messageId, bot, message);
+        super(id, messageId, bot, message);
     }
     public void run() {
         sendMessage.setText("Can't understand your message");

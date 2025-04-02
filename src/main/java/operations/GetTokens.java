@@ -1,6 +1,7 @@
 package operations;
 
 import keyboards.StartKeyboard;
+import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 import sqlTables.AdminToken;
 import sqlTables.AdminTokenRepository;
@@ -12,19 +13,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class GetTokens extends Operation {
-    private UserRepository userRepository;
-    private AdminTokenRepository adminTokenRepository;
+    private final UserRepository userRepository;
+    private final AdminTokenRepository adminTokenRepository;
 
-    public GetTokens(String chatId, String userId, String messageId,
+    public GetTokens(IdPair id, String messageId,
                      MyTelegramBot bot, String message,
                      UserRepository userRepository, AdminTokenRepository adminTokenRepository) {
-        super(chatId, userId, messageId, bot, message);
+        super(id, messageId, bot, message);
         this.userRepository = userRepository;
         this.adminTokenRepository = adminTokenRepository;
     }
     public void run() {
-        User user = bot.getAuthorizedUsers().get(userId);
-        if (!bot.getAuthorizedUsers().containsKey(userId))
+        User user = bot.getAuthorizedUsers().get(id);
+        if (!bot.getAuthorizedUsers().containsKey(id))
             sendMessage.setText("You must login first");
         else if (!user.isCanEditTasks())
             sendMessage.setText("You haven't right to have token");
@@ -44,8 +45,8 @@ public class GetTokens extends Operation {
             }
         } else {
             sendMessage.setText("Something went wrong, login again");
-            bot.getAuthorizedUsers().remove(userId);
-            sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard());
+            bot.getAuthorizedUsers().remove(id);
+            sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard(id));
         }
         sendReply();
     }

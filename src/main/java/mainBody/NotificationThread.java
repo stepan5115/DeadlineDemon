@@ -4,15 +4,16 @@ import operations.OperationManager;
 import sqlTables.Assignment;
 import sqlTables.AssignmentRepository;
 import sqlTables.NotificationSentRepository;
-import sqlTables.User;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
 
 public class NotificationThread implements Runnable {
     public final int MILLI_BETWEEN_MESSAGES = 6000;
-    private AssignmentRepository assignmentRepository;
-    private NotificationSentRepository notificationSentRepository;
-    private MyTelegramBot bot;
+    private final AssignmentRepository assignmentRepository;
+    private final NotificationSentRepository notificationSentRepository;
+    private final MyTelegramBot bot;
 
     public NotificationThread(MyTelegramBot bot, AssignmentRepository assignmentRepository,
                               NotificationSentRepository notificationSentRepository) {
@@ -23,10 +24,15 @@ public class NotificationThread implements Runnable {
     public void run() {
         while (true) {
             assignmentRepository.deleteExpiredAssignments(LocalDateTime.now());
-            for (String userId : bot.getAuthorizedUsers().keySet())
-                for (Assignment assignment : assignmentRepository.findAll())
-                    bot.executorService.execute(OperationManager.getNotificationOperation(bot, userId, null, userId,"", assignment,
-                            notificationSentRepository));
+            for (Assignment assignment : assignmentRepository.findAll()) {
+                List<String> busyId = new LinkedList<>();
+                for (IdPair userId : bot.getAuthorizedUsers().keySet())
+                    if (!busyId.contains(userId.getChatId())) {
+                        busyId.add(userId.getChatId());
+                        bot.executorService.execute(OperationManager.getNotificationOperation(bot, userId, assignment,
+                                notificationSentRepository));
+                    }
+            }
             try {
                 Thread.sleep(MILLI_BETWEEN_MESSAGES);
             } catch (InterruptedException e) {

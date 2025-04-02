@@ -1,14 +1,15 @@
 package operations;
 
+import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 
 public class HelpUser extends Operation {
-    public HelpUser(String chatId, String userId, String messageId,
+    public HelpUser(IdPair id, String messageId,
                     MyTelegramBot bot, String message) {
-        super(chatId, userId, messageId, bot, message);
+        super(id, messageId, bot, message);
     }
     public void run() {
-        if (!bot.getAuthorizedUsers().containsKey(userId))
+        if (!bot.getAuthorizedUsers().containsKey(id))
             sendMessage.setText("You must login first");
         else
             sendMessage.setText(

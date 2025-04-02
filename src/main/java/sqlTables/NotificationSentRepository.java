@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface NotificationSentRepository extends JpaRepository<NotificationSent, Long> {
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    Optional<NotificationSent> findByUserAndAssignment(User user, Assignment assignment);
+    Optional<NotificationSent> findByChatIdAndAssignment(Long chatId, Assignment assignment);
 }

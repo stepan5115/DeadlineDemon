@@ -2,6 +2,7 @@ package operations;
 
 import keyboards.InstanceKeyboardBuilder;
 import keyboards.StartKeyboard;
+import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 import sqlTables.AdminToken;
 import sqlTables.AdminTokenRepository;
@@ -13,26 +14,26 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DeleteToken extends Operation {
-    private UserRepository userRepository;
-    private AdminTokenRepository adminTokenRepository;
+    private final UserRepository userRepository;
+    private final AdminTokenRepository adminTokenRepository;
 
-    public DeleteToken(String chatId, String userId, String messageId,
+    public DeleteToken(IdPair id, String messageId,
                        MyTelegramBot bot, String message,
-                     UserRepository userRepository, AdminTokenRepository adminTokenRepository) {
-        super(chatId, userId, messageId, bot, message);
+                       UserRepository userRepository, AdminTokenRepository adminTokenRepository) {
+        super(id, messageId, bot, message);
         this.userRepository = userRepository;
         this.adminTokenRepository = adminTokenRepository;
     }
 
     public void run() {
-        User user = bot.getAuthorizedUsers().get(userId);
-        if (!bot.getAuthorizedUsers().containsKey(userId)) {
+        User user = bot.getAuthorizedUsers().get(id);
+        if (!bot.getAuthorizedUsers().containsKey(id)) {
             sendMessage.setText("You must login first");
-            bot.getDeleteTokenUsers().remove(userId);
+            bot.getDeleteTokenUsers().remove(id);
         }
         else if (!user.isCanEditTasks()) {
             sendMessage.setText("You haven't right to have token");
-            bot.getDeleteTokenUsers().remove(userId);
+            bot.getDeleteTokenUsers().remove(id);
         }
         else {
             List<AdminToken> adminTokens = adminTokenRepository.findByUsername(user.getUsername());
@@ -41,9 +42,9 @@ public class DeleteToken extends Operation {
                 tokensNames.add(adminToken.getToken());
             if (adminTokens.isEmpty()) {
                 sendMessage.setText("You do not have admin token");
-                bot.getDeleteTokenUsers().remove(userId);
+                bot.getDeleteTokenUsers().remove(id);
             }
-            else if (bot.getDeleteTokenUsers().contains(userId)) {
+            else if (bot.getDeleteTokenUsers().contains(id)) {
                 StringBuilder text = new StringBuilder();
                 if (userRepository.existsByUsername(user.getUsername())) {
                     adminTokenRepository.deleteExpiredTokens(LocalDateTime.now());
@@ -55,24 +56,24 @@ public class DeleteToken extends Operation {
                         text.append("Can't find admin token");
                     if (tokensNames.isEmpty()) {
                         text.append("\nYou do not have more admin token");
-                        bot.getDeleteTokenUsers().remove(userId);
+                        bot.getDeleteTokenUsers().remove(id);
                     } else {
                         text.append("\nEnter next token or break operation");
-                        sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
+                        sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,
                                 tokensNames.toArray(new String[0])));
                     }
                     sendMessage.setText(text.toString());
                 } else {
                     sendMessage.setText("Something went wrong, login again");
-                    bot.getAuthorizedUsers().remove(userId);
-                    bot.getDeleteTokenUsers().remove(userId);
-                    sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard());
+                    bot.getAuthorizedUsers().remove(id);
+                    bot.getDeleteTokenUsers().remove(id);
+                    sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard(id));
                 }
             } else {
                 sendMessage.setText("Enter token");
-                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(true,
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,
                         tokensNames.toArray(new String[0])));
-                bot.getDeleteTokenUsers().add(userId);
+                bot.getDeleteTokenUsers().add(id);
             }
         }
         sendReply();

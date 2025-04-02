@@ -1,5 +1,6 @@
 package operations;
 
+import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 import sqlTables.Assignment;
 import sqlTables.NotificationSentRepository;
@@ -7,91 +8,87 @@ import sqlTables.NotificationSentRepository;
 public class OperationManager {
     public static Operation getRightOperation(MyTelegramBot bot, String chatId, String userId, String messageId,
                                               String message) {
-        if (bot.getLogInUserStates().containsKey(chatId))
-            return new LogIn(chatId, userId, messageId, bot, message, bot.getUserRepository());
-        if (bot.getSignInUserStates().containsKey(chatId))
-            return new SignIn(chatId, userId, messageId, bot, message, bot.getUserRepository());
-        if (bot.getEnterGroupUsers().contains(chatId))
-            return new EnterGroup(chatId, userId, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
-        if (bot.getExitGroupUsers().contains(chatId))
-            return new ExitGroup(chatId, userId, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
-        if (bot.getEnterTokenUsers().contains(chatId))
-            return new GetAdminRights(chatId, userId, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
-        if (bot.getDeleteTokenUsers().contains(chatId))
-            return new DeleteToken(chatId, userId, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
-        if (bot.getDeleteGroupUsers().contains(chatId))
-            return new DeleteGroup(chatId, userId, messageId, bot, message, bot.getGroupRepository(), bot.getUserRepository());
-        if (bot.getCreateGroupUsers().contains(chatId))
-            return new CreateGroup(chatId, userId, messageId, bot, message, bot.getGroupRepository());
-        if (bot.getCreateAssignmentUsers().containsKey(chatId))
-            return new CreateAssignment(chatId, userId, messageId, bot, message,
-                    bot.getAssignmentRepository(), bot.getGroupRepository(),
-                    bot.getSubjectRepository());
-        if (bot.getDeleteAssignmentUsers().contains(chatId))
-            return new DeleteAssignment(chatId, userId, messageId, bot, message, bot.getAssignmentRepository());
-        if (bot.getCreateSubjectUsers().contains(chatId))
-            return new CreateSubject(chatId, userId, messageId, bot, message, bot.getSubjectRepository());
-        if (bot.getDeleteSubjectUsers().contains(chatId))
-            return new DeleteSubject(chatId, userId, messageId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
+        IdPair id = new IdPair(chatId, userId);
 
-        if (message.trim().equals("/login"))
-            return new LogIn(chatId, userId, messageId, bot, message, bot.getUserRepository());
-        if (message.trim().equals("/register"))
-            return new SignIn(chatId, userId, messageId, bot, message, bot.getUserRepository());
-        if (message.trim().equals("/logout"))
-            return new LogOut(chatId, userId, messageId, bot, message);
-        if (message.trim().equals("/enterGroup"))
-            return new EnterGroup(chatId, userId, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
-        if (message.trim().equals("/exitGroup"))
-            return new ExitGroup(chatId, userId, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
-        if (message.trim().equals("/enableNotifications"))
-            return new EnableAutoMailing(chatId, userId, messageId, bot, message, bot.getUserRepository());
-        if (message.trim().equals("/disableNotifications"))
-            return new DisableAutoMailing(chatId, userId, messageId, bot, message, bot.getUserRepository());
-        if (message.trim().equals("/generateToken"))
-            return new GenerateToken(chatId, userId, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
-        if (message.trim().equals("/getAdminRights"))
-            return new GetAdminRights(chatId, userId, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
-        if (message.trim().equals("/getMyTokens"))
-            return new GetTokens(chatId, userId, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
-        if (message.trim().equals("/deleteToken"))
-            return new DeleteToken(chatId, userId, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
-        if (message.trim().equals("/createGroup"))
-            return new CreateGroup(chatId, userId, messageId, bot, message, bot.getGroupRepository());
-        if (message.trim().equals("/deleteGroup"))
-            return new DeleteGroup(chatId, userId, messageId, bot, message, bot.getGroupRepository(), bot.getUserRepository());
-        if (message.trim().equals("/createAssignment"))
-            return new CreateAssignment(chatId, userId, messageId, bot, message,
+        if (message.trim().equals("/breakOperation"))
+            return new ExitOperation(id, messageId, bot, message);
+
+        if (bot.getEnterGroupUsers().contains(id))
+            return new EnterGroup(id, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
+        if (bot.getExitGroupUsers().contains(id))
+            return new ExitGroup(id, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
+        if (bot.getEnterTokenUsers().contains(id))
+            return new GetAdminRights(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+        if (bot.getDeleteTokenUsers().contains(id))
+            return new DeleteToken(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+        if (bot.getDeleteGroupUsers().contains(id))
+            return new DeleteGroup(id, messageId, bot, message, bot.getGroupRepository(), bot.getUserRepository());
+        if (bot.getCreateGroupUsers().contains(id))
+            return new CreateGroup(id, messageId, bot, message, bot.getGroupRepository());
+        if (bot.getCreateAssignmentUsers().containsKey(id))
+            return new CreateAssignment(id, messageId, bot, message,
                     bot.getAssignmentRepository(), bot.getGroupRepository(),
                     bot.getSubjectRepository());
-        if (message.trim().equals("/deleteAssignment"))
-            return new DeleteAssignment(chatId, userId, messageId, bot, message, bot.getAssignmentRepository());
-        if (message.trim().equals("/createSubject"))
-            return new CreateSubject(chatId, userId, messageId, bot, message, bot.getSubjectRepository());
-        if (message.trim().equals("/deleteSubject"))
-            return new DeleteSubject(chatId, userId, messageId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
-        if (message.trim().equals("/start"))
-            return new Start(chatId, userId, messageId, bot, message);
-        if (message.trim().equals("/admin"))
-            return new SetAdminKeyboard(chatId, userId, messageId, bot, message);
-        if (message.trim().equals("/info"))
-            return new GetInfo(chatId, userId, messageId, bot, message, bot.getAssignmentRepository());
-        if (message.trim().equals("/about"))
-            return new AboutOperation(chatId, userId, messageId, bot, message);
-        if (message.trim().equals("/help"))
-            return new HelpUser(chatId, userId, messageId, bot, message);
-        if (message.trim().equals("/helpAdmin"))
-            return new HelpAdmin(chatId, userId, messageId, bot, message);
-        return new MisUnderstand(chatId, userId, messageId, bot, message);
+        if (bot.getDeleteAssignmentUsers().contains(id))
+            return new DeleteAssignment(id, messageId, bot, message, bot.getAssignmentRepository());
+        if (bot.getCreateSubjectUsers().contains(id))
+            return new CreateSubject(id, messageId, bot, message, bot.getSubjectRepository());
+        if (bot.getDeleteSubjectUsers().contains(id))
+            return new DeleteSubject(id, messageId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
+        if (bot.getLogInUserStates().containsKey(id))
+            return new LogIn(id, messageId, bot, message, bot.getUserRepository());
+        if (bot.getSignInUserStates().containsKey(id))
+            return new SignIn(id, messageId, bot, message, bot.getUserRepository());
+
+        return switch (message.trim()) {
+            case "/enterGroup" ->
+                    new EnterGroup(id, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
+            case "/exitGroup" ->
+                    new ExitGroup(id, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
+            case "/enableNotifications" ->
+                    new EnableAutoMailing(id, messageId, bot, message, bot.getUserRepository());
+            case "/disableNotifications" ->
+                    new DisableAutoMailing(id, messageId, bot, message, bot.getUserRepository());
+            case "/generateToken" ->
+                    new GenerateToken(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+            case "/getAdminRights" ->
+                    new GetAdminRights(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+            case "/getMyTokens" ->
+                    new GetTokens(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+            case "/deleteToken" ->
+                    new DeleteToken(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+            case "/createGroup" -> new CreateGroup(id, messageId, bot, message, bot.getGroupRepository());
+            case "/deleteGroup" ->
+                    new DeleteGroup(id, messageId, bot, message, bot.getGroupRepository(), bot.getUserRepository());
+            case "/createAssignment" -> new CreateAssignment(id, messageId, bot, message,
+                    bot.getAssignmentRepository(), bot.getGroupRepository(),
+                    bot.getSubjectRepository());
+            case "/deleteAssignment" ->
+                    new DeleteAssignment(id, messageId, bot, message, bot.getAssignmentRepository());
+            case "/createSubject" ->
+                    new CreateSubject(id, messageId, bot, message, bot.getSubjectRepository());
+            case "/deleteSubject" ->
+                    new DeleteSubject(id, messageId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
+            case "/admin" -> new SetAdminKeyboard(id, messageId, bot, message);
+            case "/info" -> new GetInfo(id, messageId, bot, message, bot.getAssignmentRepository());
+            case "/help" -> new HelpUser(id, messageId, bot, message);
+            case "/helpAdmin" -> new HelpAdmin(id, messageId, bot, message);
+            case "/login" -> new LogIn(id, messageId, bot, message, bot.getUserRepository());
+            case "/register" -> new SignIn(id, messageId, bot, message, bot.getUserRepository());
+            case "/logout" -> new LogOut(id, messageId, bot, message);
+            case "/start" -> new Start(id, messageId, bot, message);
+            case "/about" -> new AboutOperation(id, messageId, bot, message);
+            default -> new MisUnderstand(id, messageId, bot, message);
+        };
+
     }
-    public static Operation getShutDownOperation(MyTelegramBot bot, String userId,
-                                                 String messageId, String chatId, String message) {
-        return new ShutDownOperation(chatId, userId, messageId, bot, message);
+    public static Operation getShutDownOperation(MyTelegramBot bot, IdPair id,
+                                                 String messageId, String message) {
+        return new ShutDownOperation(id, messageId, bot, message);
     }
-    public static Operation getNotificationOperation(MyTelegramBot bot, String userId,
-                                                     String messageId, String chatId, String message,
+    public static Operation getNotificationOperation(MyTelegramBot bot, IdPair id,
                                                      Assignment assignment,
                                                      NotificationSentRepository notificationSentRepository) {
-        return new NotifyOperation(chatId, userId, messageId, bot, message, assignment, notificationSentRepository);
+        return new NotifyOperation(id, null, bot, null, assignment, notificationSentRepository);
     }
 }

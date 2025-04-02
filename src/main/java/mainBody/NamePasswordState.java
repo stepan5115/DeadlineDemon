@@ -2,6 +2,7 @@ package mainBody;
 
 import lombok.Getter;
 
+@Getter
 public class NamePasswordState {
 
     public enum StateType {
@@ -9,9 +10,7 @@ public class NamePasswordState {
         WAITING_PASSWORD
     }
 
-    @Getter
     private final String username;
-    @Getter
     private final StateType type;
 
     public NamePasswordState(StateType type, String username) {
