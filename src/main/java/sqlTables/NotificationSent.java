@@ -26,6 +26,6 @@ public class NotificationSent {
     @Column(name = "chat_id", nullable = false)
     private Long chatId;  // Теперь просто ID чата без связи с User
 
-    @Column(name = "sent_at", nullable = false, updatable = false)
+    @Column(name = "sent_at", nullable = false)
     private LocalDateTime sentAt = LocalDateTime.now();
 }
