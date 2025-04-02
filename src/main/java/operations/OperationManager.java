@@ -39,6 +39,8 @@ public class OperationManager {
             return new LogIn(id, messageId, bot, message, bot.getUserRepository());
         if (bot.getSignInUserStates().containsKey(id))
             return new SignIn(id, messageId, bot, message, bot.getUserRepository());
+        if (bot.getSetIntervalUsers().contains(id))
+            return new SetInterval(id, messageId, bot, message, bot.getUserRepository());
 
         return switch (message.trim()) {
             case "/enterGroup" ->
@@ -78,6 +80,7 @@ public class OperationManager {
             case "/logout" -> new LogOut(id, messageId, bot, message);
             case "/start" -> new Start(id, messageId, bot, message);
             case "/about" -> new AboutOperation(id, messageId, bot, message);
+            case "/setInterval" -> new SetInterval(id, messageId, bot, message, bot.getUserRepository());
             default -> new MisUnderstand(id, messageId, bot, message);
         };
 

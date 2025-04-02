@@ -70,9 +70,12 @@ public class UserKeyboard {
         //row5
         List<InlineKeyboardButton> row5 = new ArrayList<>();
         //button 9
-        InlineKeyboardButton button9 = new InlineKeyboardButton("/help");
-        button9.setCallbackData("/help"  + "_" + userId);
+        InlineKeyboardButton button9 = new InlineKeyboardButton("/setInterval");
+        button9.setCallbackData("/setInterval"  + "_" + userId);
         row5.add(button9);
+        InlineKeyboardButton button10 = new InlineKeyboardButton("/help");
+        button10.setCallbackData("/help"  + "_" + userId);
+        row5.add(button10);
 
         rows.add(row1);
         rows.add(row2);
@@ -104,6 +107,7 @@ public class UserKeyboard {
         row4.add("/logout");
         KeyboardRow row5 = new KeyboardRow();
         row5.add("/help");
+        row5.add("/setInterval");
         rows.add(row1);
         rows.add(row2);
         rows.add(row3);

@@ -29,6 +29,7 @@ public class GetInfo extends Operation {
                 text.append("\nYou have allowed notifications");
             else
                 text.append("\nYou do not have allowed notifications");
+            text.append("\nYour interval between notifications-").append(user.getFormattedInterval());
             List<String> groups = user.getGroups();
             if ((groups == null) || (groups.isEmpty()))
                 text.append("\nYou are not in any group");

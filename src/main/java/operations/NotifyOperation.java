@@ -4,6 +4,7 @@ import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 import sqlTables.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,25 +21,37 @@ public class NotifyOperation extends Operation {
         this.notificationSentRepository = notificationSentRepository;
     }
 
-    public boolean isNotTimeCome(Long id) {
+    public boolean isNotTimeCome(Long id, User user) {
+        int hour = LocalDateTime.now().getHour();
+        if (hour == 23 || hour < 8) {
+            return true; // Нельзя отправить уведомление ночью
+        }
         Optional<NotificationSent> notificationSent = notificationSentRepository.findByChatIdAndAssignment(id, assignment);
         if (notificationSent.isEmpty()) {
             NotificationSent newNotificationSent = new NotificationSent();
             newNotificationSent.setChatId(id);
             newNotificationSent.setAssignment(assignment);
-            newNotificationSent.setStage(0);
+            newNotificationSent.setSentAt(LocalDateTime.now());
             notificationSentRepository.saveAndFlush(newNotificationSent);
+            return false;
         } else {
-            double fractionPassed = (double) java.time.Duration.between(assignment.getCreatedAt(), LocalDateTime.now()).toSeconds() /
-                    java.time.Duration.between(assignment.getCreatedAt(), assignment.getDeadline()).toSeconds();
-            int actualPart = (int) Math.floor(fractionPassed * 10);
-            if (actualPart > notificationSent.get().getStage()) {
-                notificationSent.get().setStage(actualPart);
-                notificationSentRepository.saveAndFlush(notificationSent.get());
-            } else
+            NotificationSent existingNotification = notificationSent.get();
+            LocalDateTime lastSentAt = existingNotification.getSentAt();
+            Duration userInterval = user.getNotificationInterval();
+            if (userInterval == null) {
+                existingNotification.setSentAt(LocalDateTime.now());
+                notificationSentRepository.saveAndFlush(existingNotification);
+                return false;
+            }
+            LocalDateTime nextAllowedTime = lastSentAt.plus(userInterval);
+            if (LocalDateTime.now().isBefore(nextAllowedTime)) {
                 return true;
+            } else {
+                existingNotification.setSentAt(LocalDateTime.now());
+                notificationSentRepository.saveAndFlush(existingNotification);
+                return false;
+            }
         }
-        return false;
     }
 
     public void forUser() {
@@ -56,7 +69,7 @@ public class NotifyOperation extends Operation {
                 targetGroups.add(group);
         if (targetGroups.isEmpty())
             return;
-        if (isNotTimeCome(Long.parseLong(id.getUserId())))
+        if (isNotTimeCome(Long.parseLong(id.getUserId()), user))
             return;
         StringBuilder text = new StringBuilder("Dear " + user.getUsername() + "! I remind you of the assignment \"" +
                 assignment.getTitle() + "\" in the subject \"" + assignment.getSubject().getName() +
@@ -68,6 +81,9 @@ public class NotifyOperation extends Operation {
         sendReply();
     }
     public void forChat() {
+        User userTrigger = bot.getAuthorizedUsers().get(id);
+        if (!bot.getAuthorizedUsers().containsKey(id))
+            throw new IllegalArgumentException("notify for not authorized user");
         List<IdPair> users = new LinkedList<>();
         for (IdPair userId : bot.getAuthorizedUsers().keySet())
             if (userId.getChatId().equals(id.getChatId()))
@@ -90,9 +106,11 @@ public class NotifyOperation extends Operation {
         }
         if (targetUsers.isEmpty())
             return;
-        if (isNotTimeCome(Long.parseLong(id.getChatId())))
+        if (isNotTimeCome(Long.parseLong(id.getChatId()), userTrigger))
             return;
-        StringBuilder text = new StringBuilder("I remind about the assignment \"" +
+        StringBuilder text = new StringBuilder("Triggered by " + userTrigger.getUsername() +
+                "(interval: " + userTrigger.getFormattedInterval() + ")" +
+                "\nI remind about the assignment \"" +
                 assignment.getTitle() + "\" in the subject \"" + assignment.getSubject().getName() +
                 "\", which need to complete on " + assignment.getDeadline() +
                 ".\nDescription: " + assignment.getDescription() + "\nThis assignment applies to students:");

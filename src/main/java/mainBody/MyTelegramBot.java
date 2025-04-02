@@ -62,6 +62,8 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     private final ConcurrentLinkedQueue<IdPair> createSubjectUsers = new ConcurrentLinkedQueue<>();
     @Getter
     private final ConcurrentLinkedQueue<IdPair> deleteSubjectUsers = new ConcurrentLinkedQueue<>();
+    @Getter
+    private final ConcurrentLinkedQueue<IdPair> setIntervalUsers = new ConcurrentLinkedQueue<>();
 
     public MyTelegramBot(UserRepository userRepository,
                          SubjectRepository subjectRepository,
