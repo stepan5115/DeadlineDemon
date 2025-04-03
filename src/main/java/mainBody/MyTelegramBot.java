@@ -5,9 +5,11 @@ import operations.ExitOperation;
 import operations.OperationManager;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import sqlTables.*;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -29,6 +31,8 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     private final AssignmentRepository assignmentRepository;
     @Getter
     private final NotificationSentRepository notificationSentRepository;
+    @Getter
+    private final PendingNotificationRepository pendingNotificationRepository;
 
     final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
@@ -70,17 +74,33 @@ public class MyTelegramBot extends TelegramLongPollingBot {
                          GroupRepository groupRepository,
                          AssignmentRepository assignmentRepository,
                          AdminTokenRepository adminTokenRepository,
-                         NotificationSentRepository notificationSentRepository) {
+                         NotificationSentRepository notificationSentRepository,
+                         PendingNotificationRepository pendingNotificationRepository) {
         this.userRepository = userRepository;
         this.subjectRepository = subjectRepository;
         this.groupRepository = groupRepository;
         this.assignmentRepository = assignmentRepository;
         this.adminTokenRepository = adminTokenRepository;
         this.notificationSentRepository = notificationSentRepository;
+        this.pendingNotificationRepository = pendingNotificationRepository;
         NotificationThread notificationThread = new NotificationThread(this, assignmentRepository, notificationSentRepository);
         Thread notifyThread = new Thread(notificationThread);
         notifyThread.setDaemon(true);
         notifyThread.start();
+        List<PendingNotification> pendingUsers = pendingNotificationRepository.findAll();
+
+        for (PendingNotification user : pendingUsers) {
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setText("Бот снова в сети! 🚀");
+            sendMessage.setChatId(user.getChatId().toString());
+            try {
+                execute(sendMessage);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        pendingNotificationRepository.deleteAll();
     }
 
     @Override

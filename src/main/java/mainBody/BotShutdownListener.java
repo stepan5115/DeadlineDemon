@@ -5,6 +5,7 @@ import operations.OperationManager;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
+import sqlTables.PendingNotification;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class BotShutdownListener implements ApplicationListener<ContextClosedEve
             bot.executorService.shutdown();
             return;
         }
+        bot.getPendingNotificationRepository().deleteAll();
         List<String> chatIds = new LinkedList<>();
         for (IdPair userId : bot.getAuthorizedUsers().keySet())
             if (!chatIds.contains(userId.getChatId())) {
@@ -34,6 +36,9 @@ public class BotShutdownListener implements ApplicationListener<ContextClosedEve
                         "⚡ Бот будет отключен для технического обслуживания. " +
                                 "Приносим извинения за временные неудобства."));
                 chatIds.add(userId.getChatId());
+                PendingNotification pendingNotification = new PendingNotification();
+                pendingNotification.setChatId(Long.parseLong(userId.getChatId()));
+                bot.getPendingNotificationRepository().save(pendingNotification);
             }
         try {
             if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {

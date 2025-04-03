@@ -22,9 +22,10 @@
         }
 
         public boolean isNotTimeCome(Long id, User user) {
-    //        if (hour == 23 || hour < 8) {
-    //            return true; // Нельзя отправить уведомление ночью
-    //        }
+            int hour = LocalDateTime.now().getHour();
+            if (hour == 23 || hour < 8) {
+                return true; // Нельзя отправить уведомление ночью
+            }
             Optional<NotificationSent> notificationSent = notificationSentRepository.findByChatIdAndAssignment(id, assignment);
             if (notificationSent.isEmpty()) {
                 NotificationSent newNotificationSent = new NotificationSent();
