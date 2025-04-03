@@ -41,6 +41,8 @@ public class OperationManager {
             return new SignIn(id, messageId, bot, message, bot.getUserRepository());
         if (bot.getSetIntervalUsers().contains(id))
             return new SetInterval(id, messageId, bot, message, bot.getUserRepository());
+        if (bot.getGetAssignmentInfo().containsKey(id))
+            return new GetAssignments(id, messageId, bot, message, bot.getUserRepository(), bot.getAssignmentRepository(), bot.getSubjectRepository());
 
         return switch (message.trim()) {
             case "/enterGroup" ->
@@ -81,6 +83,7 @@ public class OperationManager {
             case "/start" -> new Start(id, messageId, bot, message);
             case "/about" -> new AboutOperation(id, messageId, bot, message);
             case "/setInterval" -> new SetInterval(id, messageId, bot, message, bot.getUserRepository());
+            case "/getAssignments" -> new GetAssignments(id, messageId, bot, message, bot.getUserRepository(), bot.getAssignmentRepository(), bot.getSubjectRepository());
             default -> new MisUnderstand(id, messageId, bot, message);
         };
 

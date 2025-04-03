@@ -35,11 +35,11 @@ public class CreateGroup extends Operation {
             }
             else {
                 sendMessage.setText("This group already exists. Try again");
-                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true));
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
             }
         } else {
             sendMessage.setText("Enter name of group");
-            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true));
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
             bot.getCreateGroupUsers().add(id);
         }
         sendReply();

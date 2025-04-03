@@ -58,14 +58,14 @@ public class DeleteSubject extends Operation {
                 bot.getDeleteSubjectUsers().remove(id);
             } else {
                 text.append("Enter another subject or break operation");
-                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                         subjectsNames.toArray(new String[0])));
             }
             sendMessage.setText(text.toString());
         }
         else {
             sendMessage.setText("Choose a subject from list");
-            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,false,
                     subjectsNames.toArray(new String[0])));
             bot.getDeleteSubjectUsers().add(id);
         }

@@ -49,11 +49,11 @@ public class SetInterval extends Operation {
                     }
                 } else {
                     sendMessage.setText("Invalid format. Please try again.");
-                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true));
+                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false));
                 }
             } else {
                 sendMessage.setText("Invalid format. Please use: <count> S|M|D");
-                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true));
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false));
             }
         } else {
             sendMessage.setText(
@@ -64,7 +64,7 @@ public class SetInterval extends Operation {
                     <count> D
                     S - seconds, M - minutes, D - days
                     """);
-            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true));
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false));
             bot.getSetIntervalUsers().add(id);
         }
         sendReply();

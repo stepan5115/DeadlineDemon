@@ -59,7 +59,7 @@ public class DeleteToken extends Operation {
                         bot.getDeleteTokenUsers().remove(id);
                     } else {
                         text.append("\nEnter next token or break operation");
-                        sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,
+                        sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                                 tokensNames.toArray(new String[0])));
                     }
                     sendMessage.setText(text.toString());
@@ -71,7 +71,7 @@ public class DeleteToken extends Operation {
                 }
             } else {
                 sendMessage.setText("Enter token");
-                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                         tokensNames.toArray(new String[0])));
                 bot.getDeleteTokenUsers().add(id);
             }

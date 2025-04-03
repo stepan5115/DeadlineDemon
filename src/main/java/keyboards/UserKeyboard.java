@@ -73,15 +73,24 @@ public class UserKeyboard {
         InlineKeyboardButton button9 = new InlineKeyboardButton("/setInterval");
         button9.setCallbackData("/setInterval"  + "_" + userId);
         row5.add(button9);
-        InlineKeyboardButton button10 = new InlineKeyboardButton("/help");
-        button10.setCallbackData("/help"  + "_" + userId);
+        //button 10
+        InlineKeyboardButton button10 = new InlineKeyboardButton("/getAssignments");
+        button10.setCallbackData("/getAssignments"  + "_" + userId);
         row5.add(button10);
+
+        //row 6
+        List<InlineKeyboardButton> row6 = new ArrayList<>();
+        //Button 11
+        InlineKeyboardButton button11 = new InlineKeyboardButton("/help");
+        button11.setCallbackData("/help"  + "_" + userId);
+        row6.add(button10);
 
         rows.add(row1);
         rows.add(row2);
         rows.add(row3);
         rows.add(row4);
         rows.add(row5);
+        rows.add(row6);
 
         markup.setKeyboard(rows);
         return markup;
@@ -106,13 +115,16 @@ public class UserKeyboard {
         row4.add("/info");
         row4.add("/logout");
         KeyboardRow row5 = new KeyboardRow();
-        row5.add("/help");
+        row5.add("/getAssignments");
         row5.add("/setInterval");
+        KeyboardRow row6 = new KeyboardRow();
+        row6.add("/help");
         rows.add(row1);
         rows.add(row2);
         rows.add(row3);
         rows.add(row4);
         rows.add(row5);
+        rows.add(row6);
         markup.setKeyboard(rows);
         markup.setOneTimeKeyboard(false);
         return markup;

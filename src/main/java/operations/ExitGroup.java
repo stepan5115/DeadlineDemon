@@ -47,24 +47,24 @@ public class ExitGroup extends Operation {
             } else if (group.isPresent() &&
                     !user.getGroups().contains(group.get().getName())) {
                 tmp = "You not in this group. Try again!";
-                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true));
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
             }
             else {
                 tmp = "Group not found. Try again!";
-                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true));
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
             }
             if ((user.getGroups() == null) || (user.getGroups().isEmpty())) {
                 sendMessage.setText(tmp + "\nNow, you are not in any group");
                 bot.getExitGroupUsers().remove(id);
             } else {
                 sendMessage.setText(tmp);
-                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                         user.getGroups().toArray(new String[0])));
             }
         }
         else {
             sendMessage.setText("Please enter a name of group from list");
-            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true,
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false,
                     user.getGroups().toArray(new String[0])));
             bot.getExitGroupUsers().add(id);
         }

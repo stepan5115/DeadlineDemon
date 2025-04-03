@@ -46,7 +46,7 @@ public class CreateAssignment extends Operation {
                         status.setState(TitDesGroDeaSubState.StateType.WAITING_DESCRIPTION);
                         status.setTitle(message);
                     }
-                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true));
+                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
                     break;
                 }
                 case TitDesGroDeaSubState.StateType.WAITING_DESCRIPTION: {
@@ -64,18 +64,18 @@ public class CreateAssignment extends Operation {
                     for (Group group : groups)
                         groupNames.add(group.getName());
                     groupNames.add("/toDeadline");
-                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,
+                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                             groupNames.toArray(new String[0])));
                     break;
                 }
                 case TitDesGroDeaSubState.StateType.WAITING_GROUP: {
                     String[] array = {"/toDeadline"};
-                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, array));
+                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false, array));
                     if (message.trim().equals("/toDeadline")) {
                         if (status.getGroup().isEmpty())
                             sendMessage.setText("You must choose at list one group");
                         else {
-                            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true));
+                            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
                             sendMessage.setText("Now, enter the Deadline in this format: " +
                                     DateParser.DATE_FORMAT);
                             status.setGroup(status.getGroup());
@@ -98,7 +98,7 @@ public class CreateAssignment extends Operation {
                 }
                 case TitDesGroDeaSubState.StateType.WAITING_DEADLINE: {
                     LocalDateTime deadline = DateParser.parseDeadline(message);
-                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true));
+                    sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
                     if (deadline == null)
                         sendMessage.setText("Bad format for deadline. There are example: " +
                                 DateParser.DATE_FORMAT);
@@ -119,7 +119,7 @@ public class CreateAssignment extends Operation {
                         }
                         for (Subject subject : subjects)
                             subjectNames.add(subject.getName());
-                        sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,
+                        sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                                 subjectNames.toArray(new String[0])));
                     }
                     break;
@@ -145,14 +145,14 @@ public class CreateAssignment extends Operation {
                         bot.getCreateAssignmentUsers().remove(id);
                     } else {
                         sendMessage.setText("Subject not found. Try again");
-                        sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true));
+                        sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
                     }
                     break;
                 }
             }
         } else {
             sendMessage.setText("First, enter title of assignment");
-            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true));
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
             bot.getCreateAssignmentUsers().put(id, new TitDesGroDeaSubState(TitDesGroDeaSubState.StateType.WAITING_TITLE));
         }
         sendReply();

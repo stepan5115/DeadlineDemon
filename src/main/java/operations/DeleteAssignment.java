@@ -48,13 +48,13 @@ public class DeleteAssignment extends Operation {
                 bot.getDeleteAssignmentUsers().remove(id);
             } else {
                 text.append("\nEnter title of assignment");
-                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                         assignmentsNames.toArray(new String[0])));
             }
             sendMessage.setText(text.toString());
         } else {
             sendMessage.setText("Enter title of assignment to delete from list");
-            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                     assignmentsNames.toArray(new String[0])));
             bot.getDeleteAssignmentUsers().add(id);
         }

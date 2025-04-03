@@ -21,6 +21,8 @@ public class ExitOperation extends Operation {
         bot.getDeleteAssignmentUsers().remove(id);
         bot.getCreateSubjectUsers().remove(id);
         bot.getDeleteSubjectUsers().remove(id);
+        bot.getSetIntervalUsers().remove(id);
+        bot.getGetAssignmentInfo().remove(id);
         sendMessage.setText("Break all operations if they have been exited");
         sendReply();
     }

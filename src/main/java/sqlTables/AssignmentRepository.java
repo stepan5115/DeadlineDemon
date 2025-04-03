@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
@@ -35,4 +36,6 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     void deleteAssignmentsByTitleIgnoreCase(String title);
 
     boolean existsBySubjectId(Long subjectId);
+
+    Optional<Assignment> getAssignmentByTitle(String title);
 }

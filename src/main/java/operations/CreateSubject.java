@@ -27,7 +27,7 @@ public class CreateSubject extends Operation {
         else if (bot.getCreateSubjectUsers().contains(id)) {
             if (subjectRepository.existsByNameIgnoreCase(message)) {
                 sendMessage.setText("Subject already exists. Try again");
-                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true));
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
             }
             else {
                 Subject subject = new Subject();
@@ -39,7 +39,7 @@ public class CreateSubject extends Operation {
         }
         else {
             sendMessage.setText("Enter subject name");
-            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true));
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
             bot.getCreateSubjectUsers().add(id);
         }
         sendReply();

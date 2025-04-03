@@ -59,13 +59,13 @@ public class DeleteGroup extends Operation {
                 bot.getDeleteGroupUsers().remove(id);
             } else {
                 text.append("\nEnter group name from list");
-                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true,
+                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false,
                         groupsNames.toArray(new String[0])));
             }
             sendMessage.setText(text.toString());
         } else {
             sendMessage.setText("Enter name of group from list");
-            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                     groupsNames.toArray(new String[0])));
             bot.getDeleteGroupUsers().add(id);
         }

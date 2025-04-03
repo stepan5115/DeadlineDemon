@@ -53,7 +53,7 @@ public class GetAdminRights extends Operation {
             bot.getEnterTokenUsers().remove(id);
         } else {
             sendMessage.setText("Enter token");
-            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true));
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false));
             bot.getEnterTokenUsers().add(id);
         }
         sendReply();

@@ -53,7 +53,7 @@ public class EnterGroup extends Operation {
                 names.add(group.getName());
             }
             sendMessage.setText("Please enter a name of group from list");
-            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true,
+            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false,
                     names.toArray(new String[0])));
             bot.getEnterGroupUsers().add(id);
         }
