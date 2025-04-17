@@ -1,9 +1,10 @@
 package operations;
 
+import keyboards.ChooseKeyboard;
 import keyboards.StartKeyboard;
-import keyboards.UserKeyboard;
 import mainBody.IdPair;
 import mainBody.MyTelegramBot;
+import sqlTables.User;
 
 
 public class Start extends Operation {
@@ -13,8 +14,9 @@ public class Start extends Operation {
     }
     public void run() {
         if (bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("Hello, " + bot.getAuthorizedUsers().get(id).getUsername() + "!");
-            sendMessage.setReplyMarkup(UserKeyboard.getInlineKeyboard(id));
+            User user = bot.getAuthorizedUsers().get(id);
+            sendMessage.setText("Hello, " + user.getUsername() + "!");
+            sendMessage.setReplyMarkup(ChooseKeyboard.getInlineKeyboard(id, user.isCanEditTasks()));
         } else {
             sendMessage.setText("Hello, stranger!");
             sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard(id));

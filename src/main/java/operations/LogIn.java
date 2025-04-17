@@ -1,6 +1,6 @@
 package operations;
 
-import keyboards.UserKeyboard;
+import keyboards.ChooseKeyboard;
 import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 import mainBody.NamePasswordState;
@@ -49,7 +49,7 @@ public class LogIn extends Operation {
                 else if (user.isPresent() && PasswordEncryptor.matches(message, user.get().getPassword())) {
                     bot.getAuthorizedUsers().put(id, user.get());
                     sendMessage.setText("You logged in!");
-                    sendMessage.setReplyMarkup(UserKeyboard.getInlineKeyboard(id));
+                    sendMessage.setReplyMarkup(ChooseKeyboard.getInlineKeyboard(id, user.get().isCanEditTasks()));
                 } else if(user.isPresent() && !PasswordEncryptor.matches(message, user.get().getPassword()))
                     sendMessage.setText("Incorrect password");
                 else

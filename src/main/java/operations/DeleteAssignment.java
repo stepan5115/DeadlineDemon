@@ -32,7 +32,7 @@ public class DeleteAssignment extends Operation {
             bot.getDeleteAssignmentUsers().remove(id);
         }
         else if (assignmentsNames.isEmpty()) {
-            sendMessage.setText("No subjects in system");
+            sendMessage.setText("No assignment in system");
             bot.getDeleteAssignmentUsers().remove(id);
         }
         else if (bot.getDeleteAssignmentUsers().contains(id)) {

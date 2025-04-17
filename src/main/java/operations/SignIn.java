@@ -1,7 +1,7 @@
 package operations;
 
+import keyboards.ChooseKeyboard;
 import keyboards.InstanceKeyboardBuilder;
-import keyboards.UserKeyboard;
 import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 import mainBody.NamePasswordState;
@@ -49,7 +49,7 @@ public class SignIn extends Operation {
                     bot.getAuthorizedUsers().put(id, newUser);
                     bot.getSignInUserStates().remove(id);
                     sendMessage.setText("Successfully sign in!");
-                    sendMessage.setReplyMarkup(UserKeyboard.getInlineKeyboard(id));
+                    sendMessage.setReplyMarkup(ChooseKeyboard.getInlineKeyboard(id, newUser.isCanEditTasks()));
                 } else {
                     sendMessage.setText("Something went wrong!");
                     bot.getSignInUserStates().remove(id);
