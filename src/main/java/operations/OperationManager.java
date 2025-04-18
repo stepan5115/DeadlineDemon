@@ -45,45 +45,65 @@ public class OperationManager {
             return new GetAssignments(id, messageId, bot, message, bot.getUserRepository(), bot.getAssignmentRepository(), bot.getSubjectRepository());
 
         return switch (message.trim()) {
-            case "/enterGroup" ->
-                    new EnterGroup(id, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
-            case "/exitGroup" ->
-                    new ExitGroup(id, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
-            case "/enableNotifications" ->
+            case "/help" -> new HelpUser(id, messageId, bot, message);
+            case "/back" ->
+                new BackKeyboardOperation(id, messageId, bot, message);
+            //Notifications Menu
+            case "/notifications" ->
+                new NotificationsKeyboardGet(id, messageId, bot, message);
+            case "/enable" ->
                     new EnableAutoMailing(id, messageId, bot, message, bot.getUserRepository());
-            case "/disableNotifications" ->
+            case "/disable" ->
                     new DisableAutoMailing(id, messageId, bot, message, bot.getUserRepository());
-            case "/generateToken" ->
-                    new GenerateToken(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
-            case "/getAdminRights" ->
-                    new GetAdminRights(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
-            case "/getMyTokens" ->
-                    new GetTokens(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
-            case "/deleteToken" ->
-                    new DeleteToken(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
-            case "/createGroup" -> new CreateGroup(id, messageId, bot, message, bot.getGroupRepository());
+            //Groups Menu
+            case "/groups" ->
+                new GroupsKeyboardGet(id, messageId, bot, message);
+            case "/enter" ->
+                    new EnterGroup(id, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
+            case "/exit" ->
+                    new ExitGroup(id, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
+            case "/createGroup" ->
+                    new CreateGroup(id, messageId, bot, message, bot.getGroupRepository());
             case "/deleteGroup" ->
                     new DeleteGroup(id, messageId, bot, message, bot.getGroupRepository(), bot.getUserRepository());
-            case "/createAssignment" -> new CreateAssignment(id, messageId, bot, message,
+            //Tasks Menu
+            case "/tasks" ->
+                new TasksKeyboardGet(id, messageId, bot, message);
+            case "/getTasks" -> new GetAssignments(id, messageId, bot, message,
+                    bot.getUserRepository(), bot.getAssignmentRepository(), bot.getSubjectRepository());
+            case "/createTask" -> new CreateAssignment(id, messageId, bot, message,
                     bot.getAssignmentRepository(), bot.getGroupRepository(),
                     bot.getSubjectRepository());
-            case "/deleteAssignment" ->
+            case "/deleteTask" ->
                     new DeleteAssignment(id, messageId, bot, message, bot.getAssignmentRepository());
+            case "/subjects" ->
+                new SubjectsKeyboardGet(id, messageId, bot, message);
             case "/createSubject" ->
                     new CreateSubject(id, messageId, bot, message, bot.getSubjectRepository());
             case "/deleteSubject" ->
                     new DeleteSubject(id, messageId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
-            case "/admin" -> new SetAdminKeyboard(id, messageId, bot, message);
+            //Tokens Menu
+            case "/tokens" ->
+                new TokensKeyboardGet(id, messageId, bot, message);
+            case "/generate" ->
+                    new GenerateToken(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+            case "/delete" ->
+                    new DeleteToken(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+            case "/getMyTokens" ->
+                    new GetTokens(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+            //Profile Menu
+            case "/profile" ->
+                new ProfileKeyboardGet(id, messageId, bot, message);
+            case "/getAdminRights" ->
+                    new GetAdminRights(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
             case "/info" -> new GetInfo(id, messageId, bot, message, bot.getAssignmentRepository());
-            case "/help" -> new HelpUser(id, messageId, bot, message);
-            case "/helpAdmin" -> new HelpAdmin(id, messageId, bot, message);
+            case "/logout" -> new LogOut(id, messageId, bot, message);
+            case "/setInterval" -> new SetInterval(id, messageId, bot, message, bot.getUserRepository());
+            //Start Menu
+            case "/start" -> new Start(id, messageId, bot, message);
             case "/login" -> new LogIn(id, messageId, bot, message, bot.getUserRepository());
             case "/register" -> new SignIn(id, messageId, bot, message, bot.getUserRepository());
-            case "/logout" -> new LogOut(id, messageId, bot, message);
-            case "/start" -> new Start(id, messageId, bot, message);
             case "/about" -> new AboutOperation(id, messageId, bot, message);
-            case "/setInterval" -> new SetInterval(id, messageId, bot, message, bot.getUserRepository());
-            case "/getAssignments" -> new GetAssignments(id, messageId, bot, message, bot.getUserRepository(), bot.getAssignmentRepository(), bot.getSubjectRepository());
             default -> new MisUnderstand(id, messageId, bot, message);
         };
 
