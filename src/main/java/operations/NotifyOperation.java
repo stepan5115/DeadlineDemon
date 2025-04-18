@@ -68,10 +68,10 @@
                 return;
             if (isNotTimeCome(Long.parseLong(id.getUserId()), user))
                 return;
-            StringBuilder text = new StringBuilder("Dear " + user.getUsername() + "! I remind you of the assignment \"" +
-                    assignment.getTitle() + "\" in the subject \"" + assignment.getSubject().getName() +
-                    "\", which you will need to complete on " + assignment.getDeadline() +
-                    ".\nDescription: " + assignment.getDescription() + "\nThis assignment applies to your groups:");
+            StringBuilder text = new StringBuilder("Уважаемый " + user.getUsername() + "! Напоминаю вам про задание \"" +
+                    assignment.getTitle() + "\" по дисциплине \"" + assignment.getSubject().getName() +
+                    "\", которое вам требуется выполнить до " + assignment.getDeadline() +
+                    ".\nОписание: " + assignment.getDescription() + "\nЭто задание относится к вашим группам:");
             for (String group : targetGroups)
                 text.append('\n').append(group);
             sendMessage.setText(text.toString());
@@ -105,12 +105,12 @@
                 return;
             if (isNotTimeCome(Long.parseLong(id.getChatId()), userTrigger))
                 return;
-            StringBuilder text = new StringBuilder("Triggered by " + userTrigger.getUsername() +
-                    "(interval: " + userTrigger.getFormattedInterval() + ")" +
-                    "\nI remind about the assignment \"" +
-                    assignment.getTitle() + "\" in the subject \"" + assignment.getSubject().getName() +
-                    "\", which need to complete on " + assignment.getDeadline() +
-                    ".\nDescription: " + assignment.getDescription() + "\nThis assignment applies to students:");
+            StringBuilder text = new StringBuilder("Вызвано уведомлениями пользователя: " + userTrigger.getUsername() +
+                    "(интервал уведомлений: " + userTrigger.getFormattedInterval() + ")" +
+                    "\nНапоминаю вам про задание \"" +
+                    assignment.getTitle() + "\" по предмету \"" + assignment.getSubject().getName() +
+                    "\", которое требуется выполнить до " + assignment.getDeadline() +
+                    ".\nОписание: " + assignment.getDescription() + "\nЭто задание относится к следующим пользователям:");
             for (User user : targetUsers)
                 text.append('\n').append(user.getUsername());
             sendMessage.setText(text.toString());

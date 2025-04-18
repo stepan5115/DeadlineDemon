@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationsKeyboard {
-    public static ReplyKeyboard getInlineKeyboard(IdPair id, boolean adminMode) {
+    public static ReplyKeyboard getInlineKeyboard(IdPair id) {
         if (id.getChatId().equals(id.getUserId()))
-            return forUser(adminMode);
+            return forUser();
         else
-            return forChat(id.getUserId(), adminMode);
+            return forChat(id.getUserId());
     }
-    private static ReplyKeyboard forChat(String userId, boolean adminMode) {
+    private static ReplyKeyboard forChat(String userId) {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
@@ -38,13 +38,14 @@ public class NotificationsKeyboard {
         //button 3
         InlineKeyboardButton button3 = new InlineKeyboardButton("назад");
         button3.setCallbackData("/back"  + "_" + userId);
+        row2.add(button3);
         rows.add(row2);
 
         markup.setKeyboard(rows);
         return markup;
     }
 
-    private static ReplyKeyboard forUser(boolean adminMode) {
+    private static ReplyKeyboard forUser() {
         ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
         markup.setResizeKeyboard(true);
         markup.setOneTimeKeyboard(false);

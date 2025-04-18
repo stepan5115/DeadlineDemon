@@ -9,7 +9,7 @@ public class MisUnderstand extends Operation {
         super(id, messageId, bot, message);
     }
     public void run() {
-        sendMessage.setText("Can't understand your message");
+        sendMessage.setText("Не могу понять ваше сообщение");
         sendReply();
     }
 }

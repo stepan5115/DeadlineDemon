@@ -18,11 +18,11 @@ public class CreateGroup extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
             bot.getCreateGroupUsers().remove(id);
         }
         else if (!user.isCanEditTasks()) {
-            sendMessage.setText("You haven't right to create group");
+            sendMessage.setText("У вас нету на это прав");
             bot.getCreateGroupUsers().remove(id);
         }
         else if (bot.getCreateGroupUsers().contains(id)) {
@@ -31,14 +31,14 @@ public class CreateGroup extends Operation {
                 newGroup.setName(message);
                 groupRepository.save(newGroup);
                 bot.getCreateGroupUsers().remove(id);
-                sendMessage.setText("Success add group!");
+                sendMessage.setText("Группа создана");
             }
             else {
-                sendMessage.setText("This group already exists. Try again");
+                sendMessage.setText("Группа уже создана, попробуйте снова");
                 sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
             }
         } else {
-            sendMessage.setText("Enter name of group");
+            sendMessage.setText("Введите имя группы");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
             bot.getCreateGroupUsers().add(id);
         }

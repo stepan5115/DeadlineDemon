@@ -24,15 +24,15 @@ public class DeleteAssignment extends Operation {
         for (Assignment assignment : assignments)
             assignmentsNames.add(assignment.getTitle());
         if (!bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
             bot.getDeleteAssignmentUsers().remove(id);
         }
         else if (!user.isCanEditTasks()) {
-            sendMessage.setText("You haven't right to create assignment");
+            sendMessage.setText("У вас нет прав на удаление задания");
             bot.getDeleteAssignmentUsers().remove(id);
         }
         else if (assignmentsNames.isEmpty()) {
-            sendMessage.setText("No assignment in system");
+            sendMessage.setText("Нету заданий в системе");
             bot.getDeleteAssignmentUsers().remove(id);
         }
         else if (bot.getDeleteAssignmentUsers().contains(id)) {
@@ -40,20 +40,20 @@ public class DeleteAssignment extends Operation {
             if (assignmentRepository.existsAssignmentByTitle(message)) {
                 assignmentRepository.deleteAssignmentsByTitle(message);
                 assignmentsNames.remove(message);
-                text.append("Successfully deleted assignment!");
+                text.append("Успешно удалено");
             } else
-                text.append("Assignment not exists");
+                text.append("Не существует");
             if (assignmentsNames.isEmpty()) {
-                text.append("\nNo subjects in system");
+                text.append("\nВ системе нету заданий");
                 bot.getDeleteAssignmentUsers().remove(id);
             } else {
-                text.append("\nEnter title of assignment");
+                text.append("\nВыберите заголовок задания");
                 sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                         assignmentsNames.toArray(new String[0])));
             }
             sendMessage.setText(text.toString());
         } else {
-            sendMessage.setText("Enter title of assignment to delete from list");
+            sendMessage.setText("Выбирайте задания из списка пока они не кончатся или вы не выберете /break");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                     assignmentsNames.toArray(new String[0])));
             bot.getDeleteAssignmentUsers().add(id);

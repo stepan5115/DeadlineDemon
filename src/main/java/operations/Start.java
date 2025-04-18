@@ -15,10 +15,10 @@ public class Start extends Operation {
     public void run() {
         if (bot.getAuthorizedUsers().containsKey(id)) {
             User user = bot.getAuthorizedUsers().get(id);
-            sendMessage.setText("Hello, " + user.getUsername() + "!");
+            sendMessage.setText("Здравствуйте, " + user.getUsername());
             sendMessage.setReplyMarkup(ChooseKeyboard.getInlineKeyboard(id, user.isCanEditTasks()));
         } else {
-            sendMessage.setText("Hello, stranger!");
+            sendMessage.setText("Здравствуй, незнакомец");
             sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard(id));
         }
         sendReply();

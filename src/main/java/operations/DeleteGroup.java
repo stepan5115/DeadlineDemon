@@ -29,15 +29,15 @@ public class DeleteGroup extends Operation {
         for (Group group : groups)
             groupsNames.add(group.getName());
         if (!bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
             bot.getDeleteGroupUsers().remove(id);
         }
         else if (!user.isCanEditTasks()) {
-            sendMessage.setText("You haven't right to delete group");
+            sendMessage.setText("У вас нет прав для ужаления групп");
             bot.getDeleteGroupUsers().remove(id);
         }
         else if (groups.isEmpty()) {
-            sendMessage.setText("No groups in system");
+            sendMessage.setText("В системе нету групп");
             bot.getDeleteGroupUsers().remove(id);
         }
         else if (bot.getDeleteGroupUsers().contains(id)) {
@@ -45,26 +45,26 @@ public class DeleteGroup extends Operation {
             Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
             if (group.isPresent()) {
                 if (userRepository.existsByGroupName(group.get().getName()))
-                    text.append("You can't delete a group because it has users.");
+                    text.append("Вы не можете удалить группы с участниками");
                 else {
                     groupRepository.delete(group.get());
                     groupsNames.remove(group.get().getName());
-                    text.append("Success delete group!");
+                    text.append("Успешно удалена группа");
                 }
             }
             else
-                sendMessage.setText("Can't find group");
+                sendMessage.setText("Группа не найдена");
             if (groupsNames.isEmpty()) {
-                text.append("\nNo groups in system");
+                text.append("\nВ системе не осталось групп");
                 bot.getDeleteGroupUsers().remove(id);
             } else {
-                text.append("\nEnter group name from list");
+                text.append("\nВыберите группу из списка");
                 sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false,
                         groupsNames.toArray(new String[0])));
             }
             sendMessage.setText(text.toString());
         } else {
-            sendMessage.setText("Enter name of group from list");
+            sendMessage.setText("Выбирайте группы из списка пока они не кончатся или пока вы не введете /break");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                     groupsNames.toArray(new String[0])));
             bot.getDeleteGroupUsers().add(id);

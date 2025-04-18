@@ -17,16 +17,16 @@ public class CreateSubject extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
             bot.getCreateSubjectUsers().remove(id);
         }
         else if (!user.isCanEditTasks()) {
-            sendMessage.setText("You haven't right to create assignment");
+            sendMessage.setText("У вас нет на это прав");
             bot.getCreateSubjectUsers().remove(id);
         }
         else if (bot.getCreateSubjectUsers().contains(id)) {
             if (subjectRepository.existsByNameIgnoreCase(message)) {
-                sendMessage.setText("Subject already exists. Try again");
+                sendMessage.setText("Предмет уже создан, попробуйте снова");
                 sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
             }
             else {
@@ -34,11 +34,11 @@ public class CreateSubject extends Operation {
                 subject.setName(message);
                 subjectRepository.save(subject);
                 bot.getCreateSubjectUsers().remove(id);
-                sendMessage.setText("Subject created");
+                sendMessage.setText("Предмет создан");
             }
         }
         else {
-            sendMessage.setText("Enter subject name");
+            sendMessage.setText("Введите имя предмета");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
             bot.getCreateSubjectUsers().add(id);
         }

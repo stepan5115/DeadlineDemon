@@ -67,7 +67,7 @@ public class HelpUser extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id))
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
         else if (user.isCanEditTasks())
             sendMessage.setText(adminHelp);
         else

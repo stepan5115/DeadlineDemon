@@ -26,11 +26,11 @@ public class GetAdminRights extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
             bot.getEnterTokenUsers().remove(id);
         }
         else if (user.isCanEditTasks()) {
-            sendMessage.setText("You already have the admin rights");
+            sendMessage.setText("Вы уже обладаете правами администратора");
             bot.getEnterTokenUsers().remove(id);
         }
         else if (bot.getEnterTokenUsers().contains(id)) {
@@ -42,17 +42,17 @@ public class GetAdminRights extends Operation {
                     userRepository.save(user);
                     adminTokenRepository.deleteByToken(adminToken.get().getToken());
                     synchronizedUsers();
-                    sendMessage.setText("Congratulations! Now you have the admin rights");
+                    sendMessage.setText("Поздравляю, теперь вы администратор");
                 } else
-                    sendMessage.setText("Doesn't find that token. May be it's outdated");
+                    sendMessage.setText("Токен не найден. Возможно он устарел или был удален");
             } else {
-                sendMessage.setText("Something went wrong, login again");
+                sendMessage.setText("Что-то пошло не так. Попробуйте войти в аккаунт снова");
                 bot.getAuthorizedUsers().remove(id);
                 sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard(id));
             }
             bot.getEnterTokenUsers().remove(id);
         } else {
-            sendMessage.setText("Enter token");
+            sendMessage.setText("Введите токен");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false));
             bot.getEnterTokenUsers().add(id);
         }

@@ -42,7 +42,7 @@ public class OperationManager {
         if (bot.getSetIntervalUsers().contains(id))
             return new SetInterval(id, messageId, bot, message, bot.getUserRepository());
         if (bot.getGetAssignmentInfo().containsKey(id))
-            return new GetAssignments(id, messageId, bot, message, bot.getUserRepository(), bot.getAssignmentRepository(), bot.getSubjectRepository());
+            return new GetAssignments(id, messageId, bot, message, bot.getAssignmentRepository(), bot.getSubjectRepository());
 
         return switch (message.trim()) {
             case "/help" -> new HelpUser(id, messageId, bot, message);
@@ -70,7 +70,7 @@ public class OperationManager {
             case "/tasks" ->
                 new TasksKeyboardGet(id, messageId, bot, message);
             case "/getTasks" -> new GetAssignments(id, messageId, bot, message,
-                    bot.getUserRepository(), bot.getAssignmentRepository(), bot.getSubjectRepository());
+                    bot.getAssignmentRepository(), bot.getSubjectRepository());
             case "/createTask" -> new CreateAssignment(id, messageId, bot, message,
                     bot.getAssignmentRepository(), bot.getGroupRepository(),
                     bot.getSubjectRepository());

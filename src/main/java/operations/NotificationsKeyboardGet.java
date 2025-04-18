@@ -1,6 +1,5 @@
 package operations;
 
-import keyboards.ChooseKeyboard;
 import keyboards.NotificationsKeyboard;
 import mainBody.IdPair;
 import mainBody.MyTelegramBot;
@@ -14,10 +13,10 @@ public class NotificationsKeyboardGet extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id))
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
         else {
-            sendMessage.setText("notifications menu");
-            sendMessage.setReplyMarkup(NotificationsKeyboard.getInlineKeyboard(id, user.isCanEditTasks()));
+            sendMessage.setText("Меню настройки уведомлений");
+            sendMessage.setReplyMarkup(NotificationsKeyboard.getInlineKeyboard(id));
         }
         sendReply();
     }

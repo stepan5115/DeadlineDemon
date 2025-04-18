@@ -6,7 +6,10 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import sqlTables.User;
 
+import java.util.logging.Logger;
+
 abstract public class Operation implements Runnable {
+    private static final Logger logger = Logger.getLogger(Operation.class.getName());
     protected final IdPair id;
     protected final String messageId;
     protected final MyTelegramBot bot;
@@ -29,7 +32,7 @@ abstract public class Operation implements Runnable {
         try {
             bot.execute(sendMessage);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.severe("Can't send message: " + e.getMessage());
         }
     }
     protected void replyForPrivacyMessage() {
@@ -42,11 +45,13 @@ abstract public class Operation implements Runnable {
         } catch (TelegramApiException e) {
             SendMessage tmp = new SendMessage();
             tmp.setChatId(id.getChatId());
-            tmp.setText("If I'm in a chat, give me admin rights! This way I can delete the passwords you entered for privacy! This is very important!");
+            tmp.setText("Если я нахожусь в чате, то дайте мне права администратора! " +
+                    "Тогда я смогу удалять из чата ваши пароли для приватности! " +
+                    "Это очень важно!");
             try {
                 bot.execute(tmp);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                logger.severe("Can't delete message: " + e.getMessage());
             }
         }
     }

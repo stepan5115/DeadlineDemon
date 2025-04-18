@@ -16,14 +16,14 @@ public class EnableAutoMailing extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id))
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
         else if (user.isAllowNotifications())
-            sendMessage.setText("You are allowed to enable notifications");
+            sendMessage.setText("Вы уже включили уведомления");
         else {
             user.setAllowNotifications(true);
             userRepository.save(user);
             synchronizedUsers();
-            sendMessage.setText("Successfully enable notifications");
+            sendMessage.setText("Уведомления включены успешно");
         }
         sendReply();
     }

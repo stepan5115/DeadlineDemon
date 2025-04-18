@@ -29,20 +29,20 @@ public class CreateAssignment extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
             bot.getCreateAssignmentUsers().remove(id);
         }
         else if (!user.isCanEditTasks()) {
-            sendMessage.setText("You haven't right to create assignment");
+            sendMessage.setText("У вас нет на это прав");
             bot.getCreateAssignmentUsers().remove(id);
         } else if (bot.getCreateAssignmentUsers().containsKey(id)) {
             TitDesGroDeaSubState status = bot.getCreateAssignmentUsers().get(id);
             switch (status.getState()) {
                 case TitDesGroDeaSubState.StateType.WAITING_TITLE: {
                     if (assignmentRepository.existsAssignmentByTitleIgnoreCase(message))
-                        sendMessage.setText("This title already exists, choose a different title");
+                        sendMessage.setText("Этот заголовок существует, придумайте другой");
                     else {
-                        sendMessage.setText("Now, enter the description");
+                        sendMessage.setText("Теперь, введите описание");
                         status.setState(TitDesGroDeaSubState.StateType.WAITING_DESCRIPTION);
                         status.setTitle(message);
                     }
@@ -50,13 +50,14 @@ public class CreateAssignment extends Operation {
                     break;
                 }
                 case TitDesGroDeaSubState.StateType.WAITING_DESCRIPTION: {
-                    sendMessage.setText("Now, enter groups one by one from this list");
+                    sendMessage.setText("теперь выбирайте группы одна за другой из списка. " +
+                            "Для перехода далее выберите /toDeadline");
                     status.setState(TitDesGroDeaSubState.StateType.WAITING_GROUP);
                     status.setDescription(message);
                     List<Group> groups = groupRepository.findAll();
                     List<String> groupNames = new LinkedList<>();
                     if (groups.isEmpty()) {
-                        sendMessage.setText("There are no groups in system! Try add assignment when they appear");
+                        sendMessage.setText("В группе нету групп, попробуй добавить задание когда они появятся");
                         bot.getCreateAssignmentUsers().remove(id);
                         sendReply();
                         return;
@@ -73,25 +74,25 @@ public class CreateAssignment extends Operation {
                     sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false, array));
                     if (message.trim().equals("/toDeadline")) {
                         if (status.getGroup().isEmpty())
-                            sendMessage.setText("You must choose at list one group");
+                            sendMessage.setText("Нужна хотя бы одна группа");
                         else {
                             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
-                            sendMessage.setText("Now, enter the Deadline in this format: " +
+                            sendMessage.setText("Теперь введите дедлайн в формате: " +
                                     DateParser.DATE_FORMAT);
                             status.setGroup(status.getGroup());
                             status.setState(TitDesGroDeaSubState.StateType.WAITING_DEADLINE);
                         }
                     } else {
-                        StringBuilder text = new StringBuilder("Enter /toDeadline to go " +
-                                "to the next stage or enter another group\n");
+                        StringBuilder text = new StringBuilder("Введите /toDeadline чтобы перейти " +
+                                "к следующей стадии или продолжайте выбирать группы\n");
                         Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
                         if (group.isPresent() && !status.getGroup().contains(group.get().getName())) {
                             status.getGroup().add(group.get().getName());
-                            text.append("Success added");
+                            text.append("Успешно добавлена");
                         } else if (group.isPresent() && status.getGroup().contains(group.get().getName()))
-                            text.append("Already added");
+                            text.append("Уже добавлена");
                         else
-                            text.append("Cannot find group");
+                            text.append("Группа не найдена");
                         sendMessage.setText(text.toString());
                     }
                     break;
@@ -100,18 +101,18 @@ public class CreateAssignment extends Operation {
                     LocalDateTime deadline = DateParser.parseDeadline(message);
                     sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
                     if (deadline == null)
-                        sendMessage.setText("Bad format for deadline. There are example: " +
+                        sendMessage.setText("Плохой формат ввода. Придерживайтесь шаблона: " +
                                 DateParser.DATE_FORMAT);
                     else if (!deadline.isAfter(LocalDateTime.now()))
-                        sendMessage.setText("Deadline must be after now, not before");
+                        sendMessage.setText("Дедлайн не может быть в прошлом");
                     else {
-                        sendMessage.setText("Now, enter subject name from list");
+                        sendMessage.setText("Теперь выберете предмет из списка");
                         status.setDeadline(deadline);
                         status.setState(TitDesGroDeaSubState.StateType.WAITING_SUBJECT);
                         List<Subject> subjects = subjectRepository.findAll();
                         List<String> subjectNames = new LinkedList<>();
                         if (subjects.isEmpty()) {
-                            sendMessage.setText("There are no subjects in system! Try add assignment when they appear");
+                            sendMessage.setText("В системе нету предметов, попробуйте добавить задание когда они появятся");
                             sendMessage.setReplyMarkup(null);
                             bot.getCreateAssignmentUsers().remove(id);
                             sendReply();
@@ -134,24 +135,24 @@ public class CreateAssignment extends Operation {
                         newAssignment.setDeadline(status.getDeadline());
                         newAssignment.setTargetGroups(status.getGroup());
                         if (assignmentRepository.existsAssignmentByTitleIgnoreCase(status.getTitle())) {
-                            sendMessage.setText("Something went wrong");
+                            sendMessage.setText("Что-то пошло не так. Войдите в аккаунт снова");
                             bot.getCreateAssignmentUsers().remove(id);
                             bot.getAuthorizedUsers().remove(id);
                             sendReply();
                             return;
                         }
                         assignmentRepository.save(newAssignment);
-                        sendMessage.setText("Success added assignment!");
+                        sendMessage.setText("Задание успешно создано");
                         bot.getCreateAssignmentUsers().remove(id);
                     } else {
-                        sendMessage.setText("Subject not found. Try again");
+                        sendMessage.setText("Предмет не найден, попробуйте снова");
                         sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
                     }
                     break;
                 }
             }
         } else {
-            sendMessage.setText("First, enter title of assignment");
+            sendMessage.setText("Введите заголовок задания");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false));
             bot.getCreateAssignmentUsers().put(id, new TitDesGroDeaSubState(TitDesGroDeaSubState.StateType.WAITING_TITLE));
         }

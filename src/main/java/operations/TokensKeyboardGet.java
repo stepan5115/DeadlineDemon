@@ -1,6 +1,5 @@
 package operations;
 
-import keyboards.SubjectsKeyboard;
 import keyboards.TokensKeyboard;
 import mainBody.IdPair;
 import mainBody.MyTelegramBot;
@@ -14,9 +13,9 @@ public class TokensKeyboardGet extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id))
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
         else {
-            sendMessage.setText("tokens menu");
+            sendMessage.setText("Меню токенов");
             sendMessage.setReplyMarkup(TokensKeyboard.getInlineKeyboard(id, user.isCanEditTasks()));
         }
         sendReply();

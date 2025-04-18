@@ -12,12 +12,12 @@ public class LogOut extends Operation {
     }
     public void run() {
         if (bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("Success logged out!");
+            sendMessage.setText("Успешный выход");
             bot.getAuthorizedUsers().remove(id);
             sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard(id));
         }
         else
-            sendMessage.setText("You are not authorized to log out!");
+            sendMessage.setText("Для начала войдите в аккаунт");
         sendReply();
     }
 }

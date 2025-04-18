@@ -28,20 +28,22 @@ public class DeleteToken extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
             bot.getDeleteTokenUsers().remove(id);
         }
         else if (!user.isCanEditTasks()) {
-            sendMessage.setText("You haven't right to have token");
+            sendMessage.setText("У вас нет прав чтобы иметь токены");
             bot.getDeleteTokenUsers().remove(id);
         }
+        else if (!id.getUserId().equals(id.getChatId()))
+            sendMessage.setText("Нельзя удалять токены в общем чате, это небезопасно");
         else {
             List<AdminToken> adminTokens = adminTokenRepository.findByUsername(user.getUsername());
             List<String> tokensNames = new LinkedList<>();
             for (AdminToken adminToken : adminTokens)
                 tokensNames.add(adminToken.getToken());
             if (adminTokens.isEmpty()) {
-                sendMessage.setText("You do not have admin token");
+                sendMessage.setText("У вас нету токенов");
                 bot.getDeleteTokenUsers().remove(id);
             }
             else if (bot.getDeleteTokenUsers().contains(id)) {
@@ -51,26 +53,26 @@ public class DeleteToken extends Operation {
                     if (tokensNames.contains(message)) {
                         adminTokenRepository.deleteByToken(message);
                         tokensNames.remove(message);
-                        text.append("Successfully deleted admin token");
+                        text.append("Успешно удален токен");
                     } else
-                        text.append("Can't find admin token");
+                        text.append("Токен не найден");
                     if (tokensNames.isEmpty()) {
-                        text.append("\nYou do not have more admin token");
+                        text.append("\nУ вас больше не осталось токенов");
                         bot.getDeleteTokenUsers().remove(id);
                     } else {
-                        text.append("\nEnter next token or break operation");
+                        text.append("\nВыберете следующий токен или завершите операцию");
                         sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                                 tokensNames.toArray(new String[0])));
                     }
                     sendMessage.setText(text.toString());
                 } else {
-                    sendMessage.setText("Something went wrong, login again");
+                    sendMessage.setText("Что-то пошло не так. Войдите в аккаунт снова");
                     bot.getAuthorizedUsers().remove(id);
                     bot.getDeleteTokenUsers().remove(id);
                     sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard(id));
                 }
             } else {
-                sendMessage.setText("Enter token");
+                sendMessage.setText("Выбирайте токены пока они не кончатся или вы не выберете /break");
                 sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                         tokensNames.toArray(new String[0])));
                 bot.getDeleteTokenUsers().add(id);

@@ -21,7 +21,7 @@ public class LogIn extends Operation {
     }
     public void run() {
         if (bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("You already logged in!");
+            sendMessage.setText("Вы уже вошли");
             bot.getLogInUserStates().remove(id);
         }
         else if (bot.getLogInUserStates().containsKey(id)) {
@@ -30,35 +30,35 @@ public class LogIn extends Operation {
                 for (IdPair userId : bot.getAuthorizedUsers().keySet())
                     if (bot.getAuthorizedUsers().get(userId).getUsername().equals(message)
                             && !userId.getUserId().equals(id.getUserId())) {
-                        sendMessage.setText("This account is busy by other user!");
+                        sendMessage.setText("Этот аккаунт сейчас занят другим пользователем!");
                         bot.getLogInUserStates().remove(id);
                         sendReply();
                         return;
                     }
                 if (userRepository.existsByUsername(message)) {
-                    sendMessage.setText("Now, enter your password");
+                    sendMessage.setText("Теперь, введите пароль");
                     bot.getLogInUserStates().put(id, new NamePasswordState(NamePasswordState.StateType.WAITING_PASSWORD, message));
                 } else {
-                    sendMessage.setText("Can't find your name");
+                    sendMessage.setText("Не могу найти введенный логин");
                     bot.getLogInUserStates().remove(id);
                 }
             } else if (state.getType() == NamePasswordState.StateType.WAITING_PASSWORD) {
                 Optional<User> user = userRepository.findByUsername(state.getUsername());
                 if (message.length() > 15)
-                    sendMessage.setText("Incorrect password");
+                    sendMessage.setText("Неправильный пароль");
                 else if (user.isPresent() && PasswordEncryptor.matches(message, user.get().getPassword())) {
                     bot.getAuthorizedUsers().put(id, user.get());
-                    sendMessage.setText("You logged in!");
+                    sendMessage.setText("Успешный вход");
                     sendMessage.setReplyMarkup(ChooseKeyboard.getInlineKeyboard(id, user.get().isCanEditTasks()));
                 } else if(user.isPresent() && !PasswordEncryptor.matches(message, user.get().getPassword()))
-                    sendMessage.setText("Incorrect password");
+                    sendMessage.setText("Неверный пароль");
                 else
-                    sendMessage.setText("Something went wrong!");
+                    sendMessage.setText("Что-то пошло не так");
                 bot.getLogInUserStates().remove(id);
                 replyForPrivacyMessage();
             }
         } else {
-            sendMessage.setText("First, enter your name");
+            sendMessage.setText("Введите логин");
             bot.getLogInUserStates().put(id, new NamePasswordState(NamePasswordState.StateType.WAITING_USERNAME, null));
         }
         sendReply();

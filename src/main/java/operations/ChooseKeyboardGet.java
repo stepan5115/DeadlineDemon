@@ -13,9 +13,9 @@ public class ChooseKeyboardGet extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id))
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
         else {
-            sendMessage.setText("choose menu");
+            sendMessage.setText("Меню выбора");
             sendMessage.setReplyMarkup(ChooseKeyboard.getInlineKeyboard(id, user.isCanEditTasks()));
         }
         sendReply();

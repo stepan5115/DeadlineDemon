@@ -26,11 +26,11 @@ public class EnterGroup extends Operation {
     public void run() {
         List<Group> allDBGroups = groupRepository.findAll();
         if (!bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
             bot.getEnterGroupUsers().remove(id);
         }
         else if (allDBGroups.isEmpty()) {
-            sendMessage.setText("There are no groups in system");
+            sendMessage.setText("В системе нету групп");
             bot.getEnterGroupUsers().remove(id);
         }
         else if (bot.getEnterGroupUsers().contains(id)) {
@@ -41,18 +41,18 @@ public class EnterGroup extends Operation {
                 user.addGroup(group.get().getName());
                 userRepository.save(user);
                 synchronizedUsers();
-                sendMessage.setText("Successfully entered group");
+                sendMessage.setText("Успешный вход");
             } else if (group.isPresent() &&
                     user.getGroups().contains(group.get().getName()))
-                sendMessage.setText("You already have this group");
+                sendMessage.setText("Вы уже в этой группе");
             else
-                sendMessage.setText("Group not found");
+                sendMessage.setText("Группа не найдена");
         } else {
             List<String> names = new LinkedList<>();
             for (Group group : allDBGroups) {
                 names.add(group.getName());
             }
-            sendMessage.setText("Please enter a name of group from list");
+            sendMessage.setText("Выбирайте группы из списка пока не выберете /break");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false,
                     names.toArray(new String[0])));
             bot.getEnterGroupUsers().add(id);

@@ -29,15 +29,15 @@ public class DeleteSubject extends Operation {
         for (Subject subject : subjects)
             subjectsNames.add(subject.getName());
         if (!bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
             bot.getDeleteSubjectUsers().remove(id);
         }
         else if (!user.isCanEditTasks()) {
-            sendMessage.setText("You haven't right to create assignment");
+            sendMessage.setText("У вас нет прав для удаления предметов");
             bot.getDeleteSubjectUsers().remove(id);
         }
         if (subjects.isEmpty()) {
-            sendMessage.setText("There are no subjects in system");
+            sendMessage.setText("В системе нету предметов");
             bot.getDeleteSubjectUsers().remove(id);
         }
         else if (bot.getDeleteSubjectUsers().contains(id)) {
@@ -45,26 +45,26 @@ public class DeleteSubject extends Operation {
             Optional<Subject> subject = subjectRepository.findByName(message);
             if (subject.isPresent()) {
                 if (assignmentRepository.existsBySubjectId(subject.get().getId()))
-                    text.append("You can't delete subject that has a assignment.");
+                    text.append("Вы не можете удалить предмет по которому есть задания");
                 else {
                     subjectRepository.delete(subject.get());
                     subjectsNames.remove(subject.get().getName());
-                    text.append("Subject deleted.");
+                    text.append("Предмет удален");
                 }
             } else
-                text.append("Subject not found");
+                text.append("Предмет не найден");
             if (subjectsNames.isEmpty()) {
-                text.append("There are no subjects in system");
+                text.append("В системе не осталось предметов");
                 bot.getDeleteSubjectUsers().remove(id);
             } else {
-                text.append("Enter another subject or break operation");
+                text.append("Выберете еще предмет или закончите операцию");
                 sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true, false,
                         subjectsNames.toArray(new String[0])));
             }
             sendMessage.setText(text.toString());
         }
         else {
-            sendMessage.setText("Choose a subject from list");
+            sendMessage.setText("Выбирайте предметы пока они не закончатся или вы не выберете /break");
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(),true,false,
                     subjectsNames.toArray(new String[0])));
             bot.getDeleteSubjectUsers().add(id);

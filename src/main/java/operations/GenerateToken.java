@@ -23,9 +23,11 @@ public class GenerateToken extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id))
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
         else if (!user.isCanEditTasks())
-            sendMessage.setText("You haven't right to generate token");
+            sendMessage.setText("У вас нет прав для генерации токена");
+        else if (!id.getUserId().equals(id.getChatId()))
+            sendMessage.setText("Нельзя генерировать токен в общем чате, это небезопасно");
         else if (userRepository.existsByUsername(user.getUsername())) {
             String token = TokenGenerator.generateToken();
             AdminToken newToken = new AdminToken();
@@ -33,11 +35,11 @@ public class GenerateToken extends Operation {
             newToken.setCreatedBy(user);
             adminTokenRepository.save(newToken);
             sendMessage.setText(String.format("""
-                    Success generate token!
+                    Токен успешно сгенерирован!
                     %s
                     Срок действия %d дней""", token, AdminToken.durabilityInDays));
         } else {
-            sendMessage.setText("Something went wrong, login again");
+            sendMessage.setText("Что-то пошло не так. Войдите в аккаунт снова");
             bot.getAuthorizedUsers().remove(id);
             sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard(id));
         }

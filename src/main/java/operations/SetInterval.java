@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class SetInterval extends Operation {
     public static final Duration MIN_NOTIFICATION_INTERVAL = Duration.ofMinutes(5);
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public SetInterval(IdPair id, String messageId,
                              MyTelegramBot bot, String message,
@@ -23,7 +23,7 @@ public class SetInterval extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
             bot.getDeleteGroupUsers().remove(id);
         }
         else if (bot.getSetIntervalUsers().contains(id)) {
@@ -39,30 +39,32 @@ public class SetInterval extends Operation {
                     default -> null;
                 };
                 if (interval != null) {
-                    if (interval.compareTo(MIN_NOTIFICATION_INTERVAL) < 0)
-                        sendMessage.setText("The interval is too small");
+                    if (interval.compareTo(MIN_NOTIFICATION_INTERVAL) < 0) {
+                        sendMessage.setText("Слишком короткий интервал, попробуйте другой");
+                        sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false));
+                    }
                     else {
                         user.setNotificationInterval(interval);
                         userRepository.save(user);
-                        sendMessage.setText("Interval set successfully!");
+                        sendMessage.setText("Интервал успешно изменен");
                         bot.getSetIntervalUsers().remove(id);
                     }
                 } else {
-                    sendMessage.setText("Invalid format. Please try again.");
+                    sendMessage.setText("Неправильно указана единица измерения времени");
                     sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false));
                 }
             } else {
-                sendMessage.setText("Invalid format. Please use: <count> S|M|D");
+                sendMessage.setText("Неправильный формат ввода. Используйте: <число> S|M|D");
                 sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false));
             }
         } else {
             sendMessage.setText(
                     """
-                    Enter interval one of three format:
-                    <count> S
-                    <count> M
-                    <count> D
-                    S - seconds, M - minutes, D - days
+                    Введите интервал в одном из трех форматов:
+                    <число> S
+                    <число> M
+                    <число> D
+                    S - секунды, M - минуты, D - дни
                     """);
             sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false));
             bot.getSetIntervalUsers().add(id);

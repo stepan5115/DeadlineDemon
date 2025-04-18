@@ -16,14 +16,14 @@ public class DisableAutoMailing extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id))
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
         else if (!user.isAllowNotifications())
-            sendMessage.setText("You are not allowed to enable notifications");
+            sendMessage.setText("Вы уже отключили уведомления");
         else {
             user.setAllowNotifications(false);
             userRepository.save(user);
             synchronizedUsers();
-            sendMessage.setText("Successfully disable notifications");
+            sendMessage.setText("Уведомления отключены успешно");
         }
         sendReply();
     }

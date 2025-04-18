@@ -26,25 +26,27 @@ public class GetTokens extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id))
-            sendMessage.setText("You must login first");
+            sendMessage.setText("Для начала войдите в аккаунт");
         else if (!user.isCanEditTasks())
-            sendMessage.setText("You haven't right to have token");
+            sendMessage.setText("У вас нет прав для этого");
+        else if (!id.getUserId().equals(id.getChatId()))
+            sendMessage.setText("Нельзя просматривать токены в общем чате, это небезопасно");
         else if (userRepository.existsByUsername(user.getUsername())) {
             adminTokenRepository.deleteExpiredTokens(LocalDateTime.now());
             List<AdminToken> adminTokens = adminTokenRepository.findByUsername(user.getUsername());
             if (adminTokens.isEmpty())
-                sendMessage.setText("You have no admin token");
+                sendMessage.setText("У вас нету токенов");
             else {
-                StringBuilder stringBuilder = new StringBuilder("Your admin tokens:");
+                StringBuilder stringBuilder = new StringBuilder("Ваши токены:");
                 for (AdminToken adminToken : adminTokens)
                     stringBuilder.append("\n").
-                            append(adminToken.getToken()).append("(remaining time - ").
+                            append(adminToken.getToken()).append("(оставшееся время - ").
                             append(Duration.between(LocalDateTime.now(),
-                                    adminToken.getExpiresAt()).toHours()).append(" hours)");
+                                    adminToken.getExpiresAt()).toHours()).append(" часов)");
                 sendMessage.setText(stringBuilder.toString());
             }
         } else {
-            sendMessage.setText("Something went wrong, login again");
+            sendMessage.setText("Что-то пошло не так, войдите в аккаунт заново");
             bot.getAuthorizedUsers().remove(id);
             sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard(id));
         }

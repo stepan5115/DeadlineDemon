@@ -15,11 +15,11 @@ public class BackKeyboardOperation extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id)) {
-            sendMessage.setText("start keyboard");
+            sendMessage.setText("Стартовое меню");
             sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard(id));
         }
         else {
-            sendMessage.setText("profile menu");
+            sendMessage.setText("Меню выбора");
             sendMessage.setReplyMarkup(ChooseKeyboard.getInlineKeyboard(id, user.isCanEditTasks()));
         }
         sendReply();

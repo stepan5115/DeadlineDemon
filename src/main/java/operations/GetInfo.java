@@ -18,28 +18,28 @@ public class GetInfo extends Operation {
     public void run() {
         User user = bot.getAuthorizedUsers().get(id);
         if (!bot.getAuthorizedUsers().containsKey(id))
-            sendMessage.setText("You are a stranger");
+            sendMessage.setText("Вы незнакомец");
         else {
-            StringBuilder text = new StringBuilder("Username: " + user.getUsername());
+            StringBuilder text = new StringBuilder("Логин: " + user.getUsername());
             if (user.isCanEditTasks())
-                text.append("\nYou have admin rights");
+                text.append("\nУ вас есть права администратора");
             else
-                text.append("\nYou do not have admin rights");
+                text.append("\nУ вас нет прав администратора");
             if (user.isAllowNotifications())
-                text.append("\nYou have allowed notifications");
+                text.append("\nУ вас включены уведомления");
             else
-                text.append("\nYou do not have allowed notifications");
-            text.append("\nYour interval between notifications-").append(user.getFormattedInterval());
+                text.append("\nУ вас выключены уведомления");
+            text.append("\nВаш интервал между уведомлениями - ").append(user.getFormattedInterval());
             List<String> groups = user.getGroups();
             if ((groups == null) || (groups.isEmpty()))
-                text.append("\nYou are not in any group");
+                text.append("\nВы не состоите ни в одной группе");
             else {
-                text.append("\nYou're groups:");
+                text.append("\nВаши группы:");
                 for (String group : groups) {
                     text.append("\n - ").append(group).append(": ");
                     List<Assignment> assignments = assignmentRepository.findByTargetGroupsContaining(group);
                     if (assignments.isEmpty())
-                        text.append("no assignments found");
+                        text.append("заданий не найдено");
                     else
                         for (Assignment assignment : assignments) {
                             text.append(assignment.getTitle()).append("(").
