@@ -38,6 +38,7 @@ public class DeleteToken extends Operation {
         else if (!id.getUserId().equals(id.getChatId()))
             sendMessage.setText("Нельзя удалять токены в общем чате, это небезопасно");
         else {
+            adminTokenRepository.deleteExpiredTokens(LocalDateTime.now());
             List<AdminToken> adminTokens = adminTokenRepository.findByUsername(user.getUsername());
             List<String> tokensNames = new LinkedList<>();
             for (AdminToken adminToken : adminTokens)

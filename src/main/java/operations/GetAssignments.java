@@ -158,17 +158,17 @@ public class GetAssignments extends Operation {
 
     private List<String> filterFindAssignment(AssignmentInfoState state) {
         List<Assignment> assignments = assignmentRepository.findAll();
+        List<String> filterGroups = state.getGroups();
         List<String> namesAssignment = new ArrayList<>();
+        LocalDateTime stateDeadline = state.getDeadline();
         for (Assignment assignment : assignments)
             for (String assignmentGroup : assignment.getTargetGroups()) {
-                List<String> filterGroups = state.getGroups();
                 if (!filterGroups.isEmpty() && !filterGroups.contains(assignmentGroup))
-                    break;
-                LocalDateTime stateDeadline = state.getDeadline();
+                    continue;
                 if ((stateDeadline != null) && stateDeadline.isBefore(assignment.getDeadline()))
-                    break;
+                    continue;
                 if (!state.getSubjects().isEmpty() && !state.getSubjects().contains(assignment.getSubject().getName()))
-                    break;
+                    continue;
                 namesAssignment.add(assignment.getTitle());
                 break;
             }
