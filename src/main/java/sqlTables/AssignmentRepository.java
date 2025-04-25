@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
@@ -21,7 +22,7 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     boolean existsAssignmentByTitle(String title);
 
     @Query(value = "SELECT * FROM assignments WHERE groups @> to_jsonb(:groupName)", nativeQuery = true)
-    List<Assignment> findByTargetGroupsContaining(@Param("groupName") String groupName);
+    Set<Assignment> findByTargetGroupsContaining(@Param("groupName") String groupName);
 
 
 
@@ -38,4 +39,6 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     boolean existsBySubjectId(Long subjectId);
 
     Optional<Assignment> getAssignmentByTitle(String title);
+
+    Optional<Assignment> getAssignmentById(Long id);
 }

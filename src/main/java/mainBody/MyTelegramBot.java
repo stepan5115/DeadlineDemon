@@ -69,6 +69,14 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     private final ConcurrentLinkedQueue<IdPair> setIntervalUsers = new ConcurrentLinkedQueue<>();
     @Getter
     private final ConcurrentHashMap<IdPair, AssignmentInfoState> getAssignmentInfo = new ConcurrentHashMap<>();
+    @Getter
+    private final ConcurrentLinkedQueue<IdPair> excludeAssignment = new ConcurrentLinkedQueue<>();
+    @Getter
+    private final ConcurrentLinkedQueue<IdPair> includeAssignment = new ConcurrentLinkedQueue<>();
+    @Getter
+    private final ConcurrentLinkedQueue<IdPair> excludeSubject = new ConcurrentLinkedQueue<>();
+    @Getter
+    private final ConcurrentLinkedQueue<IdPair> includeSubject = new ConcurrentLinkedQueue<>();
 
     public MyTelegramBot(UserRepository userRepository,
                          SubjectRepository subjectRepository,

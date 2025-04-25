@@ -5,7 +5,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -19,7 +21,7 @@ public class TitDesGroDeaSubState {
     }
     private String title;
     private String description;
-    private List<String> group = new ArrayList<>();
+    private Set<String> group = new HashSet<>();
     private LocalDateTime deadline;
     private StateType state;
 

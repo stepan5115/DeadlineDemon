@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -16,9 +16,9 @@ public class AssignmentInfoState {
         WAITING_SUBJECTS,
         WAITING_ASSIGNMENT
     }
-    private List<String> groups = new ArrayList<>();
+    private Set<String> groups = new HashSet<>();
     private LocalDateTime deadline;
-    private List<String> subjects = new ArrayList<>();
+    private Set<String> subjects = new HashSet<>();
     private StateType state;
 
     public AssignmentInfoState(AssignmentInfoState.StateType state) {

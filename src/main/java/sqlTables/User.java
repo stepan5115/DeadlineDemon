@@ -2,13 +2,13 @@ package sqlTables;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.glassfish.grizzly.utils.ArraySet;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -29,7 +29,7 @@ public class User {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private List<String> groups;
+    private Set<String> groups = new HashSet<>();
 
     @Column(name = "can_edit_assignments", nullable = false)
     private boolean canEditTasks;
@@ -39,6 +39,14 @@ public class User {
 
     @Column(name = "notification_interval")
     private Long notificationIntervalSeconds = 86400L;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "completed_assignments", columnDefinition = "jsonb")
+    private Set<Long> completedAssignments = new HashSet<>();
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "notification_excluded_subjects", columnDefinition = "jsonb")
+    private Set<Long> notificationExcludedSubjects = new HashSet<>();
 
     public String getFormattedInterval() {
         if (notificationIntervalSeconds == null) return "Не задан";
@@ -68,18 +76,52 @@ public class User {
     }
 
     public void addGroup(String groupName) {
-        if (this.groups == null) {
-            this.groups = new ArrayList<>();
-        }
-        if (!this.groups.contains(groupName)) {
-            this.groups.add(groupName);
-        }
+        this.groups.add(groupName);
     }
 
     public void removeGroup(String groupName) {
-        if (this.groups != null) {
-            this.groups.remove(groupName);
-        }
+        this.groups.remove(groupName);
+    }
+
+    public Set<String> getTargetGroupsByAssignment(Assignment assignment) {
+        Set<String> targetGroups = new HashSet<>();
+        for (String group : assignment.getTargetGroups())
+            if ((groups != null) && groups.contains(group))
+                targetGroups.add(group);
+        return targetGroups;
+    }
+    public boolean isUserHaveAssignment(Assignment assignment) {
+        for (String group : assignment.getTargetGroups())
+            if (groups.contains(group))
+                return true;
+        return false;
+    }
+
+    public void normalizeExcluded(UserRepository userRepository,
+                                  AssignmentRepository assignmentRepository,
+                                  SubjectRepository subjectRepository) {
+        boolean isNormalize = true;
+        Optional<User> user = userRepository.findById(this.user_id);
+        if (user.isEmpty())
+            throw new IllegalArgumentException("actual user doesn't exist!!");
+        //normalize assignment
+        Set<Long> tmpCompletedAssignments = user.get().getCompletedAssignments();
+        this.completedAssignments.clear();
+        for (Long id : tmpCompletedAssignments)
+            if (assignmentRepository.existsById(id))
+                this.completedAssignments.add(id);
+            else
+                isNormalize = false;
+        //normalize subject
+        Set<Long> tmpNotificationExcludedSubjects = user.get().getNotificationExcludedSubjects();
+        this.notificationExcludedSubjects.clear();
+        for (Long id : tmpNotificationExcludedSubjects)
+            if (subjectRepository.existsById(id))
+                this.notificationExcludedSubjects.add(id);
+            else
+                isNormalize = false;
+        if (!isNormalize)
+            userRepository.save(this);
     }
 
     public void setNotificationIntervalFromDuration(Duration interval) {

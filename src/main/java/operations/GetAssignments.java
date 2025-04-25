@@ -9,9 +9,7 @@ import utils.DateParser;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class GetAssignments extends Operation {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
@@ -40,7 +38,7 @@ public class GetAssignments extends Operation {
                                 "перехода к следующему этапу. Если не выбрать ни один предмет, то фильтр " +
                                 "по предметам будет отключен");
                         List<Subject> subjects = subjectRepository.findAll();
-                        List<String> namesSubject = new ArrayList<>();
+                        Set<String> namesSubject = new HashSet<>();
                         for (Subject subject : subjects)
                             namesSubject.add(subject.getName());
                         if (namesSubject.isEmpty()) {
@@ -54,19 +52,17 @@ public class GetAssignments extends Operation {
                         }
                     }
                     else if (user.getGroups().contains(message)) {
-                        if (state.getGroups().contains(message))
-                            sendMessage.setText("Уже добавлена");
-                        else {
-                            state.getGroups().add(message);
+                        if (state.getGroups().add(message))
                             sendMessage.setText("Группа добавлена в фильтр");
-                        }
+                        else
+                            sendMessage.setText("Уже добавлена");
                     } else
                         sendMessage.setText("Группа не найдена");
                     break;
                 }
                 case WAITING_SUBJECTS: {
                     List<Subject> subjects = subjectRepository.findAll();
-                    List<String> namesSubject = new ArrayList<>();
+                    Set<String> namesSubject = new HashSet<>();
                     for (Subject subject : subjects)
                         namesSubject.add(subject.getName());
                     if (message.equals("/next")) {
@@ -77,12 +73,10 @@ public class GetAssignments extends Operation {
                         sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, true));
                     }
                     else if (namesSubject.contains(message)) {
-                        if (state.getSubjects().contains(message))
-                            sendMessage.setText("Уже добавлен");
-                        else {
-                            state.getSubjects().add(message);
+                        if (state.getSubjects().add(message))
                             sendMessage.setText("Предмет добавлен");
-                        }
+                        else
+                            sendMessage.setText("Уже добавлен");
                     }
                     else
                         sendMessage.setText("Предмет не найден");
@@ -158,7 +152,7 @@ public class GetAssignments extends Operation {
 
     private List<String> filterFindAssignment(AssignmentInfoState state) {
         List<Assignment> assignments = assignmentRepository.findAll();
-        List<String> filterGroups = state.getGroups();
+        Set<String> filterGroups = state.getGroups();
         List<String> namesAssignment = new ArrayList<>();
         LocalDateTime stateDeadline = state.getDeadline();
         for (Assignment assignment : assignments)
@@ -175,25 +169,3 @@ public class GetAssignments extends Operation {
         return namesAssignment;
     }
 }
-
-
-//            Optional<Assignment> assignment = assignmentRepository.getAssignmentByTitle(message);
-//            if (assignment.isPresent()) {
-//                Assignment actualAssignment = assignment.get();
-//                sendMessage.setText("""
-//                        \"%s\" assignment
-//                        Description: \"%s\"
-//                        Deadline: \"%s\"
-//                        Subject: \"%s\"
-//                        Target Groups: \"%s\"
-//                        """.formatted(actualAssignment.getTitle(),
-//                        actualAssignment.getDescription(),
-//                        actualAssignment.getDeadline().format(formatter),
-//                        actualAssignment.getSubject().getName(),
-//                        String.join(", ", actualAssignment.getTargetGroups())
-//                        ));
-//            } else {
-//                sendMessage.setText("Cannot find assignment with title " + message);
-//                sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true,
-//                        targetAssignments.toArray(new String[0])));
-//            }

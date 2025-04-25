@@ -43,6 +43,18 @@ public class OperationManager {
             return new SetInterval(id, messageId, bot, message, bot.getUserRepository());
         if (bot.getGetAssignmentInfo().containsKey(id))
             return new GetAssignments(id, messageId, bot, message, bot.getAssignmentRepository(), bot.getSubjectRepository());
+        if (bot.getExcludeAssignment().contains(id))
+            return new ExcludeAssignment(id, messageId, bot, message, bot.getUserRepository(),
+                    bot.getAssignmentRepository(), bot.getSubjectRepository());
+        if (bot.getIncludeAssignment().contains(id))
+            return new IncludeAssignment(id, messageId, bot, message, bot.getUserRepository(),
+                    bot.getAssignmentRepository(), bot.getSubjectRepository());
+        if (bot.getExcludeSubject().contains(id))
+            return new ExcludeSubject(id, messageId, bot, message, bot.getUserRepository(),
+                    bot.getAssignmentRepository(), bot.getSubjectRepository());
+        if (bot.getIncludeSubject().contains(id))
+            return new IncludeSubject(id, messageId, bot, message, bot.getUserRepository(),
+                    bot.getAssignmentRepository(), bot.getSubjectRepository());
 
         return switch (message.trim()) {
             case "/help" -> new HelpUser(id, messageId, bot, message);
@@ -55,6 +67,18 @@ public class OperationManager {
                     new EnableAutoMailing(id, messageId, bot, message, bot.getUserRepository());
             case "/disable" ->
                     new DisableAutoMailing(id, messageId, bot, message, bot.getUserRepository());
+            case "/excludeAssignment" ->
+                new ExcludeAssignment(id, messageId, bot, message, bot.getUserRepository(),
+                        bot.getAssignmentRepository(), bot.getSubjectRepository());
+            case "/includeAssignment" ->
+                new IncludeAssignment(id, messageId, bot, message, bot.getUserRepository(),
+                        bot.getAssignmentRepository(), bot.getSubjectRepository());
+            case "/excludeSubject" ->
+                new ExcludeSubject(id, messageId, bot, message, bot.getUserRepository(),
+                        bot.getAssignmentRepository(), bot.getSubjectRepository());
+            case "/includeSubject" ->
+                    new IncludeSubject(id, messageId, bot, message, bot.getUserRepository(),
+                            bot.getAssignmentRepository(), bot.getSubjectRepository());
             //Groups Menu
             case "/groups" ->
                 new GroupsKeyboardGet(id, messageId, bot, message);

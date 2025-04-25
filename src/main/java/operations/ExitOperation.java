@@ -23,6 +23,10 @@ public class ExitOperation extends Operation {
         bot.getDeleteSubjectUsers().remove(id);
         bot.getSetIntervalUsers().remove(id);
         bot.getGetAssignmentInfo().remove(id);
+        bot.getExcludeAssignment().remove(id);
+        bot.getIncludeAssignment().remove(id);
+        bot.getExcludeSubject().remove(id);
+        bot.getIncludeSubject().remove(id);
         sendMessage.setText("Операция завершена");
         sendReply();
     }

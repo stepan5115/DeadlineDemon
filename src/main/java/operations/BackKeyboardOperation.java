@@ -1,7 +1,6 @@
 package operations;
 
 import keyboards.ChooseKeyboard;
-import keyboards.ProfileKeyboard;
 import keyboards.StartKeyboard;
 import mainBody.IdPair;
 import mainBody.MyTelegramBot;

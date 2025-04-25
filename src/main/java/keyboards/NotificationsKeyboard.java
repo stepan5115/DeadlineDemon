@@ -32,14 +32,35 @@ public class NotificationsKeyboard {
         button2.setCallbackData("/enable"  + "_" + userId);
         row1.add(button2);
         rows.add(row1);
-
         //row 2
         List<InlineKeyboardButton> row2 = new ArrayList<>();
         //button 3
-        InlineKeyboardButton button3 = new InlineKeyboardButton("назад");
-        button3.setCallbackData("/back"  + "_" + userId);
+        InlineKeyboardButton button3 = new InlineKeyboardButton("отключить задание");
+        button3.setCallbackData("/excludeAssignment"  + "_" + userId);
         row2.add(button3);
+        //button 4
+        InlineKeyboardButton button4 = new InlineKeyboardButton("включить задание");
+        button4.setCallbackData("/includeAssignment"  + "_" + userId);
+        row2.add(button4);
         rows.add(row2);
+        //row 3
+        List<InlineKeyboardButton> row3 = new ArrayList<>();
+        //button 5
+        InlineKeyboardButton button5 = new InlineKeyboardButton("отключить предмет");
+        button5.setCallbackData("/excludeSubject"  + "_" + userId);
+        row3.add(button5);
+        //button 4
+        InlineKeyboardButton button6 = new InlineKeyboardButton("включить предмет");
+        button6.setCallbackData("/includeAssignment"  + "_" + userId);
+        row3.add(button6);
+        rows.add(row3);
+        //row 4
+        List<InlineKeyboardButton> row4 = new ArrayList<>();
+        //button 7
+        InlineKeyboardButton button7 = new InlineKeyboardButton("назад");
+        button7.setCallbackData("/back"  + "_" + userId);
+        row4.add(button7);
+        rows.add(row4);
 
         markup.setKeyboard(rows);
         return markup;
@@ -57,8 +78,18 @@ public class NotificationsKeyboard {
         rows.add(row1);
         //row 2
         KeyboardRow row2 = new KeyboardRow();
-        row2.add("/back");
+        row2.add("/excludeAssignment");
+        row2.add("/includeAssignment");
         rows.add(row2);
+        //row 3
+        KeyboardRow row3 = new KeyboardRow();
+        row3.add("/excludeSubject");
+        row3.add("/includeSubject");
+        rows.add(row3);
+        //row 4
+        KeyboardRow row4 = new KeyboardRow();
+        row4.add("/back");
+        rows.add(row4);
 
         markup.setKeyboard(rows);
         markup.setOneTimeKeyboard(false);

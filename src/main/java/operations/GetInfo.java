@@ -5,7 +5,7 @@ import mainBody.MyTelegramBot;
 import sqlTables.*;
 
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Set;
 
 public class GetInfo extends Operation {
     private final AssignmentRepository assignmentRepository;
@@ -30,14 +30,14 @@ public class GetInfo extends Operation {
             else
                 text.append("\nУ вас выключены уведомления");
             text.append("\nВаш интервал между уведомлениями - ").append(user.getFormattedInterval());
-            List<String> groups = user.getGroups();
+            Set<String> groups = user.getGroups();
             if ((groups == null) || (groups.isEmpty()))
                 text.append("\nВы не состоите ни в одной группе");
             else {
                 text.append("\nВаши группы:");
                 for (String group : groups) {
                     text.append("\n - ").append(group).append(": ");
-                    List<Assignment> assignments = assignmentRepository.findByTargetGroupsContaining(group);
+                    Set<Assignment> assignments = assignmentRepository.findByTargetGroupsContaining(group);
                     if (assignments.isEmpty())
                         text.append("заданий не найдено");
                     else

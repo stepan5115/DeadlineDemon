@@ -6,7 +6,9 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "assignments")
@@ -28,7 +30,7 @@ public class Assignment {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "groups", columnDefinition = "jsonb")
-    private List<String> targetGroups;
+    private Set<String> targetGroups = new HashSet<>();
 
     @Column(nullable = false)
     private LocalDateTime deadline;
