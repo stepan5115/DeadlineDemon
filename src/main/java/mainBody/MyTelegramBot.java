@@ -1,8 +1,14 @@
 package mainBody;
 
+import APIOperations.APIOperationManager;
+import APIOperations.LogInOperation;
 import lombok.Getter;
 import operations.OperationManager;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -10,10 +16,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import sqlTables.*;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Optional;
+import java.util.concurrent.*;
 import java.util.logging.Logger;
 
 @Component
@@ -142,6 +146,19 @@ public class MyTelegramBot extends TelegramLongPollingBot {
                     null, actualData));
         }
     }
+    /*
+    @PostMapping("/login")
+    public DeferredResult<ResponseEntity<String>> login(
+            @RequestParam String username,
+            @RequestParam String password) {
+
+        DeferredResult<ResponseEntity<String>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerLogInOperation(username, password, );
+
+        return deferredResult;
+    }
+     */
 
     @Override
     public String getBotUsername() {
