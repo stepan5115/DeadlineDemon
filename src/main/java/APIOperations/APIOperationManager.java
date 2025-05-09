@@ -21,4 +21,8 @@ public class APIOperationManager {
         executeOperation(new LogInOperation(name, password, userRepository), callback);
     }
 
+    public static void registerSignUpOperation(String name, String password, UserRepository userRepository,
+                                               OperationCallback callback) {
+        executeOperation(new SignUpOperation(name, password, userRepository), callback);
+    }
 }

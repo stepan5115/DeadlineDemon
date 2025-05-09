@@ -1,10 +1,10 @@
 package APIResponses;
 
-public class LoginResponse {
+public class BaseResponse {
     private String status;
     private String message;
 
-    public LoginResponse(String status, String message) {
+    public BaseResponse(String status, String message) {
         this.status = status;
         this.message = message;
     }

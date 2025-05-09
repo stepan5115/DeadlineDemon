@@ -1,7 +1,7 @@
 package mainBody;
 
 import APIOperations.APIOperationManager;
-import APIResponses.LoginResponse;
+import APIResponses.BaseResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,30 +18,52 @@ public class BotApiController {
     public BotApiController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+    private static void setResponse(String result,
+                                    DeferredResult<ResponseEntity<BaseResponse>> deferredResult) {
+        BaseResponse responseBody;
+        ResponseEntity<BaseResponse> response;
+        if (result.startsWith("WRONG")) {
+            responseBody = new BaseResponse("error", result);
+            response = ResponseEntity.status(401).body(responseBody);
+        } else {
+            responseBody = new BaseResponse("success", result);
+            response = ResponseEntity.ok(responseBody);
+        }
+
+        deferredResult.setResult(response);
+    }
+
     @PostMapping("/login")
-    public DeferredResult<ResponseEntity<LoginResponse>> login(
+    public DeferredResult<ResponseEntity<BaseResponse>> login(
             @RequestParam String username,
             @RequestParam String password) {
 
-        DeferredResult<ResponseEntity<LoginResponse>> deferredResult = new DeferredResult<>();
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
 
         APIOperationManager.registerLogInOperation(
                 username,
                 password,
                 userRepository,
                 result -> {
-                    LoginResponse responseBody;
-                    ResponseEntity<LoginResponse> response;
+                    setResponse(result, deferredResult);
+                }
+        );
 
-                    if (result.startsWith("WRONG")) {
-                        responseBody = new LoginResponse("error", result);
-                        response = ResponseEntity.status(401).body(responseBody);
-                    } else {
-                        responseBody = new LoginResponse("success", result);
-                        response = ResponseEntity.ok(responseBody);
-                    }
+        return deferredResult;
+    }
+    @PostMapping("/signup")
+    public DeferredResult<ResponseEntity<BaseResponse>> signup(
+            @RequestParam String username,
+            @RequestParam String password) {
 
-                    deferredResult.setResult(response);
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerSignUpOperation(
+                username,
+                password,
+                userRepository,
+                result -> {
+                    setResponse(result, deferredResult);
                 }
         );
 
