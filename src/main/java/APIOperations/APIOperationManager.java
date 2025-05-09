@@ -25,4 +25,8 @@ public class APIOperationManager {
                                                OperationCallback callback) {
         executeOperation(new SignUpOperation(name, password, userRepository), callback);
     }
+    public static void registerGetInfoOperation(String name, String password, UserRepository userRepository,
+                                               OperationCallback callback) {
+        executeOperation(new GetInfoOperation(name, password, userRepository), callback);
+    }
 }

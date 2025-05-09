@@ -4,11 +4,12 @@ import keyboards.ChooseKeyboard;
 import org.springframework.http.ResponseEntity;
 import sqlTables.User;
 import sqlTables.UserRepository;
+import utils.JsonUtil;
 import utils.PasswordEncryptor;
 
 import java.util.Optional;
 
-public class LogInOperation implements BotOperation {
+public class GetInfoOperation implements BotOperation {
     private final String username;
     private final String password;
     private final UserRepository userRepository;
@@ -16,7 +17,7 @@ public class LogInOperation implements BotOperation {
     private String result;
 
     //только менеджер может создавать
-    protected LogInOperation(String username, String password, UserRepository userRepository) {
+    protected GetInfoOperation(String username, String password, UserRepository userRepository) {
         this.username = username;
         this.password = password;
         this.userRepository = userRepository;
@@ -30,7 +31,7 @@ public class LogInOperation implements BotOperation {
         } else if (password.length() > 15) {
             result = "WRONG: Неверный пароль";
         } else if (PasswordEncryptor.matches(password, user.get().getPassword())) {
-            result = "OK";
+            result = JsonUtil.toJsonUser(user.get());
         } else {
             result = "WRONG: Неверный пароль";
         }

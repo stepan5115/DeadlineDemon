@@ -69,4 +69,21 @@ public class BotApiController {
 
         return deferredResult;
     }
+    @PostMapping("/getInfo")
+    public DeferredResult<ResponseEntity<BaseResponse>> getInfo(
+            @RequestParam String username,
+            @RequestParam String password) {
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerGetInfoOperation(
+                username,
+                password,
+                userRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
 }
