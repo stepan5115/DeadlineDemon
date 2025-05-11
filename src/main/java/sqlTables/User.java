@@ -126,4 +126,34 @@ public class User {
 
     public void setNotificationIntervalFromDuration(Duration interval) {
     }
+
+    public Set<Assignment> getAssignments(AssignmentRepository assignmentRepository) {
+        Set<Assignment> assignments = new HashSet<>();
+        for (Assignment assignment : assignmentRepository.findAll())
+            if ((!completedAssignments.contains(assignment.getId())) &&
+                    (!notificationExcludedSubjects.contains(assignment.getSubject().getId()))) {
+                for (String assignmentGroup : assignment.getTargetGroups())
+                    if (groups.contains(assignmentGroup)) {
+                        assignments.add(assignment);
+                        break;
+                    }
+            }
+        return assignments;
+    }
+    public Set<String> getExcludedSubjects(SubjectRepository subjectRepository) {
+        Set<String> excludedSubjects = new HashSet<>();
+        for (Long id : notificationExcludedSubjects) {
+            Optional<Subject> subject = subjectRepository.findById(id);
+            subject.ifPresent(value -> excludedSubjects.add(value.getName()));
+        }
+        return excludedSubjects;
+    }
+    public Set<String> getCompletedAssignments(AssignmentRepository assignmentRepository) {
+        Set<String> resultCompletedAssignments = new HashSet<>();
+        for (Long id : completedAssignments) {
+            Optional<Assignment> assignment = assignmentRepository.findById(id);
+            assignment.ifPresent(value -> resultCompletedAssignments.add(value.getTitle()));
+        }
+        return resultCompletedAssignments;
+    }
 }

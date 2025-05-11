@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.async.DeferredResult;
+import sqlTables.AssignmentRepository;
+import sqlTables.SubjectRepository;
 import sqlTables.UserRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,9 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class BotApiController {
     private final UserRepository userRepository;
+    private final AssignmentRepository assignmentRepository;
+    private final SubjectRepository subjectRepository;
 
-    public BotApiController(UserRepository userRepository) {
+    public BotApiController(UserRepository userRepository, AssignmentRepository assignmentRepository, SubjectRepository subjectRepository) {
         this.userRepository = userRepository;
+        this.assignmentRepository = assignmentRepository;
+        this.subjectRepository = subjectRepository;
     }
     private static void setResponse(String result,
                                     DeferredResult<ResponseEntity<BaseResponse>> deferredResult) {
@@ -79,6 +85,8 @@ public class BotApiController {
                 username,
                 password,
                 userRepository,
+                assignmentRepository,
+                subjectRepository,
                 result -> {
                     setResponse(result, deferredResult);
                 }

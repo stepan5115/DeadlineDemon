@@ -1,5 +1,7 @@
 package APIOperations;
 
+import sqlTables.AssignmentRepository;
+import sqlTables.SubjectRepository;
 import sqlTables.UserRepository;
 
 import java.util.concurrent.ExecutorService;
@@ -26,7 +28,7 @@ public class APIOperationManager {
         executeOperation(new SignUpOperation(name, password, userRepository), callback);
     }
     public static void registerGetInfoOperation(String name, String password, UserRepository userRepository,
-                                               OperationCallback callback) {
-        executeOperation(new GetInfoOperation(name, password, userRepository), callback);
+                                                AssignmentRepository assignmentRepository, SubjectRepository subjectRepository, OperationCallback callback) {
+        executeOperation(new GetInfoOperation(name, password, userRepository, assignmentRepository, subjectRepository), callback);
     }
 }
