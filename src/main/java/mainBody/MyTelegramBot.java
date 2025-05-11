@@ -21,7 +21,7 @@ import java.util.concurrent.*;
 import java.util.logging.Logger;
 
 @Component
-public class MyTelegramBot extends TelegramLongPollingBot {
+public class MyTelegramBot extends TelegramLongPollingBot implements AuthorizedUsersProvider {
     private final String botToken = "8054120880:AAF78Qz9kPvwR3p2OhN4GEFCVznCw-Kf2No";
     private final String botName = "DeadlineDemonBot";
     private static final Logger logger = Logger.getLogger(MyTelegramBot.class.getName());
@@ -168,5 +168,10 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         return botToken;
+    }
+
+    @Override
+    public ConcurrentHashMap<IdPair, User> getAuthorizedUsers() {
+        return authorizedUsers;
     }
 }

@@ -6,10 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.async.DeferredResult;
-import sqlTables.AssignmentRepository;
-import sqlTables.GroupRepository;
-import sqlTables.SubjectRepository;
-import sqlTables.UserRepository;
+import sqlTables.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,13 +17,15 @@ public class BotApiController {
     private final AssignmentRepository assignmentRepository;
     private final SubjectRepository subjectRepository;
     private final GroupRepository groupRepository;
+    private final AdminTokenRepository adminTokenRepository;
 
     public BotApiController(UserRepository userRepository, AssignmentRepository assignmentRepository, SubjectRepository subjectRepository,
-                            GroupRepository groupRepository) {
+                            GroupRepository groupRepository, AdminTokenRepository adminTokenRepository) {
         this.userRepository = userRepository;
         this.assignmentRepository = assignmentRepository;
         this.subjectRepository = subjectRepository;
         this.groupRepository = groupRepository;
+        this.adminTokenRepository = adminTokenRepository;
     }
     private static void setResponse(String result,
                                     DeferredResult<ResponseEntity<BaseResponse>> deferredResult) {
@@ -113,6 +112,68 @@ public class BotApiController {
                 assignmentId,
                 userRepository,
                 assignmentRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("/inCompleteAssignment")
+    public DeferredResult<ResponseEntity<BaseResponse>> inCompleteAssignment(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String assignmentId) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerInCompleteAssignment(
+                username,
+                password,
+                assignmentId,
+                userRepository,
+                assignmentRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("/setNotificationStatus")
+    public DeferredResult<ResponseEntity<BaseResponse>> setNotificationStatus(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam Boolean allowNotifications) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerSetNotificationStatus(
+                username,
+                password,
+                allowNotifications,
+                userRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("/getAdminRights")
+    public DeferredResult<ResponseEntity<BaseResponse>>getAdminRights(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String token) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerGetAdminRights(
+                username,
+                password,
+                token,
+                userRepository,
+                adminTokenRepository,
                 result -> {
                     setResponse(result, deferredResult);
                 }

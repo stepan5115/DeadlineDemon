@@ -1,14 +1,17 @@
 package APIOperations;
 
-import sqlTables.AssignmentRepository;
-import sqlTables.GroupRepository;
-import sqlTables.SubjectRepository;
-import sqlTables.UserRepository;
+import mainBody.AuthorizedUsersProvider;
+import sqlTables.*;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class APIOperationManager {
+    private static AuthorizedUsersProvider usersProvider;
+
+    public static void init(AuthorizedUsersProvider provider) {
+        usersProvider = provider;
+    }
     private APIOperationManager() {}
 
     private static final int THREAD_POOL_SIZE = 100;
@@ -36,5 +39,17 @@ public class APIOperationManager {
     public static void registerCompleteAssignment(String name, String password, String assignmentId, UserRepository userRepository,
                                                   AssignmentRepository assignmentRepository, OperationCallback callback) {
         executeOperation(new CompleteAssignmentOperation(name, password,assignmentId, userRepository, assignmentRepository), callback);
+    }
+    public static void registerInCompleteAssignment(String name, String password, String assignmentId, UserRepository userRepository,
+                                                    AssignmentRepository assignmentRepository, OperationCallback callback) {
+        executeOperation(new InCompleteAssignmentOperation(name, password,assignmentId, userRepository, assignmentRepository), callback);
+    }
+    public static void registerSetNotificationStatus(String name, String password, Boolean allowNotifications,
+                                                     UserRepository userRepository, OperationCallback callback) {
+        executeOperation(new SetNotificationStatusOperation(name, password, allowNotifications, userRepository, usersProvider), callback);
+    }
+    public static void registerGetAdminRights(String name, String password, String token, UserRepository userRepository,
+                                              AdminTokenRepository adminTokenRepository, OperationCallback callback) {
+        executeOperation(new RegisterGetAdminRightsOperation(name, password, token, userRepository, adminTokenRepository, usersProvider), callback);
     }
 }
