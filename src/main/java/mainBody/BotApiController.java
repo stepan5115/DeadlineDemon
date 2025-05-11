@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.async.DeferredResult;
 import sqlTables.AssignmentRepository;
+import sqlTables.GroupRepository;
 import sqlTables.SubjectRepository;
 import sqlTables.UserRepository;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,11 +19,14 @@ public class BotApiController {
     private final UserRepository userRepository;
     private final AssignmentRepository assignmentRepository;
     private final SubjectRepository subjectRepository;
+    private final GroupRepository groupRepository;
 
-    public BotApiController(UserRepository userRepository, AssignmentRepository assignmentRepository, SubjectRepository subjectRepository) {
+    public BotApiController(UserRepository userRepository, AssignmentRepository assignmentRepository, SubjectRepository subjectRepository,
+                            GroupRepository groupRepository) {
         this.userRepository = userRepository;
         this.assignmentRepository = assignmentRepository;
         this.subjectRepository = subjectRepository;
+        this.groupRepository = groupRepository;
     }
     private static void setResponse(String result,
                                     DeferredResult<ResponseEntity<BaseResponse>> deferredResult) {
@@ -87,6 +91,7 @@ public class BotApiController {
                 userRepository,
                 assignmentRepository,
                 subjectRepository,
+                groupRepository,
                 result -> {
                     setResponse(result, deferredResult);
                 }

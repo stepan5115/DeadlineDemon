@@ -1,6 +1,7 @@
 package APIOperations;
 
 import sqlTables.AssignmentRepository;
+import sqlTables.GroupRepository;
 import sqlTables.SubjectRepository;
 import sqlTables.UserRepository;
 
@@ -28,8 +29,9 @@ public class APIOperationManager {
         executeOperation(new SignUpOperation(name, password, userRepository), callback);
     }
     public static void registerGetInfoOperation(String name, String password, UserRepository userRepository,
-                                                AssignmentRepository assignmentRepository, SubjectRepository subjectRepository, OperationCallback callback) {
-        executeOperation(new GetInfoOperation(name, password, userRepository, assignmentRepository, subjectRepository), callback);
+                                                AssignmentRepository assignmentRepository, SubjectRepository subjectRepository,
+                                                GroupRepository groupRepository, OperationCallback callback) {
+        executeOperation(new GetInfoOperation(name, password, userRepository, assignmentRepository, subjectRepository, groupRepository), callback);
     }
     public static void registerCompleteAssignment(String name, String password, String assignmentId, UserRepository userRepository,
                                                   AssignmentRepository assignmentRepository, OperationCallback callback) {

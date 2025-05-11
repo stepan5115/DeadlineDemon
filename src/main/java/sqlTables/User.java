@@ -140,20 +140,28 @@ public class User {
             }
         return assignments;
     }
-    public Set<String> getExcludedSubjects(SubjectRepository subjectRepository) {
-        Set<String> excludedSubjects = new HashSet<>();
+    public Set<Subject> getExcludedSubjects(SubjectRepository subjectRepository) {
+        Set<Subject> excludedSubjects = new HashSet<>();
         for (Long id : notificationExcludedSubjects) {
             Optional<Subject> subject = subjectRepository.findById(id);
-            subject.ifPresent(value -> excludedSubjects.add(value.getName()));
+            subject.ifPresent(excludedSubjects::add);
         }
         return excludedSubjects;
     }
-    public Set<String> getCompletedAssignments(AssignmentRepository assignmentRepository) {
-        Set<String> resultCompletedAssignments = new HashSet<>();
+    public Set<Assignment> getCompletedAssignments(AssignmentRepository assignmentRepository) {
+        Set<Assignment> resultCompletedAssignments = new HashSet<>();
         for (Long id : completedAssignments) {
             Optional<Assignment> assignment = assignmentRepository.findById(id);
-            assignment.ifPresent(value -> resultCompletedAssignments.add(value.getTitle()));
+            assignment.ifPresent(resultCompletedAssignments::add);
         }
         return resultCompletedAssignments;
+    }
+    public Set<Group> getGroups(GroupRepository groupRepository) {
+        Set<Group> result = new HashSet<>();
+        for (String groupName: groups) {
+            Optional<Group> group = groupRepository.findByName(groupName);
+            group.ifPresent(result::add);
+        }
+        return result;
     }
 }

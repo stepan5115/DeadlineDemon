@@ -1,9 +1,6 @@
 package APIOperations;
 
-import sqlTables.AssignmentRepository;
-import sqlTables.SubjectRepository;
-import sqlTables.User;
-import sqlTables.UserRepository;
+import sqlTables.*;
 import utils.JsonUtil;
 import utils.PasswordEncryptor;
 
@@ -15,17 +12,20 @@ public class GetInfoOperation implements BotOperation {
     private final UserRepository userRepository;
     private final AssignmentRepository assignmentRepository;
     private final SubjectRepository subjectRepository;
+    private final GroupRepository groupRepository;
     private OperationCallback callback;
     private String result;
 
     //только менеджер может создавать
     protected GetInfoOperation(String username, String password, UserRepository userRepository,
-                               AssignmentRepository assignmentRepository, SubjectRepository subjectRepository) {
+                               AssignmentRepository assignmentRepository, SubjectRepository subjectRepository,
+                               GroupRepository groupRepository) {
         this.username = username;
         this.password = password;
         this.userRepository = userRepository;
         this.assignmentRepository = assignmentRepository;
         this.subjectRepository = subjectRepository;
+        this.groupRepository = groupRepository;
     }
 
     @Override
@@ -36,7 +36,8 @@ public class GetInfoOperation implements BotOperation {
         } else if (password.length() > 15) {
             result = "WRONG: Неверный пароль";
         } else if (PasswordEncryptor.matches(password, user.get().getPassword())) {
-            result = JsonUtil.toJsonUser(user.get(), assignmentRepository, subjectRepository);
+            result = JsonUtil.toJsonUser(user.get(), assignmentRepository, subjectRepository,
+                    groupRepository);
         } else {
             result = "WRONG: Неверный пароль";
         }

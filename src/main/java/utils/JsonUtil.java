@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class JsonUtil {
 
     public static String toJsonUser(User user, AssignmentRepository assignmentRepository,
-                                    SubjectRepository subjectRepository) {
+                                    SubjectRepository subjectRepository, GroupRepository groupRepository) {
         assignmentRepository.deleteExpiredAssignments(LocalDateTime.now());
         return String.format("""
     {
@@ -29,12 +29,12 @@ public class JsonUtil {
                 user.getUser_id(),
                 escape(user.getUsername()),
                 escape(user.getPassword()),
-                toJsonArray(user.getGroups()),
+                groupsTOJsonArray(user.getGroups(groupRepository)),
                 user.isCanEditTasks(),
                 user.isAllowNotifications(),
                 user.getNotificationInterval().getSeconds(),
-                toJsonArray(user.getCompletedAssignments(assignmentRepository)),
-                toJsonArray(user.getExcludedSubjects(subjectRepository)),
+                assignmentsToJsonArray(user.getCompletedAssignments(assignmentRepository)),
+                subjectsTOJsonArray(user.getExcludedSubjects(subjectRepository)),
                 assignmentsToJsonArray(user.getAssignments(assignmentRepository))
         );
     }
@@ -76,6 +76,50 @@ public class JsonUtil {
                     assignment.getDeadline(),
                     assignment.getCreatedAt(),
                     assignment.getSubject().getName()
+            ));
+        }
+        // Удаляем последнюю запятую
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("]");
+
+        return sb.toString();
+    }
+    private static String subjectsTOJsonArray(Set<Subject> subjects) {
+        if (subjects == null || subjects.isEmpty()) {
+            return "[]";
+        }
+
+        StringBuilder sb = new StringBuilder("[");
+        for (Subject subject : subjects) {
+            sb.append(String.format("""
+            {
+              "subject_id": %d,
+              "name": "%s"
+            },""",
+                    subject.getId(),
+                    escape(subject.getName())
+            ));
+        }
+        // Удаляем последнюю запятую
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("]");
+
+        return sb.toString();
+    }
+    private static String groupsTOJsonArray(Set<Group> groups) {
+        if (groups == null || groups.isEmpty()) {
+            return "[]";
+        }
+
+        StringBuilder sb = new StringBuilder("[");
+        for (Group group : groups) {
+            sb.append(String.format("""
+            {
+              "group_id": %d,
+              "name": "%s"
+            },""",
+                    group.getId(),
+                    escape(group.getName())
             ));
         }
         // Удаляем последнюю запятую
