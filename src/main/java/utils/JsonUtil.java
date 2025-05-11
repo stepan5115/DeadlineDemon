@@ -67,7 +67,7 @@ public class JsonUtil {
               "groups": %s,
               "deadline": "%s",
               "createdAt": "%s",
-              "subject_id": %d
+              "subject": %s
             },""",
                     assignment.getId(),
                     escape(assignment.getTitle()),
@@ -75,7 +75,7 @@ public class JsonUtil {
                     toJsonArray(assignment.getTargetGroups()),
                     assignment.getDeadline(),
                     assignment.getCreatedAt(),
-                    assignment.getSubject().getId()
+                    assignment.getSubject().getName()
             ));
         }
         // Удаляем последнюю запятую

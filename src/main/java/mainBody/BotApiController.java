@@ -94,4 +94,25 @@ public class BotApiController {
 
         return deferredResult;
     }
+    @PostMapping("/completeAssignment")
+    public DeferredResult<ResponseEntity<BaseResponse>> completeAssignment(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String assignmentId) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerCompleteAssignment(
+                username,
+                password,
+                assignmentId,
+                userRepository,
+                assignmentRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
 }

@@ -31,4 +31,8 @@ public class APIOperationManager {
                                                 AssignmentRepository assignmentRepository, SubjectRepository subjectRepository, OperationCallback callback) {
         executeOperation(new GetInfoOperation(name, password, userRepository, assignmentRepository, subjectRepository), callback);
     }
+    public static void registerCompleteAssignment(String name, String password, String assignmentId, UserRepository userRepository,
+                                                  AssignmentRepository assignmentRepository, OperationCallback callback) {
+        executeOperation(new CompleteAssignmentOperation(name, password,assignmentId, userRepository, assignmentRepository), callback);
+    }
 }
