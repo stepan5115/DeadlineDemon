@@ -50,6 +50,10 @@ public class APIOperationManager {
     }
     public static void registerGetAdminRights(String name, String password, String token, UserRepository userRepository,
                                               AdminTokenRepository adminTokenRepository, OperationCallback callback) {
-        executeOperation(new RegisterGetAdminRightsOperation(name, password, token, userRepository, adminTokenRepository, usersProvider), callback);
+        executeOperation(new GetAdminRightsOperation(name, password, token, userRepository, adminTokenRepository, usersProvider), callback);
+    }
+    public static void registerSetInterval(String name, String password, Long seconds, UserRepository userRepository,
+                                           OperationCallback callback) {
+        executeOperation(new SetIntervalOperation(name, password, seconds, userRepository, usersProvider), callback);
     }
 }

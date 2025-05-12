@@ -181,4 +181,24 @@ public class BotApiController {
 
         return deferredResult;
     }
+    @PostMapping("/setInterval")
+    public DeferredResult<ResponseEntity<BaseResponse>>setInterval(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam Long seconds) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerSetInterval(
+                username,
+                password,
+                seconds,
+                userRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
 }
