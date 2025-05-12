@@ -52,7 +52,7 @@ public class JsonUtil {
                 .map(e -> e instanceof String ? "\"" + escape(e.toString()) + "\"" : e.toString())
                 .collect(Collectors.joining(", ", "[", "]"));
     }
-    private static String assignmentsToJsonArray(Set<Assignment> assignments) {
+    public static String assignmentsToJsonArray(Set<Assignment> assignments) {
         if (assignments == null || assignments.isEmpty()) {
             return "[]";
         }
@@ -84,7 +84,7 @@ public class JsonUtil {
 
         return sb.toString();
     }
-    private static String subjectsTOJsonArray(Set<Subject> subjects) {
+    public static String subjectsTOJsonArray(Set<Subject> subjects) {
         if (subjects == null || subjects.isEmpty()) {
             return "[]";
         }
@@ -106,7 +106,7 @@ public class JsonUtil {
 
         return sb.toString();
     }
-    private static String groupsTOJsonArray(Set<Group> groups) {
+    public static String groupsTOJsonArray(Set<Group> groups) {
         if (groups == null || groups.isEmpty()) {
             return "[]";
         }

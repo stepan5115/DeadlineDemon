@@ -56,4 +56,16 @@ public class APIOperationManager {
                                            OperationCallback callback) {
         executeOperation(new SetIntervalOperation(name, password, seconds, userRepository, usersProvider), callback);
     }
+    public static void registerGetAllSubjects(String name, String password, UserRepository userRepository,
+                                              SubjectRepository subjectRepository, OperationCallback callback) {
+        executeOperation(new GetAllSubjectsOperation(name, password, userRepository, subjectRepository), callback);
+    }
+    public static void registerExcludeSubject(String name, String password, String subjectId, UserRepository userRepository,
+                                              SubjectRepository subjectRepository, OperationCallback callback) {
+        executeOperation(new ExcludeSubjectOperation(name, password, subjectId, userRepository, subjectRepository, usersProvider), callback);
+    }
+    public static void registerIncludeSubject(String name, String password, String subjectId, UserRepository userRepository,
+                                              SubjectRepository subjectRepository, OperationCallback callback) {
+        executeOperation(new IncludeSubjectOperation(name, password, subjectId, userRepository, subjectRepository, usersProvider), callback);
+    }
 }

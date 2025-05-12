@@ -201,4 +201,65 @@ public class BotApiController {
 
         return deferredResult;
     }
+    @PostMapping("/getAllSubjects")
+    public DeferredResult<ResponseEntity<BaseResponse>>getAllSubjects(
+            @RequestParam String username,
+            @RequestParam String password) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerGetAllSubjects(
+                username,
+                password,
+                userRepository,
+                subjectRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("/excludeSubject")
+    public DeferredResult<ResponseEntity<BaseResponse>>excludeSubject(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String subjectId) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerExcludeSubject(
+                username,
+                password,
+                subjectId,
+                userRepository,
+                subjectRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("/includeSubject")
+    public DeferredResult<ResponseEntity<BaseResponse>>includeSubject(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String subjectId) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerIncludeSubject(
+                username,
+                password,
+                subjectId,
+                userRepository,
+                subjectRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
 }
