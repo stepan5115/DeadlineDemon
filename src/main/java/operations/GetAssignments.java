@@ -15,6 +15,8 @@ public class GetAssignments extends Operation {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
     private final AssignmentRepository assignmentRepository;
     private final SubjectRepository subjectRepository;
+    private final String COMPLETE_STATUS = "Выполнено";
+    private final String IN_COMPLETE_STATUS = "Не выполнено";
 
     public GetAssignments(IdPair id, String messageId,
                           MyTelegramBot bot, String message, AssignmentRepository assignmentRepository,
@@ -84,18 +86,10 @@ public class GetAssignments extends Operation {
                 }
                 case WAITING_DEADLINE: {
                     if (message.equals("/next")) {
-                        sendMessage.setText("Теперь, выберите задание из списка. Для выхода выберите опцию " +
-                                "/break");
-                        List<String> namesAssignment = filterFindAssignment(state);
-                        if (namesAssignment.isEmpty()) {
-                            sendMessage.setText("Ни одно задание не подходит под требования (либо их вовсе нету)");
-                            bot.getGetAssignmentInfo().remove(id);
-                        }
-                        else {
-                            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false,
-                                    namesAssignment.toArray(new String[0])));
-                            state.setState(AssignmentInfoState.StateType.WAITING_ASSIGNMENT);
-                        }
+                        sendMessage.setText("Теперь, выберите статус задания");
+                        sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, true,
+                                IN_COMPLETE_STATUS, COMPLETE_STATUS));
+                        state.setState(AssignmentInfoState.StateType.WAITING_COMPLETE_STATUS);
                     }
                     else {
                         LocalDateTime deadline = DateParser.parseDeadline(message);
@@ -108,8 +102,32 @@ public class GetAssignments extends Operation {
                     }
                     break;
                 }
+                case WAITING_COMPLETE_STATUS: {
+                    if (message.equals("/next")) {
+                        sendMessage.setText("Теперь, выберите задание из списка. Для выхода выберите опцию " +
+                                "/break");
+                        List<String> namesAssignment = filterFindAssignment(state, user);
+                        if (namesAssignment.isEmpty()) {
+                            sendMessage.setText("Ни одно задание не подходит под требования (либо их вовсе нету)");
+                            bot.getGetAssignmentInfo().remove(id);
+                        }
+                        else {
+                            sendMessage.setReplyMarkup(InstanceKeyboardBuilder.getInlineKeyboard(id.getUserId(), true, false,
+                                    namesAssignment.toArray(new String[0])));
+                            state.setState(AssignmentInfoState.StateType.WAITING_ASSIGNMENT);
+                        }
+                    } else if (message.equals(COMPLETE_STATUS)) {
+                        state.setComplete(COMPLETE_STATUS);
+                        sendMessage.setText("OK");
+                    } else if (message.equals(IN_COMPLETE_STATUS)) {
+                        state.setComplete(IN_COMPLETE_STATUS);
+                        sendMessage.setText("OK");
+                    } else
+                        sendMessage.setText("I can't find this status");
+                    break;
+                }
                 case WAITING_ASSIGNMENT: {
-                    List<String> namesAssignmentFilter = filterFindAssignment(state);
+                    List<String> namesAssignmentFilter = filterFindAssignment(state, user);
                     if (namesAssignmentFilter.contains(message)) {
                         Optional<Assignment> assignment = assignmentRepository.getAssignmentByTitle(message);
                         if (assignment.isPresent()) {
@@ -150,7 +168,7 @@ public class GetAssignments extends Operation {
         sendReply();
     }
 
-    private List<String> filterFindAssignment(AssignmentInfoState state) {
+    private List<String> filterFindAssignment(AssignmentInfoState state, User user) {
         List<Assignment> assignments = assignmentRepository.findAll();
         Set<String> filterGroups = state.getGroups();
         List<String> namesAssignment = new ArrayList<>();
@@ -163,6 +181,14 @@ public class GetAssignments extends Operation {
                     continue;
                 if (!state.getSubjects().isEmpty() && !state.getSubjects().contains(assignment.getSubject().getName()))
                     continue;
+                if ((state.getComplete() != null)) {
+                    if ((state.getComplete().equals(COMPLETE_STATUS)) &&
+                            !user.getCompletedAssignments().contains(assignment.getId()))
+                        continue;
+                    if ((state.getComplete().equals(IN_COMPLETE_STATUS)) &&
+                            user.getCompletedAssignments().contains(assignment.getId()))
+                        continue;
+                }
                 namesAssignment.add(assignment.getTitle());
                 break;
             }

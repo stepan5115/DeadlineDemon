@@ -14,11 +14,13 @@ public class AssignmentInfoState {
         WAITING_GROUPS,
         WAITING_DEADLINE,
         WAITING_SUBJECTS,
+        WAITING_COMPLETE_STATUS,
         WAITING_ASSIGNMENT
     }
     private Set<String> groups = new HashSet<>();
     private LocalDateTime deadline;
     private Set<String> subjects = new HashSet<>();
+    private String complete;
     private StateType state;
 
     public AssignmentInfoState(AssignmentInfoState.StateType state) {

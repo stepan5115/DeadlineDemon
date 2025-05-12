@@ -1,12 +1,13 @@
 package APIOperations;
 
+import mainBody.AuthorizedUsersProvider;
 import sqlTables.*;
 import utils.JsonUtil;
 import utils.PasswordEncryptor;
 
 import java.util.Optional;
 
-public class CompleteAssignmentOperation implements BotOperation {
+public class CompleteAssignmentOperation extends BotSynchronizedOperation {
     private final String username;
     private final String password;
     private final String assignmentId;
@@ -17,7 +18,8 @@ public class CompleteAssignmentOperation implements BotOperation {
 
     //только менеджер может создавать
     protected CompleteAssignmentOperation(String username, String password, String assignmentId, UserRepository userRepository,
-                               AssignmentRepository assignmentRepository) {
+                               AssignmentRepository assignmentRepository, AuthorizedUsersProvider usersProvider) {
+        super(usersProvider);
         this.username = username;
         this.password = password;
         this.assignmentId = assignmentId;
@@ -44,6 +46,7 @@ public class CompleteAssignmentOperation implements BotOperation {
                         user.get().getCompletedAssignments().add(assignment.get().getId());
                         userRepository.save(user.get());
                         result = "OK";
+                        updateAuthorizedUsersStatus(user.get().getUser_id());
                     } catch (Exception e) {
                         result = "WRONG: Server error";
                     }
@@ -66,5 +69,13 @@ public class CompleteAssignmentOperation implements BotOperation {
     @Override
     public String getResult() {
         return result;
+    }
+
+    @Override
+    protected void updateAuthorizedUsersStatus(Long accountId) {
+        for (User user : usersProvider.getAuthorizedUsers().values()) {
+            if (user.getUser_id().equals(accountId))
+                user.getCompletedAssignments().add(Long.parseLong(assignmentId));
+        }
     }
 }

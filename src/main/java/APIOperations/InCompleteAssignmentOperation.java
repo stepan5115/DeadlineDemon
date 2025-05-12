@@ -1,12 +1,13 @@
 package APIOperations;
 
+import mainBody.AuthorizedUsersProvider;
 import sqlTables.*;
 import utils.JsonUtil;
 import utils.PasswordEncryptor;
 
 import java.util.Optional;
 
-public class InCompleteAssignmentOperation implements BotOperation {
+public class InCompleteAssignmentOperation extends BotSynchronizedOperation {
     private final String username;
     private final String password;
     private final String assignmentId;
@@ -17,7 +18,8 @@ public class InCompleteAssignmentOperation implements BotOperation {
 
     //только менеджер может создавать
     protected InCompleteAssignmentOperation(String username, String password, String assignmentId, UserRepository userRepository,
-                                          AssignmentRepository assignmentRepository) {
+                                          AssignmentRepository assignmentRepository, AuthorizedUsersProvider usersProvider) {
+        super(usersProvider);
         this.username = username;
         this.password = password;
         this.assignmentId = assignmentId;
@@ -44,6 +46,7 @@ public class InCompleteAssignmentOperation implements BotOperation {
                         user.get().getCompletedAssignments().remove(assignment.get().getId());
                         userRepository.save(user.get());
                         result = "OK";
+                        updateAuthorizedUsersStatus(user.get().getUser_id());
                     } catch (Exception e) {
                         result = "WRONG: Server error";
                     }
@@ -66,5 +69,13 @@ public class InCompleteAssignmentOperation implements BotOperation {
     @Override
     public String getResult() {
         return result;
+    }
+
+    @Override
+    protected void updateAuthorizedUsersStatus(Long accountId) {
+        for (User user : usersProvider.getAuthorizedUsers().values()) {
+            if (user.getUser_id().equals(accountId))
+                user.getCompletedAssignments().remove(Long.parseLong(assignmentId));
+        }
     }
 }

@@ -38,11 +38,11 @@ public class APIOperationManager {
     }
     public static void registerCompleteAssignment(String name, String password, String assignmentId, UserRepository userRepository,
                                                   AssignmentRepository assignmentRepository, OperationCallback callback) {
-        executeOperation(new CompleteAssignmentOperation(name, password,assignmentId, userRepository, assignmentRepository), callback);
+        executeOperation(new CompleteAssignmentOperation(name, password,assignmentId, userRepository, assignmentRepository, usersProvider), callback);
     }
     public static void registerInCompleteAssignment(String name, String password, String assignmentId, UserRepository userRepository,
                                                     AssignmentRepository assignmentRepository, OperationCallback callback) {
-        executeOperation(new InCompleteAssignmentOperation(name, password,assignmentId, userRepository, assignmentRepository), callback);
+        executeOperation(new InCompleteAssignmentOperation(name, password,assignmentId, userRepository, assignmentRepository, usersProvider), callback);
     }
     public static void registerSetNotificationStatus(String name, String password, Boolean allowNotifications,
                                                      UserRepository userRepository, OperationCallback callback) {
