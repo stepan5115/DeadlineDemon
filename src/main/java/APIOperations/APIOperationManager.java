@@ -68,4 +68,16 @@ public class APIOperationManager {
                                               SubjectRepository subjectRepository, OperationCallback callback) {
         executeOperation(new IncludeSubjectOperation(name, password, subjectId, userRepository, subjectRepository, usersProvider), callback);
     }
+    public static void registerGetAllGroups(String name, String password, UserRepository userRepository, GroupRepository groupRepository,
+                                            OperationCallback callback) {
+        executeOperation(new GetAllGroupsOperation(name, password, userRepository, groupRepository), callback);
+    }
+    public static void registerExitGroup(String name, String password, String groupName, UserRepository userRepository,
+                                         GroupRepository groupRepository, OperationCallback callback) {
+        executeOperation(new ExitGroupOperation(name, password, groupName, userRepository, groupRepository, usersProvider), callback);
+    }
+    public static void registerEnterGroup(String name, String password, String groupName, UserRepository userRepository,
+                                         GroupRepository groupRepository, OperationCallback callback) {
+        executeOperation(new EnterGroupOperation(name, password, groupName, userRepository, groupRepository, usersProvider), callback);
+    }
 }

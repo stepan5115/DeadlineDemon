@@ -262,4 +262,65 @@ public class BotApiController {
 
         return deferredResult;
     }
+    @PostMapping("/getAllGroups")
+    public DeferredResult<ResponseEntity<BaseResponse>>getAllGroups(
+            @RequestParam String username,
+            @RequestParam String password) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerGetAllGroups(
+                username,
+                password,
+                userRepository,
+                groupRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("/exitGroup")
+    public DeferredResult<ResponseEntity<BaseResponse>>exitGroup(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String groupName) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerExitGroup(
+                username,
+                password,
+                groupName,
+                userRepository,
+                groupRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("/enterGroup")
+    public DeferredResult<ResponseEntity<BaseResponse>>enterGroup(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String groupName) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerEnterGroup(
+                username,
+                password,
+                groupName,
+                userRepository,
+                groupRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
 }
