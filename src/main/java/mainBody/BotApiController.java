@@ -2,6 +2,7 @@ package mainBody;
 
 import APIOperations.APIOperationManager;
 import APIResponses.BaseResponse;
+import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,6 +10,8 @@ import org.springframework.web.context.request.async.DeferredResult;
 import sqlTables.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import utils.DateParser;
+import utils.JsonUtil;
 
 @RestController
 @RequestMapping("/api")
@@ -46,7 +49,7 @@ public class BotApiController {
     public DeferredResult<ResponseEntity<BaseResponse>> login(
             @RequestParam String username,
             @RequestParam String password) {
-
+        System.out.println("HERE");
         DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
 
         APIOperationManager.registerLogInOperation(
@@ -316,6 +319,115 @@ public class BotApiController {
                 groupName,
                 userRepository,
                 groupRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("/getAllAssignmentsIndependenceUser")
+    public DeferredResult<ResponseEntity<BaseResponse>>getAllAssignmentsIndependenceUser(
+            @RequestParam String username,
+            @RequestParam String password) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerGetAllAssignmentsIndependenceUser(
+                username,
+                password,
+                assignmentRepository,
+                userRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("/getAllSubjectsIndependenceUser")
+    public DeferredResult<ResponseEntity<BaseResponse>>getAllSubjectsIndependenceUser(
+            @RequestParam String username,
+            @RequestParam String password) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerGetAllSubjectsIndependenceUser(
+                username,
+                password,
+                subjectRepository,
+                userRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("/getAllGroupsIndependenceUser")
+    public DeferredResult<ResponseEntity<BaseResponse>>getAllGroupsIndependenceUser(
+            @RequestParam String username,
+            @RequestParam String password) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerGetAllGroupsIndependenceUser(
+                username,
+                password,
+                groupRepository,
+                userRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("/deleteAssignment")
+    public DeferredResult<ResponseEntity<BaseResponse>>deleteAssignment(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String assignmentId) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerDeleteAssignment(
+                username,
+                password,
+                assignmentId,
+                userRepository,
+                assignmentRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("/createAssignment")
+    public DeferredResult<ResponseEntity<BaseResponse>>createAssignment(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam String groupsId,
+            @RequestParam String deadline,
+            @RequestParam String subjectId) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerCreateAssignment(
+                username,
+                password,
+                title,
+                description,
+                JsonUtil.parseGroupNames(groupsId),
+                DateParser.parseDeadline(deadline),
+                subjectId,
+                userRepository,
+                assignmentRepository,
+                groupRepository,
+                subjectRepository,
                 result -> {
                     setResponse(result, deferredResult);
                 }

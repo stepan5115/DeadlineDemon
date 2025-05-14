@@ -1,10 +1,11 @@
 package utils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import sqlTables.*;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class JsonUtil {
@@ -127,5 +128,18 @@ public class JsonUtil {
         sb.append("]");
 
         return sb.toString();
+    }
+    // Десериализация JSON строки в List<String>
+    public static List<String> parseGroupNames(String jsonString) {
+        try {
+            JSONArray jsonArray = new JSONArray(jsonString);
+            List<String> groupNames = new ArrayList<>();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                groupNames.add(jsonArray.getString(i));
+            }
+            return groupNames;
+        } catch (JSONException e) {
+            return Collections.emptyList();
+        }
     }
 }

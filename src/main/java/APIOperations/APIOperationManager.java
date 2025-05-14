@@ -3,6 +3,8 @@ package APIOperations;
 import mainBody.AuthorizedUsersProvider;
 import sqlTables.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -79,5 +81,28 @@ public class APIOperationManager {
     public static void registerEnterGroup(String name, String password, String groupName, UserRepository userRepository,
                                          GroupRepository groupRepository, OperationCallback callback) {
         executeOperation(new EnterGroupOperation(name, password, groupName, userRepository, groupRepository, usersProvider), callback);
+    }
+    public static void registerGetAllAssignmentsIndependenceUser(String name, String password, AssignmentRepository assignmentRepository,
+                                                                 UserRepository userRepository, OperationCallback callback) {
+        executeOperation(new GetAllAssignmentsIndependenceUserOperation(name, password, userRepository, assignmentRepository), callback);
+    }
+    public static void registerGetAllSubjectsIndependenceUser(String name, String password, SubjectRepository subjectRepository,
+                                                                 UserRepository userRepository, OperationCallback callback) {
+        executeOperation(new GetAllSubjectsIndependenceUserOperation(name, password, userRepository, subjectRepository), callback);
+    }
+    public static void registerGetAllGroupsIndependenceUser(String name, String password, GroupRepository groupRepository,
+                                                                 UserRepository userRepository, OperationCallback callback) {
+        executeOperation(new GetAllGroupsIndependenceUserOperation(name, password, userRepository, groupRepository), callback);
+    }
+    public static void registerDeleteAssignment(String name, String password, String assignmentId, UserRepository userRepository,
+                                                AssignmentRepository assignmentRepository, OperationCallback callback) {
+        executeOperation(new DeleteAssignmentOperation(name, password, assignmentId, userRepository, assignmentRepository), callback);
+    }
+    public static void registerCreateAssignment(String name, String password, String title, String description, List<String> groupsId,
+                                                LocalDateTime deadline, String subjectId, UserRepository userRepository,
+                                                AssignmentRepository assignmentRepository, GroupRepository groupRepository,
+                                                SubjectRepository subjectRepository, OperationCallback callback) {
+        executeOperation(new CreateAssignmentOperation(name, password, title, description, groupsId, deadline, subjectId,
+                userRepository, assignmentRepository, groupRepository, subjectRepository), callback);
     }
 }
