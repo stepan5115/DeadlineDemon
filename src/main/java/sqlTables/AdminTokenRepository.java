@@ -33,4 +33,6 @@ public interface AdminTokenRepository extends JpaRepository<AdminToken, Long> {
     @Modifying
     @Transactional
     void deleteByToken(String token);
+
+    List<AdminToken> getAdminTokenByCreatedBy(User user);
 }

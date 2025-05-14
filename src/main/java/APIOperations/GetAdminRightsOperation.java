@@ -7,6 +7,7 @@ import sqlTables.User;
 import sqlTables.UserRepository;
 import utils.PasswordEncryptor;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class GetAdminRightsOperation extends BotSynchronizedOperation {
@@ -38,23 +39,27 @@ public class GetAdminRightsOperation extends BotSynchronizedOperation {
         } else if (password.length() > 15) {
             result = "WRONG: Неверный пароль";
         } else if (PasswordEncryptor.matches(password, user.get().getPassword())) {
-            try {
-                if (user.get().isCanEditTasks())
-                    result = "WRONG: already have admin rights";
-                else {
-                    Optional<AdminToken> adminToken = adminTokenRepository.findByToken(token);
-                    if (adminToken.isPresent()) {
-                        user.get().setCanEditTasks(true);
-                        userRepository.save(user.get());
-                        result = "OK";
-                        adminTokenRepository.deleteByToken(adminToken.get().getToken());
-                        updateAuthorizedUsersStatus(user.get().getUser_id());
-                    } else
-                        result = "WRONG: invalid token";
+            if (!user.get().isCanEditTasks()) {
+                try {
+                    if (user.get().isCanEditTasks())
+                        result = "WRONG: already have admin rights";
+                    else {
+                        adminTokenRepository.deleteExpiredTokens(LocalDateTime.now());
+                        Optional<AdminToken> adminToken = adminTokenRepository.findByToken(token);
+                        if (adminToken.isPresent()) {
+                            user.get().setCanEditTasks(true);
+                            userRepository.save(user.get());
+                            result = "OK";
+                            adminTokenRepository.deleteByToken(adminToken.get().getToken());
+                            updateAuthorizedUsersStatus(user.get().getUser_id());
+                        } else
+                            result = "WRONG: invalid token";
+                    }
+                } catch (Throwable e) {
+                    result = "WRONG: server error";
                 }
-            } catch (Throwable e) {
-                result = "WRONG: server error";
-            }
+            } else
+                result = "WRONG: уже есть права администратора";
         } else {
             result = "WRONG: Неверный пароль";
         }

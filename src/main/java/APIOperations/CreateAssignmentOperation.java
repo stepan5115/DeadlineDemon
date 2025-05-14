@@ -55,7 +55,7 @@ public class CreateAssignmentOperation implements BotOperation {
         } else if (PasswordEncryptor.matches(password, user.get().getPassword())) {
             if (user.get().isCanEditTasks()) {
                 try {
-                    Optional<Assignment> tmp = assignmentRepository.getAssignmentByTitle(title);
+                    Optional<Assignment> tmp = assignmentRepository.getAssignmentByTitleIgnoreCase(title);
                     if (tmp.isEmpty()) {
                         Optional<Subject> subject = subjectRepository.findById(Long.parseLong(subjectId));
                         if (subject.isPresent()) {

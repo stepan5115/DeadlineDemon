@@ -129,6 +129,28 @@ public class JsonUtil {
 
         return sb.toString();
     }
+    public static String tokensToJsonArray(Set<AdminToken> tokens) {
+        if (tokens == null || tokens.isEmpty()) {
+            return "[]";
+        }
+
+        StringBuilder sb = new StringBuilder("[");
+        for (AdminToken token : tokens) {
+            sb.append(String.format("""
+            {
+              "token_id": %d,
+              "token": "%s"
+            },""",
+                    token.getId(),
+                    escape(token.getToken())
+            ));
+        }
+        // Удаляем последнюю запятую
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("]");
+
+        return sb.toString();
+    }
     // Десериализация JSON строки в List<String>
     public static List<String> parseGroupNames(String jsonString) {
         try {

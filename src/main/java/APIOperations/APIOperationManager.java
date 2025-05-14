@@ -105,4 +105,33 @@ public class APIOperationManager {
         executeOperation(new CreateAssignmentOperation(name, password, title, description, groupsId, deadline, subjectId,
                 userRepository, assignmentRepository, groupRepository, subjectRepository), callback);
     }
+    public static void registerGenerateToken(String name, String password, UserRepository userRepository,
+                                             AdminTokenRepository adminTokenRepository, OperationCallback callback) {
+        executeOperation(new GenerateTokenOperation(name, password, userRepository, adminTokenRepository), callback);
+    }
+    public static void registerGetTokens(String name, String password, UserRepository userRepository,
+                                         AdminTokenRepository adminTokenRepository, OperationCallback callback) {
+        executeOperation(new GetTokensOperation(name, password, userRepository, adminTokenRepository), callback);
+    }
+    public static void registerDeleteToken(String name, String password, String tokenId, UserRepository userRepository,
+                                           AdminTokenRepository adminTokenRepository, OperationCallback callback) {
+        executeOperation(new DeleteTokenOperation(name, password, tokenId, userRepository, adminTokenRepository), callback);
+    }
+    public static void registerCreateSubject(String name, String password, String subjectName,
+                                             UserRepository userRepository, SubjectRepository subjectRepository, OperationCallback callback) {
+        executeOperation(new CreateSubjectOperation(name, password, subjectName, userRepository, subjectRepository), callback);
+    }
+    public static void registerDeleteSubject(String name, String password, String subjectId,
+                                             UserRepository userRepository, SubjectRepository subjectRepository,
+                                             AssignmentRepository assignmentRepository, OperationCallback callback) {
+        executeOperation(new DeleteSubjectOperation(name, password, subjectId, userRepository, subjectRepository, assignmentRepository), callback);
+    }
+    public static void registerCreateGroup(String name, String password, String groupName,
+                                             UserRepository userRepository, GroupRepository groupRepository, OperationCallback callback) {
+        executeOperation(new CreateGroupOperation(name, password, groupName, userRepository, groupRepository), callback);
+    }
+    public static void registerDeleteGroup(String name, String password, String groupId,
+                                             UserRepository userRepository, GroupRepository groupRepository, OperationCallback callback) {
+        executeOperation(new DeleteGroupOperation(name, password, groupId, userRepository, groupRepository), callback);
+    }
 }

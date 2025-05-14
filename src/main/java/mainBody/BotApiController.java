@@ -435,4 +435,148 @@ public class BotApiController {
 
         return deferredResult;
     }
+    @PostMapping("/generateToken")
+    public DeferredResult<ResponseEntity<BaseResponse>>generateToken(
+            @RequestParam String username,
+            @RequestParam String password) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerGenerateToken(
+                username,
+                password,
+                userRepository,
+                adminTokenRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("/getTokens")
+    public DeferredResult<ResponseEntity<BaseResponse>>getTokens(
+            @RequestParam String username,
+            @RequestParam String password) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerGetTokens(
+                username,
+                password,
+                userRepository,
+                adminTokenRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("deleteToken")
+    public DeferredResult<ResponseEntity<BaseResponse>>deleteToken(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String tokenId) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerDeleteToken(
+                username,
+                password,
+                tokenId,
+                userRepository,
+                adminTokenRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("createSubject")
+    public DeferredResult<ResponseEntity<BaseResponse>>createSubject(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String subjectName) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerCreateSubject(
+                username,
+                password,
+                subjectName,
+                userRepository,
+                subjectRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("deleteSubject")
+    public DeferredResult<ResponseEntity<BaseResponse>>deleteSubject(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String subjectId) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerDeleteSubject(
+                username,
+                password,
+                subjectId,
+                userRepository,
+                subjectRepository,
+                assignmentRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("createGroup")
+    public DeferredResult<ResponseEntity<BaseResponse>>createGroup(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String groupName) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerCreateGroup(
+                username,
+                password,
+                groupName,
+                userRepository,
+                groupRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
+    @PostMapping("deleteGroup")
+    public DeferredResult<ResponseEntity<BaseResponse>>deleteGroup(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String groupId) {
+
+        DeferredResult<ResponseEntity<BaseResponse>> deferredResult = new DeferredResult<>();
+
+        APIOperationManager.registerDeleteGroup(
+                username,
+                password,
+                groupId,
+                userRepository,
+                groupRepository,
+                result -> {
+                    setResponse(result, deferredResult);
+                }
+        );
+
+        return deferredResult;
+    }
 }

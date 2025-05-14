@@ -41,4 +41,6 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     Optional<Assignment> getAssignmentByTitle(String title);
 
     Optional<Assignment> getAssignmentById(Long id);
+
+    Optional<Assignment> getAssignmentByTitleIgnoreCase(String title);
 }
