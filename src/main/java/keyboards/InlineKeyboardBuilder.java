@@ -1,0 +1,103 @@
+package keyboards;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import states.State;
+
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+
+public class InlineKeyboardBuilder {
+    public static String NEXT_COMMAND = "/next";
+    public static String NEXT_COMMAND_VISIBLE = "далее";
+    public static String PREV_COMMAND = "/prev";
+    public static String PREV_COMMAND_VISIBLE = "назад";
+    public static String BREAK_COMMAND = "/break";
+    public static String BREAK_COMMAND_VISIBLE = "прервать";
+    public static String COMPLETE_COMMAND = "/complete";
+    public static String COMPLETE_COMMAND_VISIBLE = "выполнить";
+    private static int LIMIT = 7;
+    public static InlineKeyboardMarkup build(String userId, State state, Pair... visibleAndInvisible) {
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        int countButtons = visibleAndInvisible.length;
+        int maxIndexOfPage = countButtons/LIMIT;
+        state.setPageNumber(Math.max(state.getPageNumber(),0));
+        state.setPageNumber(Math.min(state.getPageNumber(),maxIndexOfPage));
+        int startIndex = state.getPageNumber()*LIMIT;
+        for (int i = 0; i < LIMIT - 1; i++)
+            if (startIndex + i < countButtons) {
+                InlineKeyboardButton button = new InlineKeyboardButton();
+                button.setText(visibleAndInvisible[startIndex + i].getVisible());
+                button.setCallbackData(visibleAndInvisible[startIndex + i].getInvisible() + "_" + userId);
+                rows.add(List.of(button));
+            }
+        List<InlineKeyboardButton> buttonsForPagination = getPaginationButtons(userId, state, maxIndexOfPage);
+        if (!buttonsForPagination.isEmpty())
+            rows.add(buttonsForPagination);
+        if (state.isCompleteButton()) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(COMPLETE_COMMAND_VISIBLE);
+            button.setCallbackData(COMPLETE_COMMAND + "_" + userId);
+            rows.add(List.of(button));
+        }
+        if (state.isBreakButton()) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(BREAK_COMMAND_VISIBLE);
+            button.setCallbackData(BREAK_COMMAND + "_" + userId);
+            rows.add(List.of(button));
+        }
+        markup.setKeyboard(rows);
+        return markup;
+    }
+
+    public static InlineKeyboardMarkup getSimpleBreak(String userId, Pair... visibleAndInvisible) {
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        for (Pair pair : visibleAndInvisible) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(pair.getVisible());
+            button.setCallbackData(pair.getInvisible() + "_" + userId);
+            rows.add(List.of(button));
+        }
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText(BREAK_COMMAND_VISIBLE);
+        button.setCallbackData(BREAK_COMMAND + "_" + userId);
+        rows.add(List.of(button));
+        markup.setKeyboard(rows);
+        return markup;
+    }
+
+    private static List<InlineKeyboardButton> getPaginationButtons(String userId, State state, int maxIndexOfPage) {
+        List<InlineKeyboardButton> buttonsForPagination = new ArrayList<>();
+        if (maxIndexOfPage > state.getPageNumber()) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(NEXT_COMMAND_VISIBLE);
+            button.setCallbackData(NEXT_COMMAND + "_" + userId);
+            buttonsForPagination.add(button);
+        }
+        if (state.getPageNumber() > 0) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(PREV_COMMAND_VISIBLE);
+            button.setCallbackData(PREV_COMMAND + "_" + userId);
+            buttonsForPagination.add(button);
+        }
+        return buttonsForPagination;
+    }
+
+    public static class Pair {
+        @Getter
+        @Setter
+        private String visible;
+        @Getter
+        @Setter
+        private String invisible;
+        public Pair(String visible, String invisible) {
+            this.visible = visible;
+            this.invisible = invisible;
+        }
+    }
+}

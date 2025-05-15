@@ -15,4 +15,12 @@ public class DateParser {
             return null;
         }
     }
+    public static String formatDeadline(LocalDateTime dateTime) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+            return dateTime.format(formatter);
+        } catch (DateTimeParseException e) {
+            return "плохой формат даты";
+        }
+    }
 }

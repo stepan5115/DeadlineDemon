@@ -10,7 +10,7 @@ public class ExitOperation extends Operation {
     }
     public void run() {
         bot.getLogInUserStates().remove(id);
-        bot.getSignInUserStates().remove(id);
+        bot.getSignUpUserStates().remove(id);
         bot.getEnterGroupUsers().remove(id);
         bot.getExitGroupUsers().remove(id);
         bot.getEnterTokenUsers().remove(id);
@@ -23,7 +23,7 @@ public class ExitOperation extends Operation {
         bot.getDeleteSubjectUsers().remove(id);
         bot.getSetIntervalUsers().remove(id);
         bot.getGetAssignmentInfo().remove(id);
-        bot.getExcludeAssignment().remove(id);
+        bot.getExcludeAssignmentStates().remove(id);
         bot.getIncludeAssignment().remove(id);
         bot.getExcludeSubject().remove(id);
         bot.getIncludeSubject().remove(id);

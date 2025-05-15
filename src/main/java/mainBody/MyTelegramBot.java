@@ -1,22 +1,17 @@
 package mainBody;
 
-import APIOperations.APIOperationManager;
-import APIOperations.LogInOperation;
 import lombok.Getter;
 import operations.OperationManager;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.context.request.async.DeferredResult;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import sqlTables.*;
+import states.AuthState;
+import states.ExcludeAssignmentState;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 
@@ -24,6 +19,7 @@ import java.util.logging.Logger;
 public class MyTelegramBot extends TelegramLongPollingBot implements AuthorizedUsersProvider {
     private final String botToken = "8054120880:AAF78Qz9kPvwR3p2OhN4GEFCVznCw-Kf2No";
     private final String botName = "DeadlineDemonBot";
+
     private static final Logger logger = Logger.getLogger(MyTelegramBot.class.getName());
     private final int THREAD_POOL_SIZE = 100;
     @Getter
@@ -46,9 +42,9 @@ public class MyTelegramBot extends TelegramLongPollingBot implements AuthorizedU
     @Getter
     private final ConcurrentHashMap<IdPair, User> authorizedUsers = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentHashMap<IdPair, NamePasswordState> logInUserStates = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<IdPair, AuthState> logInUserStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentHashMap<IdPair, NamePasswordState> signInUserStates = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<IdPair, AuthState> signUpUserStates = new ConcurrentHashMap<>();
     @Getter
     private final ConcurrentLinkedQueue<IdPair> enterGroupUsers = new ConcurrentLinkedQueue<>();
     @Getter
@@ -74,7 +70,7 @@ public class MyTelegramBot extends TelegramLongPollingBot implements AuthorizedU
     @Getter
     private final ConcurrentHashMap<IdPair, AssignmentInfoState> getAssignmentInfo = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> excludeAssignment = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, ExcludeAssignmentState> excludeAssignmentStates = new ConcurrentHashMap<>();
     @Getter
     private final ConcurrentLinkedQueue<IdPair> includeAssignment = new ConcurrentLinkedQueue<>();
     @Getter

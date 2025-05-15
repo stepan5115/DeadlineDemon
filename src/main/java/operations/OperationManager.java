@@ -36,16 +36,16 @@ public class OperationManager {
         if (bot.getDeleteSubjectUsers().contains(id))
             return new DeleteSubject(id, messageId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
         if (bot.getLogInUserStates().containsKey(id))
-            return new LogIn(id, messageId, bot, message, bot.getUserRepository());
-        if (bot.getSignInUserStates().containsKey(id))
-            return new SignIn(id, messageId, bot, message, bot.getUserRepository());
+            return new LogInOperation(id, messageId, bot, message, bot.getUserRepository());
+        if (bot.getSignUpUserStates().containsKey(id))
+            return new SignUpOperation(id, messageId, bot, message, bot.getUserRepository());
         if (bot.getSetIntervalUsers().contains(id))
             return new SetInterval(id, messageId, bot, message, bot.getUserRepository());
         if (bot.getGetAssignmentInfo().containsKey(id))
             return new GetAssignments(id, messageId, bot, message, bot.getAssignmentRepository(), bot.getSubjectRepository());
-        if (bot.getExcludeAssignment().contains(id))
-            return new ExcludeAssignment(id, messageId, bot, message, bot.getUserRepository(),
-                    bot.getAssignmentRepository(), bot.getSubjectRepository());
+        if (bot.getExcludeAssignmentStates().containsKey(id))
+            return new ExcludeAssignmentOperation(id, messageId, bot, message, bot.getUserRepository(),
+                    bot.getAssignmentRepository(), bot.getSubjectRepository(), bot.getGroupRepository());
         if (bot.getIncludeAssignment().contains(id))
             return new IncludeAssignment(id, messageId, bot, message, bot.getUserRepository(),
                     bot.getAssignmentRepository(), bot.getSubjectRepository());
@@ -68,8 +68,8 @@ public class OperationManager {
             case "/disable" ->
                     new DisableAutoMailing(id, messageId, bot, message, bot.getUserRepository());
             case "/excludeAssignment" ->
-                new ExcludeAssignment(id, messageId, bot, message, bot.getUserRepository(),
-                        bot.getAssignmentRepository(), bot.getSubjectRepository());
+                new ExcludeAssignmentOperation(id, messageId, bot, message, bot.getUserRepository(),
+                        bot.getAssignmentRepository(), bot.getSubjectRepository(), bot.getGroupRepository());
             case "/includeAssignment" ->
                 new IncludeAssignment(id, messageId, bot, message, bot.getUserRepository(),
                         bot.getAssignmentRepository(), bot.getSubjectRepository());
@@ -125,8 +125,8 @@ public class OperationManager {
             case "/setInterval" -> new SetInterval(id, messageId, bot, message, bot.getUserRepository());
             //Start Menu
             case "/start" -> new Start(id, messageId, bot, message);
-            case "/login" -> new LogIn(id, messageId, bot, message, bot.getUserRepository());
-            case "/register" -> new SignIn(id, messageId, bot, message, bot.getUserRepository());
+            case "/login" -> new LogInOperation(id, messageId, bot, message, bot.getUserRepository());
+            case "/register" -> new SignUpOperation(id, messageId, bot, message, bot.getUserRepository());
             case "/about" -> new AboutOperation(id, messageId, bot, message);
             default -> new MisUnderstand(id, messageId, bot, message);
         };
