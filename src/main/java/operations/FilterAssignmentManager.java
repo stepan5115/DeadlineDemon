@@ -34,8 +34,8 @@ public class FilterAssignmentManager {
     private static final String GROUPS_FILTERS_VISIBLE = "фильтр по группам";
     private static final String SUBJECT_FILTERS = "/subjectFilter";
     private static final String SUBJECT_FILTERS_VISIBLE = "фильтр по предмету";
-    private static final String DEADLINE_FILTERS = "фильтр по дедлайну";
-    private static final String DEADLINE_FILTERS_VISIBLE = "/deadlineFilter";
+    private static final String DEADLINE_FILTERS_VISIBLE = "фильтр по дедлайну";
+    private static final String DEADLINE_FILTERS = "/deadlineFilter";
 
 
     public static void chooseOperation(User user, String userId, FilterAssignmentState state,
@@ -61,68 +61,27 @@ public class FilterAssignmentManager {
                 if (message.equals(TITLE_FILTER)) {
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_TITLE);
                     operation.setTextLastMessage(state, "Выберите что сделать с этим фильтром");
-                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId));
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
                 }
                 else if (message.equals(DESCRIPTION_FILTER)) {
-                    /*
-                    state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_DESCRIPTION);
-                    operation.setTextLastMessage(state, "Введите строку для фильтрации по описанию!");
-                    operation.setReplyMarkupLastMessage(state, InlineKeyboardBuilder.getSimpleBreak(userId));
-                     */
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_DESCRIPTION);
                     operation.setTextLastMessage(state, "Выберите что сделать с этим фильтром");
-                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId));
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
                 }
                 else if (message.equals(GROUPS_FILTERS)) {
-                    /*
-                    InlineKeyboardMarkup inlineKeyboardMarkup = getInlineKeyboardMarkupGroups(userId, state,
-                            getAllGroups(user, state, groupRepository));
-                    if (inlineKeyboardMarkup == null) {
-                        state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
-                        operation.setTextLastMessage(state, "Не найдено групп соответственно запросу\n" +
-                                getParameterValues(state));
-                        operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
-                    }
-                    else {
-                        state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_GROUPS);
-                        operation.setTextLastMessage(state, "Выбирайте группы из списка");
-                        operation.setReplyMarkupLastMessage(state, inlineKeyboardMarkup);
-                    }
-                     */
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_GROUPS);
                     operation.setTextLastMessage(state, "Выберите что сделать с этим фильтром");
-                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId));
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
                 }
                 else if (message.equals(SUBJECT_FILTERS)) {
-                    /*
-                    InlineKeyboardMarkup inlineKeyboardMarkup = getInlineKeyboardMarkupSubjects(userId, state,
-                            getAllSubjects(user, subjectRepository));
-                    if (inlineKeyboardMarkup == null) {
-                        state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
-                        operation.setTextLastMessage(state, "Не найдено предметов соответственно запросу\n" +
-                                getParameterValues(state));
-                        operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
-                    }
-                    else {
-                        state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_SUBJECTS);
-                        operation.setTextLastMessage(state, "Выбирайте предметы из списка из списка");
-                        operation.setReplyMarkupLastMessage(state, inlineKeyboardMarkup);
-                    }
-                     */
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_SUBJECTS);
                     operation.setTextLastMessage(state, "Выберите что сделать с этим фильтром");
-                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId));
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
                 }
                 else if (message.equals(DEADLINE_FILTERS)) {
-                    /*
-                    state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_DEADLINE);
-                    operation.setTextLastMessage(state, "Теперь введите дедлайн в формате: " +
-                            DateParser.DATE_FORMAT);
-                    operation.setReplyMarkupLastMessage(state, InlineKeyboardBuilder.getSimpleBreak(userId));
-                     */
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_DEADLINE);
                     operation.setTextLastMessage(state, "Выберите что сделать с этим фильтром");
-                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId));
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
                 }
                 else if (message.equals(InlineKeyboardBuilder.COMPLETE_COMMAND)) {
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.COMPLETE);
@@ -148,7 +107,7 @@ public class FilterAssignmentManager {
                 else if (message.equals(ADD)) {
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_TITLE_ADD);
                     operation.setTextLastMessage(state, "Введите строку для фильтрации по названию!");
-                    operation.setReplyMarkupLastMessage(state, InlineKeyboardBuilder.getSimpleBreak(userId));
+                    operation.setReplyMarkupLastMessage(state, InlineKeyboardBuilder.getSimpleBreak(userId, state));
                 } else if (message.equals(DELETE)) {
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
                     state.setTitleFilter(null);
@@ -156,14 +115,14 @@ public class FilterAssignmentManager {
                     operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
                 } else {
                     operation.setTextLastMessage(state, "неизвестная операция, выберите из кнопок под сообщением!");
-                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId));
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
                 }
             }
             case FILTER_TITLE_ADD -> {
                 if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_TITLE);
                     operation.setTextLastMessage(state, "Выберите что сделать с этим фильтром");
-                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId));
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
                 }
                 else if (InputValidator.isValid(message)) {
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
@@ -174,7 +133,7 @@ public class FilterAssignmentManager {
                 } else {
                     operation.setTextLastMessage(state, "Невалидный ввод, правила: " +
                             InputValidator.RULES_DESCRIPTION + "\n. Попробуйте еще раз");
-                    operation.setReplyMarkupLastMessage(state, InlineKeyboardBuilder.getSimpleBreak(userId));
+                    operation.setReplyMarkupLastMessage(state, InlineKeyboardBuilder.getSimpleBreak(userId, state));
                 }
             }
             case FILTER_DESCRIPTION -> {
@@ -184,7 +143,26 @@ public class FilterAssignmentManager {
                     operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
                 }
-                /*
+                else if (message.equals(ADD)) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_DESCRIPTION_ADD);
+                    operation.setTextLastMessage(state, "Введите строку для фильтрации по описанию!");
+                    operation.setReplyMarkupLastMessage(state, InlineKeyboardBuilder.getSimpleBreak(userId, state));
+                } else if (message.equals(DELETE)) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
+                    state.setDescriptionFilter(null);
+                    operation.setTextLastMessage(state, "Как пожелаете!\n" + getParameterValues(state));
+                    operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
+                } else {
+                    operation.setTextLastMessage(state, "неизвестная операция, выберите из кнопок под сообщением!");
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                }
+            }
+            case FILTER_DESCRIPTION_ADD -> {
+                if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_DESCRIPTION);
+                    operation.setTextLastMessage(state, "Выберите что сделать с этим фильтром");
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                }
                 else if (InputValidator.isValid(message)) {
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
                     state.setDescriptionFilter(message);
@@ -194,31 +172,182 @@ public class FilterAssignmentManager {
                 } else {
                     operation.setTextLastMessage(state, "Невалидный ввод, правила: " +
                             InputValidator.RULES_DESCRIPTION + "\n. Попробуйте еще раз");
-                    operation.setReplyMarkupLastMessage(state, InlineKeyboardBuilder.getSimpleBreak(userId));
+                    operation.setReplyMarkupLastMessage(state, InlineKeyboardBuilder.getSimpleBreak(userId, state));
                 }
-
-                 */
             }
             case FILTER_GROUPS -> {
-                List<Subject> subjects = getAllSubjects(user, subjectRepository);
-                InlineKeyboardMarkup inlineKeyboardMarkup = getInlineKeyboardMarkupSubjects(userId, state,
-                        subjects);
                 if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
                     operation.setTextLastMessage(state, "выбор фильтра по группам прерван\n" +
                             getParameterValues(state));
                     operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
-                    state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
                 }
-                else if (inlineKeyboardMarkup == null) {
+                else if (message.equals(ADD)) {
+                    List<Group> groups = getAllGroups(user, state, groupRepository);
+                    InlineKeyboardMarkup inlineKeyboardMarkup = getInlineKeyboardMarkupGroups(userId, state,
+                            groups);
+                    if (inlineKeyboardMarkup == null) {
+                        state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_GROUPS);
+                        operation.setTextLastMessage(state, "Группы закончились!\n" + getParameterValues(state));
+                        operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                    }
+                    else {
+                        state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_GROUPS_ADD);
+                        operation.setTextLastMessage(state, "Выбирайте группы!");
+                        operation.setReplyMarkupLastMessage(state, inlineKeyboardMarkup);
+                    }
+                } else if (message.equals(DELETE)) {
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
-                    operation.setTextLastMessage(state, "Не найдено групп соответственно запросу\n" +
+                    state.setFilterGroups(new ArrayList<>(List.of()));
+                    operation.setTextLastMessage(state, "Как пожелаете!\n" + getParameterValues(state));
+                    operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
+                } else {
+                    operation.setTextLastMessage(state, "неизвестная операция, выберите из кнопок под сообщением!");
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                }
+            }
+            case FILTER_GROUPS_ADD -> {
+                List<Group> groups = getAllGroups(user, state, groupRepository);
+                if (groups == null) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_GROUPS);
+                    operation.setTextLastMessage(state, "Something going wrong");
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                    return;
+                } else if (groups.isEmpty()) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_GROUPS);
+                    operation.setTextLastMessage(state, "Больше нету групп");
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                    return;
+                }
+                Optional<Group> group = groups.stream().filter(it -> it.getId().toString().equals(message)).findFirst();
+                if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_GROUPS);
+                    operation.setTextLastMessage(state, "Выберите что сделать с этим фильтром");
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                }
+                else if (operation.basePaginationCheck(state, message))
+                    operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkupGroups(userId, state, groups));
+                else if (group.isPresent()) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
+                    state.addGroup(group.get());
+                    operation.setTextLastMessage(state, "Хорошо, запомню\n" +
+                            getParameterValues(state));
+                    operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
+                } else {
+                    operation.setTextLastMessage(state, "Группа не найдена, попробуйте еще раз");
+                    operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkupGroups(userId, state, groups));
+                }
+            }
+            case FILTER_SUBJECTS -> {
+                if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
+                    operation.setTextLastMessage(state, "выбор фильтра по предметам прерван\n" +
                             getParameterValues(state));
                     operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
                 }
+                else if (message.equals(ADD)) {
+                    List<Subject> subjects = getAllSubjects(user, subjectRepository, state);
+                    InlineKeyboardMarkup inlineKeyboardMarkup = getInlineKeyboardMarkupSubjects(userId, state,
+                            subjects);
+                    if (inlineKeyboardMarkup == null) {
+                        state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_SUBJECTS);
+                        operation.setTextLastMessage(state, "Предметы закончились!\n" + getParameterValues(state));
+                        operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                    }
+                    else {
+                        state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_SUBJECTS_ADD);
+                        operation.setTextLastMessage(state, "Выбирайте предметы!");
+                        operation.setReplyMarkupLastMessage(state, inlineKeyboardMarkup);
+                    }
+                } else if (message.equals(DELETE)) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
+                    state.setFilterSubjects(new ArrayList<>(List.of()));
+                    operation.setTextLastMessage(state, "Как пожелаете!\n" + getParameterValues(state));
+                    operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
+                } else {
+                    operation.setTextLastMessage(state, "неизвестная операция, выберите из кнопок под сообщением!");
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                }
+            }
+            case FILTER_SUBJECTS_ADD -> {
+                List<Subject> subjects = getAllSubjects(user, subjectRepository, state);
+                if (subjects == null) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_SUBJECTS);
+                    operation.setTextLastMessage(state, "Something going wrong");
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                    return;
+                } else if (subjects.isEmpty()) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_SUBJECTS);
+                    operation.setTextLastMessage(state, "Больше нету предметов");
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                    return;
+                }
+                Optional<Subject> subject = subjects.stream().filter(it -> it.getId().toString().equals(message)).findFirst();
+                if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_SUBJECTS);
+                    operation.setTextLastMessage(state, "Выберите что сделать с этим фильтром");
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                }
+                else if (operation.basePaginationCheck(state, message))
+                    operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkupSubjects(userId, state, subjects));
+                else if (subject.isPresent()) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
+                    state.addSubject(subject.get());
+                    operation.setTextLastMessage(state, "Хорошо, запомню\n" +
+                            getParameterValues(state));
+                    operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
+                } else {
+                    operation.setTextLastMessage(state, "Группа не найдена, попробуйте еще раз");
+                    operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkupSubjects(userId, state, subjects));
+                }
+            }
+            case FILTER_DEADLINE -> {
+                if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
+                    operation.setTextLastMessage(state, "выбор фильтра по дедлайну прерван\n" +
+                            getParameterValues(state));
+                    operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
+                }
+                else if (message.equals(ADD)) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_DEADLINE_ADD);
+                    operation.setTextLastMessage(state, "Введите дедлайн в формате: " +
+                            DateParser.DATE_FORMAT);
+                    operation.setReplyMarkupLastMessage(state, InlineKeyboardBuilder.getSimpleBreak(userId, state));
+                } else if (message.equals(DELETE)) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
+                    state.setDeadlineFilter(null);
+                    operation.setTextLastMessage(state, "Как пожелаете!\n" + getParameterValues(state));
+                    operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
+                } else {
+                    operation.setTextLastMessage(state, "неизвестная операция, выберите из кнопок под сообщением!");
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                }
+            }
+            case FILTER_DEADLINE_ADD -> {
+                LocalDateTime time = DateParser.parseDeadline(message);
+                if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
+                    state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_DEADLINE);
+                    operation.setTextLastMessage(state, "Выберите что сделать с этим фильтром");
+                    operation.setReplyMarkupLastMessage(state, getAddDeleteKeyboard(userId, state));
+                }
+                else if (time != null) {
+                    if (time.isAfter(LocalDateTime.now())) {
+                        state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
+                        state.setDeadlineFilter(time);
+                        operation.setTextLastMessage(state, "Хорошо, запомню\n" +
+                                getParameterValues(state));
+                        operation.setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(userId, state));
+                    }
+                    else {
+                        operation.setTextLastMessage(state, "Невалидный ввод (дата деделайна не может быть в прошлом)" +
+                                "\nПопробуйте еще раз");
+                        operation.setReplyMarkupLastMessage(state, InlineKeyboardBuilder.getSimpleBreak(userId, state));
+                    }
+                }
                 else {
-                    state.setPositionFilter(FilterAssignmentState.PositionFilter.FILTER_GROUPS);
-                    operation.setTextLastMessage(state, "Выбирайте группы из списка");
-                    operation.setReplyMarkupLastMessage(state, inlineKeyboardMarkup);
+                    operation.setTextLastMessage(state, "Невалидный ввод, придерживайтесь формы: " +
+                            DateParser.DATE_FORMAT + "\n. Попробуйте еще раз");
+                    operation.setReplyMarkupLastMessage(state, InlineKeyboardBuilder.getSimpleBreak(userId, state));
                 }
             }
         }
@@ -237,14 +366,14 @@ public class FilterAssignmentManager {
         else
             stringBuilder.append("не задан");
         stringBuilder.append("\n\"groups filter\": ");
-        if (!state.getFilterGroups().isEmpty())
+        if ((state.getFilterGroups() != null) && !state.getFilterGroups().isEmpty())
             stringBuilder.append(state.getFilterGroups().stream()
                     .map(group -> "\"" + group.getName() + "\"")
                     .collect(Collectors.joining(", ")));
         else
             stringBuilder.append("не задан");
         stringBuilder.append("\n\"subjects filter\": ");
-        if (!state.getFilterSubjects().isEmpty())
+        if ((state.getFilterSubjects() != null) && !state.getFilterSubjects().isEmpty())
             stringBuilder.append(state.getFilterSubjects().stream()
                     .map(group -> "\"" + group.getName() + "\"")
                     .collect(Collectors.joining(", ")));
@@ -279,7 +408,7 @@ public class FilterAssignmentManager {
             }
             if (namesForGroups.isEmpty())
                 return null;
-            return InlineKeyboardBuilder.build(userId, state, namesForGroups.toArray(new InlineKeyboardBuilder.Pair[0]));
+            return InlineKeyboardBuilder.getSimpleBreak(userId, state, namesForGroups.toArray(new InlineKeyboardBuilder.Pair[0]));
         } catch (Throwable e) {
             return null;
         }
@@ -292,7 +421,8 @@ public class FilterAssignmentManager {
                 groups.addAll(groupRepository.findAll());
             else
                 groups.addAll(user.getGroups(groupRepository));
-            return groups;
+            List<String> selectedGroupsNames = state.getFilterGroups().stream().map(Group::getName).toList();
+            return groups.stream().filter(group -> !selectedGroupsNames.contains(group.getName())).collect(Collectors.toList());
         } catch (Throwable e) {
             return null;
         }
@@ -315,9 +445,13 @@ public class FilterAssignmentManager {
         }
     }
     private static List<Subject> getAllSubjects(User user,
-                                                SubjectRepository subjectRepository) {
+                                                SubjectRepository subjectRepository,
+                                                FilterAssignmentState state) {
+        List<String> selectedSubjectsNames = state.getFilterSubjects().stream().map(Subject::getName).toList();
         try {
-            return subjectRepository.findAll();
+            return subjectRepository.findAll().stream()
+                    .filter(item -> !(selectedSubjectsNames.contains(item.getName())))
+                    .collect(Collectors.toList());
         } catch (Throwable e) {
             return null;
         }
@@ -325,9 +459,9 @@ public class FilterAssignmentManager {
     private void processTitleFilter(Operation operation, FilterAssignmentState state) {
 
     }
-    private static InlineKeyboardMarkup getAddDeleteKeyboard(String userId) {
+    private static InlineKeyboardMarkup getAddDeleteKeyboard(String userId, State state) {
         try {
-            return InlineKeyboardBuilder.getSimpleBreak(userId,
+            return InlineKeyboardBuilder.getSimpleBreak(userId, state,
                     new InlineKeyboardBuilder.Pair(ADD_VISIBLE, ADD),
                     new InlineKeyboardBuilder.Pair(DELETE_VISIBLE, DELETE)
             );

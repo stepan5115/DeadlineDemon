@@ -54,21 +54,11 @@ public class InlineKeyboardBuilder {
         return markup;
     }
 
-    public static InlineKeyboardMarkup getSimpleBreak(String userId, Pair... visibleAndInvisible) {
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-        for (Pair pair : visibleAndInvisible) {
-            InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText(pair.getVisible());
-            button.setCallbackData(pair.getInvisible() + "_" + userId);
-            rows.add(List.of(button));
-        }
-        InlineKeyboardButton button = new InlineKeyboardButton();
-        button.setText(BREAK_COMMAND_VISIBLE);
-        button.setCallbackData(BREAK_COMMAND + "_" + userId);
-        rows.add(List.of(button));
-        markup.setKeyboard(rows);
-        return markup;
+    public static InlineKeyboardMarkup getSimpleBreak(String userId, State state, Pair... visibleAndInvisible) {
+        state.setCompleteButton(false);
+        InlineKeyboardMarkup result = build(userId, state, visibleAndInvisible);
+        state.setCompleteButton(true);
+        return result;
     }
 
     private static List<InlineKeyboardButton> getPaginationButtons(String userId, State state, int maxIndexOfPage) {

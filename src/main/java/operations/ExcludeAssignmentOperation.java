@@ -14,8 +14,11 @@ import states.State;
 import utils.InputValidator;
 import utils.PasswordEncryptor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class ExcludeAssignmentOperation extends Operation {
     private final String TO_FILTER = "/toFilter";
@@ -61,7 +64,7 @@ public class ExcludeAssignmentOperation extends Operation {
             case ExcludeAssignmentState.Position.MAIN -> {
                 if (ifTheseNewAnswer) {
                     sendMessage.setText("Здесь вы можете помечать предметы как выполненные, выберите" +
-                            "одну из предложенных опций\n");
+                            "одну из предложенных опций");
                     sendMessage.setReplyMarkup(getInlineKeyboardMarkup(id.getUserId(), state));
                     state.setMessageForWorkId(sendReply());
                     return;
@@ -69,6 +72,7 @@ public class ExcludeAssignmentOperation extends Operation {
                 try {
                     if (message.equals(TO_FILTER)) {
                         state.setPosition(ExcludeAssignmentState.Position.FILTER_MODE);
+                        state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
                         User user = bot.getAuthorizedUsers().get(id);
                         if (user == null) {
                             setTextLastMessage(state, "пользователь не найден!");
@@ -79,6 +83,27 @@ public class ExcludeAssignmentOperation extends Operation {
                         FilterAssignmentManager.chooseOperation(user, id.getUserId(), state,
                                 this, message, groupRepository, subjectRepository, true);
                     }
+                    else if (message.equals(InlineKeyboardBuilder.COMPLETE_COMMAND)) {
+                        User user = bot.getAuthorizedUsers().get(id);
+                        if (user == null) {
+                            setTextLastMessage(state, "пользователь не найден!");
+                            setReplyMarkupLastMessage(state, null);
+                            map.remove(id);
+                            return;
+                        }
+                        InlineKeyboardMarkup inlineKeyboardMarkup = getInlineKeyboardAssignments(id.getUserId(),
+                                state, getIncludedAssignmentsAccordFilters(state, assignmentRepository, user));
+                        if (inlineKeyboardMarkup != null) {
+                            state.setPosition(ExcludeAssignmentState.Position.EXCLUDE_MODE);
+                            setTextLastMessage(state, "Выберите задание из списка для пометки выполненным");
+                            setReplyMarkupLastMessage(state, inlineKeyboardMarkup);
+                        }
+                        else {
+                            state.setPosition(ExcludeAssignmentState.Position.MAIN);
+                            setTextLastMessage(state, "Не нашлось подходящих заданий!");
+                            setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
+                        }
+                    }
                     else if (basePaginationCheck(state, message))
                         setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
                     else if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
@@ -87,8 +112,7 @@ public class ExcludeAssignmentOperation extends Operation {
                         map.remove(id);
                     }
                     else {
-                        setTextLastMessage(state, "неизвестная операция, выберите из кнопок под сообщением!\n" +
-                                getParameterValues(state));
+                        setTextLastMessage(state, "неизвестная операция, выберите из кнопок под сообщением!");
                         setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
                     }
                 } catch (Throwable e) {
@@ -101,6 +125,58 @@ public class ExcludeAssignmentOperation extends Operation {
             case FILTER_MODE -> {
                 if (triggerFilterAndCheckTheEnd(state))
                     state.setPosition(ExcludeAssignmentState.Position.MAIN);
+            }
+            case EXCLUDE_MODE -> {
+                if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
+                    state.setPosition(ExcludeAssignmentState.Position.MAIN);
+                    setTextLastMessage(state, "Здесь вы можете помечать предметы как выполненные, выберите одну из предложенных опций");
+                    setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
+                    return;
+                }
+                User user = bot.getAuthorizedUsers().get(id);
+                if (user == null) {
+                    setTextLastMessage(state, "пользователь не найден!");
+                    setReplyMarkupLastMessage(state, null);
+                    map.remove(id);
+                    return;
+                }
+                Set<Assignment> assignments = getIncludedAssignmentsAccordFilters(state, assignmentRepository, user);
+                if (assignments != null) {
+                    Optional<Assignment> assignment = assignments.stream().filter(it -> it.getId().toString()
+                            .equals(message)).findFirst();
+                    if (assignment.isPresent()) {
+                        user.getCompletedAssignments().add(assignment.get().getId());
+                        userRepository.save(user);
+                        assignments.remove(assignment.get());
+                        setTextLastMessage(state, "Успешно удалено, продолжайте выбирать");
+                        InlineKeyboardMarkup inlineKeyboardMarkup = getInlineKeyboardAssignments(id.getUserId(),
+                                state, assignments);
+                        if (inlineKeyboardMarkup != null)
+                            setReplyMarkupLastMessage(state, getInlineKeyboardAssignments(id.getUserId(), state, assignments));
+                        else {
+                            state.setPosition(ExcludeAssignmentState.Position.MAIN);
+                            setTextLastMessage(state, "Не нашлось подходящих заданий!");
+                            setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
+                        }
+                    }
+                    else {
+                        setTextLastMessage(state, "Задание не найдено, попробуйте еще раз");
+                        InlineKeyboardMarkup inlineKeyboardMarkup = getInlineKeyboardAssignments(id.getUserId(),
+                                state, assignments);
+                        if (inlineKeyboardMarkup != null)
+                            setReplyMarkupLastMessage(state, getInlineKeyboardAssignments(id.getUserId(), state, assignments));
+                        else {
+                            state.setPosition(ExcludeAssignmentState.Position.MAIN);
+                            setTextLastMessage(state, "Не нашлось подходящих заданий!");
+                            setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
+                        }
+                    }
+                }
+                else {
+                    state.setPosition(ExcludeAssignmentState.Position.MAIN);
+                    setTextLastMessage(state, "Не нашлось подходящих заданий!");
+                    setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
+                }
             }
         }
     }
@@ -117,7 +193,7 @@ public class ExcludeAssignmentOperation extends Operation {
                 this, message, groupRepository, subjectRepository, false);
         boolean checkEnd = false;
         if (state.getPositionFilter() == FilterAssignmentState.PositionFilter.COMPLETE) {
-            setTextLastMessage(state, "Фильтр применен!\n" + getParameterValues(state));
+            setTextLastMessage(state, "Фильтр применен!\n");
             setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
             checkEnd = true;
         }
@@ -127,84 +203,67 @@ public class ExcludeAssignmentOperation extends Operation {
             state.setFilterGroups(List.of());
             state.setFilterSubjects(List.of());
             state.setDeadlineFilter(null);
-            setTextLastMessage(state, "Фильтр отменен!\n" + getParameterValues(state));
+            setTextLastMessage(state, "Фильтр отменен!\n");
             setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
             checkEnd = true;
         }
         return checkEnd;
     }
 
-    protected String getParameterValues(ExcludeAssignmentState state) {
-        /*
-        StringBuilder stringBuilder = new StringBuilder("Актуальные параметры фильтрации:\n");
-        stringBuilder.append("\"title\": ");
-        if ((state.getTitleFilter() != null) && !(state.getTitleFilter().isBlank()))
-            stringBuilder.append(state.getTitleFilter());
-        else
-            stringBuilder.append("Фильтр не задан");
-        stringBuilder.append("\n\"description\": ");
-        if ((state.getDescriptionFilter() != null) && !(state.getDescriptionFilter().isBlank()))
-            stringBuilder.append(state.getDescriptionFilter());
-        else
-            stringBuilder.append("Фильтр не задан");
-        stringBuilder.append("\n\"groups\": ");
-        if (!state.getFilterGroups().isEmpty())
-            stringBuilder.append(state.getFilterGroups());
-        else
-            stringBuilder.append("Фильтр не задан");
-        stringBuilder.append("\n\"password\": ");
-        if (state.getPassword() != null)
-            stringBuilder.append(maskPassword(state.getPassword()));
-        return stringBuilder.toString();
-    }
-    private String maskPassword(String password) {
-        if (password == null || password.isEmpty()) {
-            return "";
-        }
-        if (password.length() <= 2) {
-            return "*".repeat(password.length());
-        }
-        return password.charAt(0) + "*".repeat(password.length() - 2) + password.charAt(password.length() - 1);
 
-         */
-        return "";
-    }
-    protected void processedLogIn(AuthState state) {
-        /*
-        if ((state.getUsername() == null) || (state.getUsername().isEmpty())) {
-            setTextLastMessage(state, "Не хватает имени!\n" + getParameterValues(state));
-            setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
-            state.setPosition(AuthState.Position.CHOICE);
+
+    private Set<Assignment> getIncludedAssignmentsAccordFilters(ExcludeAssignmentState state,
+                                                                 AssignmentRepository assignmentRepository,
+                                                                 User user) {
+        Set<Assignment> result = user.getAssignments(assignmentRepository);
+        String filterTitle = state.getTitleFilter();
+        if (filterTitle != null)
+            result = result.stream().filter(it -> it.getTitle().contains(filterTitle)).collect(Collectors.toSet());
+        String descriptionTitle = state.getTitleFilter();
+        if (descriptionTitle != null)
+            result = result.stream().filter(it -> it.getDescription().contains(descriptionTitle)).collect(Collectors.toSet());
+        List<String> filterGroups = new LinkedList<>();
+        try {
+            filterGroups = state.getFilterGroups().stream().map(Group::getName).toList();
+        } catch (Throwable ignored) {}
+        if (!filterGroups.isEmpty()) {
+            List<String> finalFilterGroups = filterGroups;
+            result = result.stream()
+                    .filter(it -> it.getTargetGroups().stream().anyMatch(finalFilterGroups::contains))
+                    .collect(Collectors.toSet());
         }
-        else if ((state.getPassword() == null) || (state.getPassword().isEmpty())) {
-            setTextLastMessage(state, "Не хватает пароля!\n" + getParameterValues(state));
-            setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
-            state.setPosition(AuthState.Position.CHOICE);
-        } else {
-            Optional<User> user = userRepository.findByUsername(state.getUsername());
-            if (user.isPresent()) {
-                if ((state.getPassword().length() <= 15) &&
-                        PasswordEncryptor.matches(state.getPassword(), user.get().getPassword())) {
-                    bot.getAuthorizedUsers().put(id, user.get());
-                    setTextLastMessage(state, "Успешный вход. Добро пожаловать, " + state.getUsername() + "!");
-                    setReplyMarkupLastMessage(state, null);
-                    map.remove(id);
-                    sendMessage.setText("Выбирайте команды");
-                    sendMessage.setReplyMarkup(ChooseKeyboard.getInlineKeyboard(id, user.get().isCanEditTasks()));
-                    sendReply();
-                } else {
-                    setTextLastMessage(state, "Неверный пароль!\n" + getParameterValues(state));
-                    setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
-                    state.setPosition(AuthState.Position.CHOICE);
-                }
-            } else {
-                setTextLastMessage(state, "Пользователь не найден!\n" + getParameterValues(state));
-                setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
-                state.setPosition(AuthState.Position.CHOICE);
+        List<String> filterSubjects = new LinkedList<>();
+        try {
+            filterSubjects = state.getFilterSubjects().stream().map(Subject::getName).toList();
+        } catch (Throwable ignored) {}
+        if (!filterSubjects.isEmpty()) {
+            List<String> finalFilterSubjects = filterSubjects;
+            result = result.stream()
+                    .filter(it -> it.getTargetGroups().stream().anyMatch(finalFilterSubjects::contains))
+                    .collect(Collectors.toSet());
+        }
+        LocalDateTime deadline = state.getDeadlineFilter();
+        if (deadline != null)
+            result = result.stream().filter(it -> it.getDeadline().isBefore(deadline)).collect(Collectors.toSet());
+        return result;
+    }
+    private InlineKeyboardMarkup getInlineKeyboardAssignments(String userId, ExcludeAssignmentState state,
+                                                              Set<Assignment> assignments) {
+        try {
+            List<InlineKeyboardBuilder.Pair> namesForSubjects = new ArrayList<>();
+            for (Assignment assignment : assignments) {
+                //add visible and invisible text
+                namesForSubjects.add(new InlineKeyboardBuilder.Pair(
+                        assignment.getTitle(),
+                        assignment.getId().toString()
+                ));
             }
+            if (namesForSubjects.isEmpty())
+                return null;
+            return InlineKeyboardBuilder.getSimpleBreak(userId, state, namesForSubjects.toArray(new InlineKeyboardBuilder.Pair[0]));
+        } catch (Throwable e) {
+            return null;
         }
-
-         */
     }
 
     @Override

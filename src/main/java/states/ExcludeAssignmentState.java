@@ -15,6 +15,7 @@ public class ExcludeAssignmentState extends FilterAssignmentState {
 
     public enum Position {
         MAIN,
-        FILTER_MODE
+        FILTER_MODE,
+        EXCLUDE_MODE
     }
 }

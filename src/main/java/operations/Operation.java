@@ -94,9 +94,9 @@ abstract public class Operation implements Runnable {
         }
         return false;
     }
-    protected boolean basePaginationCheck(State state, String messageId) {
+    protected boolean basePaginationCheck(State state, String message) {
         boolean flag = false;
-        if (message.equals(InlineKeyboardBuilder.COMPLETE_COMMAND)) {
+        if (message.equals(InlineKeyboardBuilder.NEXT_COMMAND)) {
             state.setPageNumber(state.getPageNumber() + 1);
             flag = true;
         }
@@ -114,6 +114,8 @@ abstract public class Operation implements Runnable {
             editMessage.setText(message);
             bot.execute(editMessage);
         } catch (Throwable e) {
+            if (e.getMessage().equals(IGNORE_ERROR_SIMILARITY_MARKUP))
+                return;
             logger.severe("Can't set text last message: " + e.getMessage());
             sendMessage.setText(message);
             sendMessage.setReplyMarkup(null);

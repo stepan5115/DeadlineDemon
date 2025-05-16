@@ -118,6 +118,7 @@ public class LogInOperation extends Operation {
                     if (InputValidator.isValid(message)) {
                         stringBuilder.append("Хорошо, запомню\n");
                         state.setPassword(message);
+                        deleteLastUserMessage();
                     } else {
                         stringBuilder.append(String.format("Запрещенные символы: \"%s\"\n",
                                 InputValidator.RULES_DESCRIPTION));

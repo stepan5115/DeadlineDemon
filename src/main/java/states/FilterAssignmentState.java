@@ -6,6 +6,7 @@ import sqlTables.Group;
 import sqlTables.Subject;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FilterAssignmentState extends State {
@@ -19,10 +20,22 @@ public class FilterAssignmentState extends State {
     private String descriptionFilter = null;
     @Getter
     @Setter
-    private List<Group> filterGroups = List.of();
+    private List<Group> filterGroups = new ArrayList<>(List.of());;
+    public void addGroup(Group group) {
+        if ((filterGroups != null) && (!filterGroups.contains(group)))
+            filterGroups.add(group);
+        else if (filterGroups == null)
+            filterGroups = new ArrayList<>(List.of(group));
+    }
     @Getter
     @Setter
-    private List<Subject> filterSubjects = List.of();
+    private List<Subject> filterSubjects = new ArrayList<>(List.of());
+    public void addSubject(Subject subject) {
+        if ((filterSubjects != null) && (!filterSubjects.contains(subject)))
+            filterSubjects.add(subject);
+        else if (filterSubjects == null)
+            filterSubjects = new ArrayList<>(List.of(subject));
+    }
     @Getter
     @Setter
     private LocalDateTime deadlineFilter = null;
