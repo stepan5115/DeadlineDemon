@@ -61,7 +61,6 @@ public class FilterAssignmentState extends State {
         FILTER_SUBJECTS_ADD,
         FILTER_DEADLINE,
         FILTER_DEADLINE_ADD,
-        COMPLETE,
-        BREAK
+        COMPLETE
     }
 }

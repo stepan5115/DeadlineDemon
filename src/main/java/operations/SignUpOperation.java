@@ -16,10 +16,10 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SignUpOperation extends Operation {
-    private final String PASSWORD_COMMAND = "/password";
-    private final String PASSWORD_COMMAND_VISIBLE = "ввести пароль";
-    private final String USERNAME_COMMAND = "/username";
-    private final String USERNAME_COMMAND_VISIBLE = "ввести имя";
+    public final String PASSWORD_COMMAND = "/password";
+    public final String PASSWORD_COMMAND_VISIBLE = "ввести пароль";
+    public final String USERNAME_COMMAND = "/username";
+    public final String USERNAME_COMMAND_VISIBLE = "ввести имя";
 
     private final UserRepository userRepository;
     private final ConcurrentHashMap<IdPair, AuthState> map = bot.getSignUpUserStates();
@@ -53,85 +53,62 @@ public class SignUpOperation extends Operation {
             case AuthState.Position.CHOICE -> {
                 if (ifTheseNewAnswer) {
                     sendMessage.setText("Добро пожаловать в меню регистрации, выберите" +
-                            "одну из предложенных опций\n");
+                            "одну из предложенных опций\n" +
+                            getParameterValues(state));
                     sendMessage.setReplyMarkup(getInlineKeyboardMarkup(id.getUserId(), state));
                     state.setMessageForWorkId(sendReply());
-                    return;
                 }
-                try {
-                    if (message.equals(PASSWORD_COMMAND)) {
-                        state.setPosition(AuthState.Position.ADD_PASSWORD);
-                        setTextLastMessage(state, "Придумайте пароль");
-                        setReplyMarkupLastMessage(state, null);
-                    }
-                    else if (message.equals(USERNAME_COMMAND)) {
-                        state.setPosition(AuthState.Position.ADD_USERNAME);
-                        setTextLastMessage(state, "Придумайте имя");
-                        setReplyMarkupLastMessage(state, null);
-                    }
-                    else if (message.equals(InlineKeyboardBuilder.COMPLETE_COMMAND))
-                        processedSignUp(state);
-                    else if (basePaginationCheck(state, message))
-                        setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
-                    else if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
-                        setTextLastMessage(state, "Операция регистрации была прервана");
-                        setReplyMarkupLastMessage(state, null);
-                        map.remove(id);
-                    }
-                    else {
-                        setTextLastMessage(state, "неизвестная операция, выберите из кнопок под сообщением!\n" +
-                                getParameterValues(state));
-                        setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
-                    }
-                } catch (Throwable e) {
+                else if (message.equals(PASSWORD_COMMAND)) {
+                    state.setPosition(AuthState.Position.ADD_PASSWORD);
+                    setLastMessage(state, "Придумайте пароль", null);
+                }
+                else if (message.equals(USERNAME_COMMAND)) {
+                    state.setPosition(AuthState.Position.ADD_USERNAME);
+                    setLastMessage(state, "Придумайте имя", null);
+                }
+                else if (message.equals(InlineKeyboardBuilder.COMPLETE_COMMAND))
+                    processedSignUp(state);
+                else if (basePaginationCheck(state, message))
+                    setLastMessage(state, "Добро пожаловать в меню регистрации, выберите" +
+                            "одну из предложенных опций\n" + getParameterValues(state),
+                            getInlineKeyboardMarkup(id.getUserId(), state));
+                else if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
+                    setLastMessage(state, "Операция регистрации была прервана", null);
                     map.remove(id);
-                    sendMessage.setText("Серверная ошибка, сообщите об этом разработчику");
-                    state.setMessageForWorkId(null);
-                    sendReply();
+                }
+                else {
+                    setLastMessage(state, "неизвестная операция, выберите из кнопок под сообщением!\n" +
+                            getParameterValues(state), getInlineKeyboardMarkup(id.getUserId(), state));
                 }
             }
             case AuthState.Position.ADD_USERNAME -> {
-                try {
-                    state.setPosition(AuthState.Position.CHOICE);
-                    StringBuilder stringBuilder = new StringBuilder();
-                    if (InputValidator.isValid(message)) {
-                        stringBuilder.append("Хорошо, запомню\n");
-                        state.setUsername(message);
-                    } else {
-                        stringBuilder.append(String.format("Запрещенные символы: \"%s\"\n",
-                                InputValidator.RULES_DESCRIPTION));
-                    }
-                    stringBuilder.append(getParameterValues(state));
-                    setTextLastMessage(state, stringBuilder.toString());
-                    setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
-                } catch (Throwable e) {
-                    map.remove(id);
-                    sendMessage.setText("Серверная ошибка, сообщите об этом разработчику");
-                    state.setMessageForWorkId(null);
-                    sendReply();
+                state.setPosition(AuthState.Position.CHOICE);
+                StringBuilder stringBuilder = new StringBuilder();
+                if (InputValidator.isValid(message)) {
+                    stringBuilder.append("Хорошо, запомню\n");
+                    state.setUsername(message);
+                } else {
+                    stringBuilder.append(String.format("Запрещенные символы: \"%s\"\n",
+                            InputValidator.RULES_DESCRIPTION));
                 }
+                stringBuilder.append(getParameterValues(state));
+                setLastMessage(state, stringBuilder.toString(),
+                        getInlineKeyboardMarkup(id.getUserId(), state));
             }
             case AuthState.Position.ADD_PASSWORD -> {
-                try {
-                    state.setPosition(AuthState.Position.CHOICE);
-                    StringBuilder stringBuilder = new StringBuilder();
-                    if (InputValidator.isValid(message)) {
-                        stringBuilder.append("Хорошо, запомню\n");
-                        state.setPassword(message);
-                        deleteLastUserMessage();
-                    } else {
-                        stringBuilder.append(String.format("Запрещенные символы: \"%s\"\n",
-                                InputValidator.RULES_DESCRIPTION));
-                    }
-                    stringBuilder.append(getParameterValues(state));
-                    setTextLastMessage(state, stringBuilder.toString());
-                    setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
-                } catch (Throwable e) {
-                    map.remove(id);
-                    sendMessage.setText("Серверная ошибка, сообщите об этом разработчику");
-                    state.setMessageForWorkId(null);
-                    sendReply();
+                state.setPosition(AuthState.Position.CHOICE);
+                StringBuilder stringBuilder = new StringBuilder();
+                if (InputValidator.isValid(message)) {
+                    stringBuilder.append("Хорошо, запомню\n");
+                    state.setPassword(message);
+                    deleteLastUserMessage();
+                } else {
+                    stringBuilder.append(String.format("Запрещенные символы: \"%s\"\n",
+                            InputValidator.RULES_DESCRIPTION));
                 }
+                stringBuilder.append(getParameterValues(state));
+                setLastMessage(state, stringBuilder.toString(),
+                        getInlineKeyboardMarkup(id.getUserId(), state));
             }
         }
     }
@@ -157,13 +134,13 @@ public class SignUpOperation extends Operation {
     }
     protected void processedSignUp(AuthState state) {
         if ((state.getUsername() == null) || (state.getUsername().isEmpty())) {
-            setTextLastMessage(state, "Не хватает имени!\n" + getParameterValues(state));
-            setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
+            setLastMessage(state, "Не хватает имени!\n" + getParameterValues(state),
+                    getInlineKeyboardMarkup(id.getUserId(), state));
             state.setPosition(AuthState.Position.CHOICE);
         }
         else if ((state.getPassword() == null) || (state.getPassword().isEmpty())) {
-            setTextLastMessage(state, "Не хватает пароля!\n" + getParameterValues(state));
-            setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
+            setLastMessage(state, "Не хватает пароля!\n" + getParameterValues(state),
+                    getInlineKeyboardMarkup(id.getUserId(), state));
             state.setPosition(AuthState.Position.CHOICE);
         } else {
             Optional<User> user = userRepository.findByUsername(state.getUsername());
@@ -174,20 +151,19 @@ public class SignUpOperation extends Operation {
                     newUser.setPassword(PasswordEncryptor.encrypt(state.getPassword()));
                     userRepository.save(newUser);
                     bot.getAuthorizedUsers().put(id, newUser);
-                    setTextLastMessage(state, "Успешная регистрация. Добро пожаловать, " + state.getUsername() + "!");
-                    setReplyMarkupLastMessage(state, null);
+                    setLastMessage(state, "Успешная регистрация. Добро пожаловать, " + state.getUsername() + "!", null);
                     map.remove(id);
                     sendMessage.setText("Выбирайте команды");
                     sendMessage.setReplyMarkup(ChooseKeyboard.getInlineKeyboard(id, newUser.isCanEditTasks()));
                     sendReply();
                 } else {
-                    setTextLastMessage(state, "Слишком длинный пароль!\n" + getParameterValues(state));
-                    setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
+                    setLastMessage(state, "Слишком длинный пароль!\n" + getParameterValues(state),
+                            getInlineKeyboardMarkup(id.getUserId(), state));
                     state.setPosition(AuthState.Position.CHOICE);
                 }
             } else {
-                setTextLastMessage(state, "Пользователь уже существует!\n" + getParameterValues(state));
-                setReplyMarkupLastMessage(state, getInlineKeyboardMarkup(id.getUserId(), state));
+                setLastMessage(state, "Пользователь уже существует!\n" + getParameterValues(state),
+                        getInlineKeyboardMarkup(id.getUserId(), state));
                 state.setPosition(AuthState.Position.CHOICE);
             }
         }

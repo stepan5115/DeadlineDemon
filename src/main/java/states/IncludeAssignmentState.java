@@ -3,7 +3,7 @@ package states;
 import lombok.Getter;
 import lombok.Setter;
 
-public class ExcludeAssignmentState extends FilterAssignmentState {
+public class IncludeAssignmentState extends FilterAssignmentState {
     @Getter
     @Setter
     private Position position = Position.MAIN;
@@ -15,6 +15,6 @@ public class ExcludeAssignmentState extends FilterAssignmentState {
     public enum Position {
         MAIN,
         FILTER_MODE,
-        EXCLUDE_MODE
+        INCLUDE_MODE
     }
 }

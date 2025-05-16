@@ -9,7 +9,6 @@ public class OperationManager {
     public static Operation getRightOperation(MyTelegramBot bot, String chatId, String userId, String messageId,
                                               String message) {
         IdPair id = new IdPair(chatId, userId);
-
         if (message.trim().equals("/breakOperation"))
             return new ExitOperation(id, messageId, bot, message);
 
@@ -46,12 +45,12 @@ public class OperationManager {
         if (bot.getExcludeAssignmentStates().containsKey(id))
             return new ExcludeAssignmentOperation(id, messageId, bot, message, bot.getUserRepository(),
                     bot.getAssignmentRepository(), bot.getSubjectRepository(), bot.getGroupRepository());
-        if (bot.getIncludeAssignment().contains(id))
-            return new IncludeAssignment(id, messageId, bot, message, bot.getUserRepository(),
-                    bot.getAssignmentRepository(), bot.getSubjectRepository());
-        if (bot.getExcludeSubject().contains(id))
-            return new ExcludeSubject(id, messageId, bot, message, bot.getUserRepository(),
-                    bot.getAssignmentRepository(), bot.getSubjectRepository());
+        if (bot.getIncludeAssignmentState().containsKey(id))
+            return new IncludeAssignmentOperation(id, messageId, bot, message, bot.getUserRepository(),
+                    bot.getAssignmentRepository(), bot.getSubjectRepository(), bot.getGroupRepository());
+        if (bot.getExcludeSubjectState().containsKey(id))
+            return new ExcludeSubjectOperation(id, messageId, bot, message, bot.getUserRepository(),
+                    bot.getSubjectRepository());
         if (bot.getIncludeSubject().contains(id))
             return new IncludeSubject(id, messageId, bot, message, bot.getUserRepository(),
                     bot.getAssignmentRepository(), bot.getSubjectRepository());
@@ -71,11 +70,11 @@ public class OperationManager {
                 new ExcludeAssignmentOperation(id, messageId, bot, message, bot.getUserRepository(),
                         bot.getAssignmentRepository(), bot.getSubjectRepository(), bot.getGroupRepository());
             case "/includeAssignment" ->
-                new IncludeAssignment(id, messageId, bot, message, bot.getUserRepository(),
-                        bot.getAssignmentRepository(), bot.getSubjectRepository());
+                new IncludeAssignmentOperation(id, messageId, bot, message, bot.getUserRepository(),
+                        bot.getAssignmentRepository(), bot.getSubjectRepository(), bot.getGroupRepository());
             case "/excludeSubject" ->
-                new ExcludeSubject(id, messageId, bot, message, bot.getUserRepository(),
-                        bot.getAssignmentRepository(), bot.getSubjectRepository());
+                new ExcludeSubjectOperation(id, messageId, bot, message, bot.getUserRepository(),
+                        bot.getSubjectRepository());
             case "/includeSubject" ->
                     new IncludeSubject(id, messageId, bot, message, bot.getUserRepository(),
                             bot.getAssignmentRepository(), bot.getSubjectRepository());

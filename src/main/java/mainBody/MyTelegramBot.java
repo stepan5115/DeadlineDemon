@@ -1,6 +1,7 @@
 package mainBody;
 
 import lombok.Getter;
+import operations.IncludeAssignmentOperation;
 import operations.OperationManager;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -8,8 +9,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import sqlTables.*;
-import states.AuthState;
-import states.ExcludeAssignmentState;
+import states.*;
 
 import java.util.List;
 import java.util.concurrent.*;
@@ -72,9 +72,9 @@ public class MyTelegramBot extends TelegramLongPollingBot implements AuthorizedU
     @Getter
     private final ConcurrentHashMap<IdPair, ExcludeAssignmentState> excludeAssignmentStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> includeAssignment = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, IncludeAssignmentState> includeAssignmentState = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> excludeSubject = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, ExcludeSubjectState> excludeSubjectState = new ConcurrentHashMap<>();
     @Getter
     private final ConcurrentLinkedQueue<IdPair> includeSubject = new ConcurrentLinkedQueue<>();
 

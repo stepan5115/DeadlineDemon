@@ -106,35 +106,20 @@ abstract public class Operation implements Runnable {
         }
         return flag;
     }
-    protected void setTextLastMessage(State state, String message) {
+    protected void setLastMessage(State state, String message, InlineKeyboardMarkup replyMarkup) {
         try {
             EditMessageText editMessage = new EditMessageText();
             editMessage.setChatId(id.getChatId());
             editMessage.setMessageId(state.getMessageForWorkId());
             editMessage.setText(message);
+            editMessage.setReplyMarkup(replyMarkup);
             bot.execute(editMessage);
         } catch (Throwable e) {
             if (e.getMessage().equals(IGNORE_ERROR_SIMILARITY_MARKUP))
                 return;
             logger.severe("Can't set text last message: " + e.getMessage());
             sendMessage.setText(message);
-            sendMessage.setReplyMarkup(null);
-            state.setMessageForWorkId(sendReply());
-        }
-    }
-    protected void setReplyMarkupLastMessage(State state, InlineKeyboardMarkup keyboardMarkup) {
-        try {
-            EditMessageReplyMarkup editMarkup  = new EditMessageReplyMarkup();
-            editMarkup.setChatId(id.getChatId());
-            editMarkup.setMessageId(state.getMessageForWorkId());
-            editMarkup.setReplyMarkup(keyboardMarkup);
-            bot.execute(editMarkup);
-        } catch (Throwable e) {
-            if (e.getMessage().equals(IGNORE_ERROR_SIMILARITY_MARKUP))
-                return;
-            logger.severe("Can't set inline markup keyboard last message: " + e.getMessage());
-            sendMessage.setText("...");
-            sendMessage.setReplyMarkup(keyboardMarkup);
+            sendMessage.setReplyMarkup(replyMarkup);
             state.setMessageForWorkId(sendReply());
         }
     }

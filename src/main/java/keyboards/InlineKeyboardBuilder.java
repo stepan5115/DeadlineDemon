@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import states.State;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,12 +18,14 @@ public class InlineKeyboardBuilder {
     public static String BREAK_COMMAND_VISIBLE = "прервать";
     public static String COMPLETE_COMMAND = "/complete";
     public static String COMPLETE_COMMAND_VISIBLE = "выполнить";
+    public static String CLEAR_COMMAND = "/clear";
+    public static String CLEAR_COMMAND_VISIBLE = "очистить";
     private static int LIMIT = 7;
-    public static InlineKeyboardMarkup build(String userId, State state, Pair... visibleAndInvisible) {
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+
+    private static List<List<InlineKeyboardButton>> formButtons(String userId, State state, Pair... visibleAndInvisible) {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         int countButtons = visibleAndInvisible.length;
-        int maxIndexOfPage = countButtons/LIMIT;
+        int maxIndexOfPage = (countButtons - 1)/LIMIT;
         state.setPageNumber(Math.max(state.getPageNumber(),0));
         state.setPageNumber(Math.min(state.getPageNumber(),maxIndexOfPage));
         int startIndex = state.getPageNumber()*LIMIT;
@@ -50,18 +51,42 @@ public class InlineKeyboardBuilder {
             button.setCallbackData(BREAK_COMMAND + "_" + userId);
             rows.add(List.of(button));
         }
-        markup.setKeyboard(rows);
+        return rows;
+    }
+
+    public static InlineKeyboardMarkup build(String userId, State state, Pair... visibleAndInvisible) {
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        markup.setKeyboard(formButtons(userId, state, visibleAndInvisible));
         return markup;
     }
 
     public static InlineKeyboardMarkup getSimpleBreak(String userId, State state, Pair... visibleAndInvisible) {
+        boolean tmp = state.isCompleteButton();
         state.setCompleteButton(false);
         InlineKeyboardMarkup result = build(userId, state, visibleAndInvisible);
-        state.setCompleteButton(true);
+        state.setCompleteButton(tmp);
         return result;
     }
 
+    public static InlineKeyboardMarkup getSimpleClearComplete(String userId, State state, Pair... visibleAndInvisible) {
+        boolean tmp = state.isBreakButton();
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        state.setBreakButton(false);
+
+        List<List<InlineKeyboardButton>> rows = formButtons(userId, state, visibleAndInvisible);
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText(CLEAR_COMMAND_VISIBLE);
+        button.setCallbackData(CLEAR_COMMAND + "_" + userId);
+        rows.add(List.of(button));
+        markup.setKeyboard(rows);
+
+        state.setBreakButton(tmp);
+        return markup;
+    }
+
     private static List<InlineKeyboardButton> getPaginationButtons(String userId, State state, int maxIndexOfPage) {
+        state.setPageNumber(Math.max(state.getPageNumber(),0));
+        state.setPageNumber(Math.min(state.getPageNumber(),maxIndexOfPage));
         List<InlineKeyboardButton> buttonsForPagination = new ArrayList<>();
         if (maxIndexOfPage > state.getPageNumber()) {
             InlineKeyboardButton button = new InlineKeyboardButton();

@@ -16,8 +16,10 @@ public class HelpUser extends Operation {
                 /notifications - меню уведомлений
                     /disable - выключить уведомления
                     /enable - включить уведомления
-                    /excludeAssignment - отключить уведомления для конкретного задания
-                    /includeAssignment - включить уведомления для конкретного задания
+                    /excludeAssignment - отключить уведомления для конкретного задания (пометить выполненным)
+                    /includeAssignment - включить уведомления для конкретного задания (пометить НЕ выполненным)
+                    /excludeSubject - отключить уведомления для предмета
+                    /includeSubject - включить уведомления для предмета
                     /back - обратно к главному меню
                 /groups - меню групп
                     /enter - войти в группу
@@ -53,6 +55,8 @@ public class HelpUser extends Operation {
                     /enable - включить уведомления
                     /excludeAssignment - отключить уведомления для конкретного задания
                     /includeAssignment - включить уведомления для конкретного задания
+                    /excludeSubject - отключить уведомления для предмета
+                    /includeSubject - включить уведомления для предмета
                     /back - обратно к главному меню
                 /groups - меню групп
                     /enter - войти в группу
