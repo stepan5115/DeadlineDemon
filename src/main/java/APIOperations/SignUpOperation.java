@@ -3,6 +3,7 @@ package APIOperations;
 import APIResponses.BaseResponse;
 import sqlTables.User;
 import sqlTables.UserRepository;
+import utils.InputValidator;
 import utils.PasswordEncryptor;
 
 import java.util.Optional;
@@ -23,9 +24,15 @@ public class SignUpOperation implements BotOperation {
 
     @Override
     public void run() {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByUsernameIgnoreCase(username);
         if (user.isPresent()) {
             result = "WRONG: Пользователь уже существует";
+        }
+        else if (!InputValidator.isValid(username, false)) {
+            result = "WRONG: Невалидное имя (запрещенные символы)";
+        }
+        else if (!InputValidator.isValid(password, false)) {
+            result = "WRONG: Невалидный пароль (запрещенные символы)";
         }
         else if (username.length() > 20) {
             result = "Слишком длинное имя, попробуйте по-короче";

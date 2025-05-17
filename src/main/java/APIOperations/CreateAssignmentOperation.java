@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import keyboards.ChooseKeyboard;
 import org.springframework.http.ResponseEntity;
 import sqlTables.*;
+import utils.InputValidator;
 import utils.PasswordEncryptor;
 
 import java.time.LocalDateTime;
@@ -54,38 +55,46 @@ public class CreateAssignmentOperation implements BotOperation {
             result = "WRONG: Неверный пароль";
         } else if (PasswordEncryptor.matches(password, user.get().getPassword())) {
             if (user.get().isCanEditTasks()) {
-                try {
-                    Optional<Assignment> tmp = assignmentRepository.getAssignmentByTitleIgnoreCase(title);
-                    if (tmp.isEmpty()) {
-                        Optional<Subject> subject = subjectRepository.findById(Long.parseLong(subjectId));
-                        if (subject.isPresent()) {
-                            if (deadline.isAfter(LocalDateTime.now())) {
-                                boolean flag = true;
-                                for (String groupName : groupNames)
-                                    if (!groupRepository.existsByName(groupName)) {
-                                        flag = false;
-                                        break;
-                                    }
-                                if (flag) {
-                                    Assignment newAssignment = new Assignment();
-                                    newAssignment.setTitle(title);
-                                    newAssignment.setDescription(description);
-                                    for (String groupName : groupNames)
-                                        newAssignment.getTargetGroups().add(groupName);
-                                    newAssignment.setDeadline(deadline);
-                                    newAssignment.setSubject(subject.get());
-                                    assignmentRepository.save(newAssignment);
-                                    result = "OK";
+                if (InputValidator.isValid(title, false)) {
+                    if (InputValidator.isValid(description, true)) {
+                        try {
+                            Optional<Assignment> tmp = assignmentRepository.getAssignmentByTitleIgnoreCase(title);
+                            if (tmp.isEmpty()) {
+                                Optional<Subject> subject = subjectRepository.findById(Long.parseLong(subjectId));
+                                if (subject.isPresent()) {
+                                    if (deadline.isAfter(LocalDateTime.now())) {
+                                        boolean flag = true;
+                                        for (String groupName : groupNames)
+                                            if (!groupRepository.existsByName(groupName)) {
+                                                flag = false;
+                                                break;
+                                            }
+                                        if (flag) {
+                                            Assignment newAssignment = new Assignment();
+                                            newAssignment.setTitle(title);
+                                            newAssignment.setDescription(description);
+                                            for (String groupName : groupNames)
+                                                newAssignment.getTargetGroups().add(groupName);
+                                            newAssignment.setDeadline(deadline);
+                                            newAssignment.setSubject(subject.get());
+                                            assignmentRepository.save(newAssignment);
+                                            result = "OK";
+                                        } else
+                                            result = "WRONG: одна или более групп отсутствуют в системе";
+                                    } else
+                                        result = "WRONG: дедлайн уже прошел";
                                 } else
-                                    result = "WRONG: одна или более групп отсутствуют в системе";
+                                    result = "WRONG: дисциплина не найдена";
                             } else
-                                result = "WRONG: дедлайн уже прошел";
-                        } else
-                            result = "WRONG: дисциплина не найдена";
-                    } else
-                        result = "WRONG: название занято другим заданием";
-                } catch (Throwable e) {
-                    result = "WRONG: server error";
+                                result = "WRONG: название занято другим заданием";
+                        } catch (Throwable e) {
+                            result = "WRONG: server error";
+                        }
+                    } else {
+                        result = "WRONG: невалидный текст (запрещенные символы)";
+                    }
+                } else {
+                    result = "WRONG: невалидное имя (запрещенные символы)";
                 }
             } else
                 result = "WRONG: у вас нет прав на это";

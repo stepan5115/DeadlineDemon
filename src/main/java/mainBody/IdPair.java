@@ -1,24 +1,16 @@
 package mainBody;
 
 import lombok.Getter;
-import states.KeyboardManagerState;
 
 public class IdPair {
     @Getter
     private String chatId;
     @Getter
     private String userId;
-    @Getter
-    private KeyboardManagerState state = null;
 
     public IdPair(String chatId, String userId) {
         this.chatId = chatId;
         this.userId = userId;
-    }
-    public IdPair(String chatId, String userId, KeyboardManagerState state) {
-        this.chatId = chatId;
-        this.userId = userId;
-        this.state = state;
     }
 
     @Override

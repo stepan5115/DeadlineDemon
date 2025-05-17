@@ -1,6 +1,7 @@
 package APIOperations;
 
 import sqlTables.*;
+import utils.InputValidator;
 import utils.PasswordEncryptor;
 import java.util.Optional;
 
@@ -31,20 +32,24 @@ public class CreateSubjectOperation implements BotOperation {
         } else if (password.length() > 15) {
             result = "WRONG: Неверный пароль";
         } else if (PasswordEncryptor.matches(password, user.get().getPassword())) {
-            try {
-                if (user.get().isCanEditTasks()) {
-                    Optional<Subject> subject = subjectRepository.findByNameIgnoreCase(subjectName);
-                    if (subject.isEmpty()) {
-                        Subject newSubject = new Subject();
-                        newSubject.setName(subjectName);
-                        subjectRepository.save(newSubject);
-                        result = "OK";
+            if (InputValidator.isValid(subjectName, false)) {
+                try {
+                    if (user.get().isCanEditTasks()) {
+                        Optional<Subject> subject = subjectRepository.findByNameIgnoreCase(subjectName);
+                        if (subject.isEmpty()) {
+                            Subject newSubject = new Subject();
+                            newSubject.setName(subjectName);
+                            subjectRepository.save(newSubject);
+                            result = "OK";
+                        } else
+                            result = "WRONG: название уже занято";
                     } else
-                        result = "WRONG: название уже занято";
-                } else
-                    result = "WRONG: у вас нет прав на это";
-            } catch (Throwable e) {
-                result = "WRONG: server error";
+                        result = "WRONG: у вас нет прав на это";
+                } catch (Throwable e) {
+                    result = "WRONG: server error";
+                }
+            } else {
+                result = "WRONG: невалидное имя(запрещенные символы)";
             }
         } else
             result = "WRONG: Неверный пароль";

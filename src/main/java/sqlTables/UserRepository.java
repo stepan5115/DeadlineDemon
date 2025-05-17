@@ -28,4 +28,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     )
     """, nativeQuery = true)
     boolean existsByGroupName(@Param("name") String name);
+
+    Optional<User> findByUsernameIgnoreCase(String username);
 }
