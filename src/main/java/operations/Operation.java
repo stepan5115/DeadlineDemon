@@ -8,7 +8,10 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import sqlTables.User;
+import sqlTables.UserRepository;
 import states.State;
+
+import java.util.Optional;
 import java.util.logging.Logger;
 
 abstract public class Operation implements Runnable {
@@ -83,6 +86,43 @@ abstract public class Operation implements Runnable {
         }
         return false;
     }
+    protected boolean checkNoAdminRights() {
+        User user = bot.getAuthorizedUsers().get(id);
+        if ((user != null) && (user.isCanEditTasks())) {
+            sendMessage.setText("У вас уже есть права администратора");
+            sendReply();
+            return true;
+        }
+        return false;
+    }
+    protected boolean additionalCheckRightsForTokens(UserRepository userRepository) {
+        try {
+            User user = bot.getAuthorizedUsers().get(id);
+            Optional<User> tmp = userRepository.findById(user.getUser_id());
+            if (tmp.isEmpty() || !tmp.get().isCanEditTasks()) {
+                sendMessage.setText("У вас нет прав на это");
+                sendReply();
+                if (tmp.isPresent())
+                    bot.getAuthorizedUsers().put(id, tmp.get());
+                else {
+                    bot.getAuthorizedUsers().remove(id);
+                }
+                return true;
+            }
+            return false;
+        } catch (Throwable e) {
+            sendMessage.setText("У вас нет прав на это");
+            return true;
+        }
+    }
+    protected boolean checkSecurityForTokens() {
+        if (!id.getUserId().equals(id.getChatId())) {
+            sendMessage.setText("Нельзя удалять токены в общем чате, это небезопасно");
+            sendReply();
+            return true;
+        }
+        return false;
+    }
     protected boolean basePaginationCheck(State state, String message) {
         boolean flag = false;
         if (message.equals(InlineKeyboardBuilder.NEXT_COMMAND)) {
@@ -132,6 +172,15 @@ abstract public class Operation implements Runnable {
                 logger.severe("Can't delete message: " + e.getMessage());
             }
         }
+    }
+    protected String maskPassword(String password) {
+        if (password == null || password.isEmpty()) {
+            return "";
+        }
+        if (password.length() <= 2) {
+            return "*".repeat(password.length());
+        }
+        return password.charAt(0) + "*".repeat(password.length() - 2) + password.charAt(password.length() - 1);
     }
     protected InlineKeyboardMarkup getInlineKeyboardMarkup(String userId, State state) {return null;}
 }

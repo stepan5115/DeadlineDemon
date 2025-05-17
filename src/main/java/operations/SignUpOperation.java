@@ -123,15 +123,6 @@ public class SignUpOperation extends Operation {
             stringBuilder.append(maskPassword(state.getPassword()));
         return stringBuilder.toString();
     }
-    private String maskPassword(String password) {
-        if (password == null || password.isEmpty()) {
-            return "";
-        }
-        if (password.length() <= 2) {
-            return "*".repeat(password.length());
-        }
-        return password.charAt(0) + "*".repeat(password.length() - 2) + password.charAt(password.length() - 1);
-    }
     protected void processedSignUp(AuthState state) {
         if ((state.getUsername() == null) || (state.getUsername().isEmpty())) {
             setLastMessage(state, "Не хватает имени!\n" + getParameterValues(state),

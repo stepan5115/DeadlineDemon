@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import sqlTables.*;
 import states.CreateGroupState;
 import states.DeleteGroupState;
+import states.EnterTokenState;
 import states.IncludeSubjectState;
 import utils.InputValidator;
 
@@ -16,16 +17,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class CreateGroupOperation extends Operation {
+public class EnterTokenOperation extends Operation {
 
-    private final GroupRepository groupRepository;
-    private final ConcurrentHashMap<IdPair, CreateGroupState> map = bot.getCreateGroupStates();
+    private final UserRepository userRepository;
+    private final AdminTokenRepository adminTokenRepository;
+    private final ConcurrentHashMap<IdPair, EnterTokenState> map = bot.getEnterTokenStates();
 
-    public CreateGroupOperation(IdPair id, String messageId,
-                                MyTelegramBot bot, String message,
-                                GroupRepository groupRepository) {
+    public EnterTokenOperation(IdPair id, String messageId,
+                               MyTelegramBot bot, String message,
+                               UserRepository userRepository, AdminTokenRepository adminTokenRepository) {
         super(id, messageId, bot, message);
-        this.groupRepository = groupRepository;
+        this.userRepository = userRepository;
+        this.adminTokenRepository = adminTokenRepository;
     }
     public void run() {
         try {
@@ -33,12 +36,12 @@ public class CreateGroupOperation extends Operation {
                 map.remove(id);
                 return;
             }
-            if (checkAdminRights()) {
+            if (checkNoAdminRights()) {
                 map.remove(id);
                 return;
             }
             if (!map.containsKey(id))
-                map.put(id, new CreateGroupState());
+                map.put(id, new EnterTokenState());
             chooseOperation(id);
         } catch (Throwable e) {
             sendMessage.setText("Ошибка на стороне сервера");
@@ -48,7 +51,7 @@ public class CreateGroupOperation extends Operation {
 
     @Override
     protected void chooseOperation(IdPair id) {
-        CreateGroupState state = map.get(id);
+        EnterTokenState state = map.get(id);
         boolean ifTheseNewAnswer = (state.getMessageForWorkId() == null);
         User user = bot.getAuthorizedUsers().get(id);
         if (user == null) {
@@ -57,7 +60,7 @@ public class CreateGroupOperation extends Operation {
             return;
         }
         if (ifTheseNewAnswer) {
-            setLastMessage(state, "Напишите имя для создания группы",
+            setLastMessage(state, "Введите токен для получения прав",
                     InlineKeyboardBuilder.getSimpleBreak(id.getUserId(), state));
         }
 
@@ -66,21 +69,18 @@ public class CreateGroupOperation extends Operation {
             map.remove(id);
         }
         else {
-            if (InputValidator.isValid(message, false)) {
-                Optional<Group> group = groupRepository.findByNameIgnoreCase(message);
-                if (group.isEmpty()) {
-                    Group newGroup = new Group();
-                    newGroup.setName(message);
-                    groupRepository.save(newGroup);
-                    setLastMessage(state, String.format("группа \"%s\" успешно создана", message), null);
-                    map.remove(id);
-                } else {
-                    setLastMessage(state, "группа уже существует, давайте другое имя!",
-                            InlineKeyboardBuilder.getSimpleBreak(id.getUserId(), state));
-                }
+            Optional<AdminToken> adminToken = adminTokenRepository.findByToken(message);
+            if (adminToken.isPresent()) {
+                user.setCanEditTasks(true);
+                userRepository.save(user);
+                adminTokenRepository.deleteByToken(adminToken.get().getToken());
+                synchronizedUsers();
+                setLastMessage(state, "Теперь вы администратор!",
+                        InlineKeyboardBuilder.getSimpleBreak(id.getUserId(), state));
+                map.remove(id);
             } else {
-                setLastMessage(state, "Название не прошло валидацию: " +
-                        InputValidator.RULES_DESCRIPTION_TITLE_PASSWORD,
+                setLastMessage(state, "Такого токена не существует (может он устарел)," +
+                                " попробуйте еще раз!",
                         InlineKeyboardBuilder.getSimpleBreak(id.getUserId(), state));
             }
         }

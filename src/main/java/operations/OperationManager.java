@@ -9,17 +9,15 @@ public class OperationManager {
     public static Operation getRightOperation(MyTelegramBot bot, String chatId, String userId, String messageId,
                                               String message) {
         IdPair id = new IdPair(chatId, userId);
-        if (message.trim().equals("/breakOperation"))
-            return new ExitOperation(id, messageId, bot, message);
 
         if (bot.getEnterGroupStates().containsKey(id))
             return new EnterGroupOperation(id, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
         if (bot.getExitGroupStates().containsKey(id))
             return new ExitGroupOperation(id, messageId, bot, message, bot.getUserRepository(), bot.getGroupRepository());
-        if (bot.getEnterTokenUsers().contains(id))
-            return new GetAdminRights(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
-        if (bot.getDeleteTokenUsers().contains(id))
-            return new DeleteToken(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+        if (bot.getEnterTokenStates().containsKey(id))
+            return new EnterTokenOperation(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+        if (bot.getDeleteTokenStates().containsKey(id))
+            return new DeleteTokenOperation(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
         if (bot.getDeleteGroupStates().containsKey(id))
             return new DeleteGroupOperation(id, messageId, bot, message, bot.getGroupRepository(), bot.getUserRepository());
         if (bot.getCreateGroupStates().containsKey(id))
@@ -31,10 +29,10 @@ public class OperationManager {
         if (bot.getDeleteAssignmentStates().containsKey(id))
             return new DeleteAssignmentOperation(id, messageId, bot, message, bot.getAssignmentRepository(),
                     bot.getSubjectRepository(), bot.getGroupRepository());
-        if (bot.getCreateSubjectUsers().contains(id))
-            return new CreateSubject(id, messageId, bot, message, bot.getSubjectRepository());
-        if (bot.getDeleteSubjectUsers().contains(id))
-            return new DeleteSubject(id, messageId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
+        if (bot.getCreateSubjectStates().containsKey(id))
+            return new CreateSubjectOperation(id, messageId, bot, message, bot.getSubjectRepository());
+        if (bot.getDeleteSubjectStates().containsKey(id))
+            return new DeleteSubjectOperation(id, messageId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
         if (bot.getLogInUserStates().containsKey(id))
             return new LogInOperation(id, messageId, bot, message, bot.getUserRepository());
         if (bot.getSignUpUserStates().containsKey(id))
@@ -106,23 +104,23 @@ public class OperationManager {
             case "/subjects" ->
                 new SubjectsKeyboardGet(id, messageId, bot, message);
             case "/createSubject" ->
-                    new CreateSubject(id, messageId, bot, message, bot.getSubjectRepository());
+                    new CreateSubjectOperation(id, messageId, bot, message, bot.getSubjectRepository());
             case "/deleteSubject" ->
-                    new DeleteSubject(id, messageId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
+                    new DeleteSubjectOperation(id, messageId, bot, message, bot.getSubjectRepository(), bot.getAssignmentRepository());
             //Tokens Menu
             case "/tokens" ->
                 new TokensKeyboardGet(id, messageId, bot, message);
             case "/generate" ->
                     new GenerateToken(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
             case "/delete" ->
-                    new DeleteToken(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+                    new DeleteTokenOperation(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
             case "/getMyTokens" ->
                     new GetTokens(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
             //Profile Menu
             case "/profile" ->
                 new ProfileKeyboardGet(id, messageId, bot, message);
             case "/getAdminRights" ->
-                    new GetAdminRights(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
+                    new EnterTokenOperation(id, messageId, bot, message, bot.getUserRepository(), bot.getAdminTokenRepository());
             case "/info" -> new GetInfo(id, messageId, bot, message, bot.getAssignmentRepository());
             case "/logout" -> new LogOut(id, messageId, bot, message);
             case "/setInterval" -> new SetIntervalOperation(id, messageId, bot, message, bot.getUserRepository());

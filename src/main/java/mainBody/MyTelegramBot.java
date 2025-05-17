@@ -51,9 +51,9 @@ public class MyTelegramBot extends TelegramLongPollingBot implements AuthorizedU
     @Getter
     private final ConcurrentHashMap<IdPair, ExitGroupState> exitGroupStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> enterTokenUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, EnterTokenState> enterTokenStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> deleteTokenUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, DeleteTokenState> deleteTokenStates = new ConcurrentHashMap<>();
     @Getter
     private final ConcurrentHashMap<IdPair, CreateGroupState> createGroupStates = new ConcurrentHashMap<>();
     @Getter
@@ -63,9 +63,9 @@ public class MyTelegramBot extends TelegramLongPollingBot implements AuthorizedU
     @Getter
     private final ConcurrentHashMap<IdPair, DeleteAssignmentState> deleteAssignmentStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> createSubjectUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, CreateSubjectState> createSubjectStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> deleteSubjectUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, DeleteSubjectState> deleteSubjectStates = new ConcurrentHashMap<>();
     @Getter
     private final ConcurrentHashMap<IdPair, SetIntervalState> setIntervalStates = new ConcurrentHashMap<>();
     @Getter
