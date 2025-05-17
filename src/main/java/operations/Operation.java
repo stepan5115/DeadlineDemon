@@ -4,15 +4,11 @@ import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import sqlTables.User;
 import states.State;
-
-import java.util.Objects;
 import java.util.logging.Logger;
 
 abstract public class Operation implements Runnable {
@@ -23,8 +19,12 @@ abstract public class Operation implements Runnable {
     protected final String message;
     protected final SendMessage sendMessage;
 
-    private final String IGNORE_ERROR_SIMILARITY_MARKUP = "Error editing message " +
+    public final String IGNORE_ERROR_SIMILARITY_MARKUP = "Error editing message " +
             "reply markup: [400] Bad Request: message is not modified: " +
+            "specified new message content and reply markup are exactly " +
+            "the same as a current content and reply markup of the message";
+    public final String IGNORE_ERROR_SIMILARITY_TEXT = "Error editing message " +
+            "text: [400] Bad Request: message is not modified: " +
             "specified new message content and reply markup are exactly " +
             "the same as a current content and reply markup of the message";
 
@@ -46,26 +46,6 @@ abstract public class Operation implements Runnable {
         } catch (Exception e) {
             logger.severe("Can't send message: " + e.getMessage());
             return null;
-        }
-    }
-    protected void replyForPrivacyMessage() {
-        DeleteMessage deleteMessage = new DeleteMessage();
-        deleteMessage.setChatId(id.getChatId());
-        deleteMessage.setMessageId(Integer.parseInt(messageId));
-        try {
-            bot.execute(deleteMessage);
-            sendMessage.setReplyToMessageId(null);
-        } catch (TelegramApiException e) {
-            SendMessage tmp = new SendMessage();
-            tmp.setChatId(id.getChatId());
-            tmp.setText("Если я нахожусь в чате, то дайте мне права администратора! " +
-                    "Тогда я смогу удалять из чата ваши пароли для приватности! " +
-                    "Это очень важно!");
-            try {
-                bot.execute(tmp);
-            } catch (Exception ex) {
-                logger.severe("Can't delete message: " + e.getMessage());
-            }
         }
     }
 
@@ -94,6 +74,15 @@ abstract public class Operation implements Runnable {
         }
         return false;
     }
+    protected boolean checkAdminRights() {
+        User user = bot.getAuthorizedUsers().get(id);
+        if ((user == null) || (!user.isCanEditTasks())) {
+            sendMessage.setText("У вас нет прав для этого");
+            sendReply();
+            return true;
+        }
+        return false;
+    }
     protected boolean basePaginationCheck(State state, String message) {
         boolean flag = false;
         if (message.equals(InlineKeyboardBuilder.NEXT_COMMAND)) {
@@ -115,21 +104,13 @@ abstract public class Operation implements Runnable {
             editMessage.setReplyMarkup(replyMarkup);
             bot.execute(editMessage);
         } catch (Throwable e) {
-            if (e.getMessage().equals(IGNORE_ERROR_SIMILARITY_MARKUP))
+            if (e.getMessage().equals(IGNORE_ERROR_SIMILARITY_MARKUP) ||
+                e.getMessage().equals(IGNORE_ERROR_SIMILARITY_TEXT))
                 return;
-            logger.severe("Can't set text last message: " + e.getMessage());
+            //logger.severe("Can't set text last message: " + e.getMessage());
             sendMessage.setText(message);
             sendMessage.setReplyMarkup(replyMarkup);
             state.setMessageForWorkId(sendReply());
-        }
-    }
-    protected void deleteLastMessage(State state) {
-        try {
-            DeleteMessage deleteMessage = new DeleteMessage();
-            deleteMessage.setChatId(id.getChatId());
-            deleteMessage.setMessageId(state.getMessageForWorkId());
-        } catch (Throwable e) {
-            logger.severe("Can't delete last message: " + e.getMessage());
         }
     }
     protected void deleteLastUserMessage() {

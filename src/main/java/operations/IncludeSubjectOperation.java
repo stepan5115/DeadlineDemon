@@ -5,23 +5,24 @@ import mainBody.IdPair;
 import mainBody.MyTelegramBot;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import sqlTables.*;
-import states.ExcludeSubjectState;
+import states.IncludeSubjectState;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ExcludeSubjectOperation extends Operation {
+public class IncludeSubjectOperation extends Operation {
 
     private final UserRepository userRepository;
     private final SubjectRepository subjectRepository;
-    private final ConcurrentHashMap<IdPair, ExcludeSubjectState> map = bot.getExcludeSubjectStates();
+    private final ConcurrentHashMap<IdPair, IncludeSubjectState> map = bot.getIncludeSubjectStates();
 
-    public ExcludeSubjectOperation(IdPair id, String messageId,
-                          MyTelegramBot bot, String message,
-                          UserRepository userRepository,
-                          SubjectRepository subjectRepository) {
+    public IncludeSubjectOperation(IdPair id, String messageId,
+                                   MyTelegramBot bot, String message,
+                                   UserRepository userRepository,
+                                   SubjectRepository subjectRepository) {
         super(id, messageId, bot, message);
         this.userRepository = userRepository;
         this.subjectRepository = subjectRepository;
@@ -33,7 +34,7 @@ public class ExcludeSubjectOperation extends Operation {
                 return;
             }
             if (!map.containsKey(id))
-                map.put(id, new ExcludeSubjectState());
+                map.put(id, new IncludeSubjectState());
             chooseOperation(id);
         } catch (Throwable e) {
             sendMessage.setText("Ошибка на стороне сервера");
@@ -43,7 +44,7 @@ public class ExcludeSubjectOperation extends Operation {
 
     @Override
     protected void chooseOperation(IdPair id) {
-        ExcludeSubjectState state = map.get(id);
+        IncludeSubjectState state = map.get(id);
         boolean ifTheseNewAnswer = (state.getMessageForWorkId() == null);
         User user = bot.getAuthorizedUsers().get(id);
         if (user == null) {
@@ -51,16 +52,16 @@ public class ExcludeSubjectOperation extends Operation {
             map.remove(id);
             return;
         }
-        List<Subject> subjects = getIncludedSubjects(subjectRepository, user);
+        Set<Subject> subjects = getExcludedSubjects(subjectRepository, user);
         if (ifTheseNewAnswer) {
             checkEmptySubjects(id, state, subjects,
-                    "Добро пожаловать в меню отключения уведомлений предметам, " +
-                            "выбирайте предметы для отключения");
+                    "Добро пожаловать в меню включения уведомлений предметам, " +
+                            "выбирайте предметы для включения");
         }
         else if (basePaginationCheck(state, message)) {
             checkEmptySubjects(id, state, subjects,
-                    "Добро пожаловать в меню отключения уведомлений предметам, " +
-                            "выбирайте предметы для отключения");
+                    "Добро пожаловать в меню включения уведомлений предметам, " +
+                            "выбирайте предметы для включения");
         }
         else if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
             setLastMessage(state, "Операция была завершена", null);
@@ -69,23 +70,23 @@ public class ExcludeSubjectOperation extends Operation {
         else {
             Optional<Subject> subject = subjects.stream().filter(it -> it.getId().toString().equals(message)).findFirst();
             if (subject.isPresent()) {
-                user.getNotificationExcludedSubjects().add(subject.get().getId());
+                user.getNotificationExcludedSubjects().remove(subject.get().getId());
                 userRepository.save(user);
                 subjects.remove(subject.get());
-                checkEmptySubjects(id, state, subjects, String.format("Уведомления для \"%s\" успешно отключены",
+                checkEmptySubjects(id, state, subjects, String.format("Уведомления для \"%s\" успешно включены",
                         subject.get().getName()));
             }
             else
                 checkEmptySubjects(id, state, subjects,"Этот предмет не входит в число " +
-                        "заблокированных или вообще не существует! Выберите из тех что под сообщением");
+                        "разблокированных или вообще не существует! Выберите из тех что под сообщением");
         }
     }
 
-    private List<Subject> getIncludedSubjects(SubjectRepository subjectRepository, User user) {
-        return subjectRepository.getAllIncludedSubjects(user);
+    private Set<Subject> getExcludedSubjects(SubjectRepository subjectRepository, User user) {
+        return user.getExcludedSubjects(subjectRepository);
     }
-    private InlineKeyboardMarkup getInlineKeyboardSubjects(String userId, ExcludeSubjectState state,
-                                                              List<Subject> subjects) {
+    private InlineKeyboardMarkup getInlineKeyboardSubjects(String userId, IncludeSubjectState state,
+                                                           List<Subject> subjects) {
         try {
             List<InlineKeyboardBuilder.Pair> namesForSubjects = new ArrayList<>();
             for (Subject subject : subjects) {
@@ -102,13 +103,13 @@ public class ExcludeSubjectOperation extends Operation {
             return null;
         }
     }
-    private void checkEmptySubjects(IdPair id, ExcludeSubjectState state, List<Subject> subjects,
-                                       String onSuccessMessage) {
-        InlineKeyboardMarkup keyboardMarkup = getInlineKeyboardSubjects(id.getUserId(), state, subjects);
+    private void checkEmptySubjects(IdPair id, IncludeSubjectState state, Set<Subject> subjects,
+                                    String onSuccessMessage) {
+        InlineKeyboardMarkup keyboardMarkup = getInlineKeyboardSubjects(id.getUserId(), state, subjects.stream().toList());
         if (keyboardMarkup != null) {
             setLastMessage(state, onSuccessMessage, keyboardMarkup);
         } else {
-            setLastMessage(state, "Разблокированных предметов больше нету", null);
+            setLastMessage(state, "Заблокированных предметов больше нету", null);
             map.remove(id);
         }
     }

@@ -11,6 +11,7 @@ public class ShutDownOperation extends Operation {
     }
     public void run() {
         sendMessage.setText(message);
+        sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard(id));
         if (id.getUserId().equals(id.getChatId()))
             sendMessage.setReplyMarkup(StartKeyboard.getInlineKeyboard(id));
         sendReply();

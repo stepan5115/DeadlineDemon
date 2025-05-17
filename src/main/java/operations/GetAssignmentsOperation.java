@@ -6,26 +6,23 @@ import mainBody.MyTelegramBot;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import sqlTables.*;
 import states.*;
+import utils.DateParser;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class IncludeAssignmentOperation extends Operation {
+public class GetAssignmentsOperation extends Operation {
     public final String TO_FILTER = "/toFilter";
     public final String TO_FILTER_VISIBLE = "фильтровать";
 
-
-    private final UserRepository userRepository;
-    private final GroupRepository groupRepository;
     private final AssignmentRepository assignmentRepository;
     private final SubjectRepository subjectRepository;
-    private final ConcurrentHashMap<IdPair, IncludeAssignmentState> map = bot.getIncludeAssignmentStates();
+    private final GroupRepository groupRepository;
+    private final ConcurrentHashMap<IdPair, GetAssignmentsState> map = bot.getGetAssignmentsStates();
 
-    public IncludeAssignmentOperation(IdPair id, String messageId,
-                                      MyTelegramBot bot, String message, UserRepository userRepository,
-                                      AssignmentRepository assignmentRepository,
+    public GetAssignmentsOperation(IdPair id, String messageId,
+                                      MyTelegramBot bot, String message, AssignmentRepository assignmentRepository,
                                       SubjectRepository subjectRepository, GroupRepository groupRepository) {
         super(id, messageId, bot, message);
-        this.userRepository = userRepository;
         this.assignmentRepository = assignmentRepository;
         this.subjectRepository = subjectRepository;
         this.groupRepository = groupRepository;
@@ -37,7 +34,7 @@ public class IncludeAssignmentOperation extends Operation {
                 return;
             }
             if (!map.containsKey(id))
-                map.put(id, new IncludeAssignmentState());
+                map.put(id, new GetAssignmentsState());
             chooseOperation(id);
         } catch (Throwable e) {
             sendMessage.setText("Ошибка на стороне сервера");
@@ -47,18 +44,17 @@ public class IncludeAssignmentOperation extends Operation {
 
     @Override
     protected void chooseOperation(IdPair id) {
-        IncludeAssignmentState state = map.get(id);
+        GetAssignmentsState state = map.get(id);
         boolean ifTheseNewAnswer = (state.getMessageForWorkId() == null);
         switch (state.getPosition()) {
-            case IncludeAssignmentState.Position.MAIN -> {
+            case GetAssignmentsState.Position.MAIN -> {
                 if (ifTheseNewAnswer) {
-                    sendMessage.setText("Здесь вы можете помечать предметы как НЕ выполненные, выберите " +
-                            "одну из предложенных опций");
+                    sendMessage.setText("Здесь вы можете просмотреть ваши задания");
                     sendMessage.setReplyMarkup(getInlineKeyboardMarkup(id.getUserId(), state));
                     state.setMessageForWorkId(sendReply());
                 }
                 else if (message.equals(TO_FILTER)) {
-                    state.setPosition(IncludeAssignmentState.Position.FILTER_MODE);
+                    state.setPosition(GetAssignmentsState.Position.FILTER_MODE);
                     state.setPositionFilter(FilterAssignmentState.PositionFilter.MAIN);
                     User user = bot.getAuthorizedUsers().get(id);
                     if (user == null) {
@@ -76,14 +72,12 @@ public class IncludeAssignmentOperation extends Operation {
                         map.remove(id);
                         return;
                     }
-
-                    Set<Assignment> assignments =getIncludedAssignmentsAccordFilters(state, assignmentRepository, user);
-                    if (!checkEmptyAssignments(id, state, assignments,
-                            "Выберите задание из списка для пометки НЕ выполненным"))
-                        state.setPosition(IncludeAssignmentState.Position.INCLUDE_MODE);
+                    Set<Assignment> assignments = getIncludedAssignmentsAccordFilters(state, assignmentRepository, user);
+                    if (!checkEmptyAssignments(id, state, assignments, "Выберите задание из списка для просмотра информации"))
+                        state.setPosition(GetAssignmentsState.Position.GET_MODE);
                 }
                 else if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
-                    setLastMessage(state, "Операция была прервана", null);
+                    setLastMessage(state, "Операция просмотра была прервана", null);
                     map.remove(id);
                 }
                 else {
@@ -93,12 +87,12 @@ public class IncludeAssignmentOperation extends Operation {
             }
             case FILTER_MODE -> {
                 if (triggerFilterAndCheckTheEnd(state))
-                    state.setPosition(IncludeAssignmentState.Position.MAIN);
+                    state.setPosition(GetAssignmentsState.Position.MAIN);
             }
-            case INCLUDE_MODE -> {
+            case GET_MODE -> {
                 if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
-                    state.setPosition(IncludeAssignmentState.Position.MAIN);
-                    setLastMessage(state, "Здесь вы можете помечать предметы как НЕ выполненные, выберите одну из предложенных опций",
+                    state.setPosition(GetAssignmentsState.Position.MAIN);
+                    setLastMessage(state, "Здесь вы можете просмотреть ваши задания",
                             getInlineKeyboardMarkup(id.getUserId(), state));
                     return;
                 }
@@ -111,32 +105,47 @@ public class IncludeAssignmentOperation extends Operation {
                 Set<Assignment> assignments = getIncludedAssignmentsAccordFilters(state, assignmentRepository, user);
                 if (basePaginationCheck(state, message)) {
                     checkEmptyAssignments(id, state, assignments,
-                            "Выберите задание из списка для пометки НЕ выполненным");
+                            "Выберите задание из списка для просмотра информации");
                 }
                 else if (assignments != null) {
                     Optional<Assignment> assignment = assignments.stream().filter(it -> it.getId().toString()
                             .equals(message)).findFirst();
                     if (assignment.isPresent()) {
-                        user.getCompletedAssignments().remove(assignment.get().getId());
-                        userRepository.save(user);
-                        assignments.remove(assignment.get());
-                        checkEmptyAssignments(id, state, assignments,
-                                String.format("Задание \"%s\" помечено как НЕ выполненное, продолжайте выбирать",
-                                        assignment.get().getTitle()));
+                        String result = """
+                                Заголовок: %s
+                                Описание: %s
+                                Группы: %s
+                                Предмет: %s (уведомления по предмету %s)
+                                Дедлайн: %s
+                                Создано: %s
+                                Статус: %s
+                                """.formatted(
+                                assignment.get().getTitle(),
+                                assignment.get().getDescription(),
+                                String.join(", ", assignment.get().getTargetGroups()),
+                                assignment.get().getSubject().getName(),
+                                user.getNotificationExcludedSubjects().contains(assignment.get().getSubject().getId()) ?
+                                        "отключены" : "включены",
+                                DateParser.formatDeadline(assignment.get().getDeadline()),
+                                DateParser.formatDeadline(assignment.get().getCreatedAt()),
+                                user.getCompletedAssignments().contains(assignment.get().getId()) ?
+                                        "выполнено" : "не выполнено"
+                        );
+                        checkEmptyAssignments(id, state, assignments, result);
                     }
                     else
                         checkEmptyAssignments(id, state, assignments, "Задание не найдено, попробуйте еще раз");
                 }
                 else {
-                    state.setPosition(IncludeAssignmentState.Position.MAIN);
+                    state.setPosition(GetAssignmentsState.Position.MAIN);
                     setLastMessage(state, "Не нашлось подходящих заданий!",
                             getInlineKeyboardMarkup(id.getUserId(), state));
                 }
             }
         }
     }
-    private boolean triggerFilterAndCheckTheEnd(IncludeAssignmentState state) {
-        state.setPosition(IncludeAssignmentState.Position.FILTER_MODE);
+    private boolean triggerFilterAndCheckTheEnd(GetAssignmentsState state) {
+        state.setPosition(GetAssignmentsState.Position.FILTER_MODE);
         User user = bot.getAuthorizedUsers().get(id);
         if (user == null) {
             setLastMessage(state, "пользователь не найден!", null);
@@ -146,22 +155,21 @@ public class IncludeAssignmentOperation extends Operation {
         FilterAssignmentManager.chooseOperation(user, id.getUserId(), state,
                 this, message, groupRepository, subjectRepository, false);
         if (state.getPositionFilter() == FilterAssignmentState.PositionFilter.COMPLETE) {
-            setLastMessage(state, "Фильтр применен!", getInlineKeyboardMarkup(id.getUserId(), state));
+            setLastMessage(state, "Фильтр применен!",
+                    getInlineKeyboardMarkup(id.getUserId(), state));
             return true;
         }
         return false;
     }
 
-
-
-    private Set<Assignment> getIncludedAssignmentsAccordFilters(IncludeAssignmentState state,
+    private Set<Assignment> getIncludedAssignmentsAccordFilters(GetAssignmentsState state,
                                                                 AssignmentRepository assignmentRepository,
                                                                 User user) {
-        Set<Assignment> result = user.getCompletedAssignments(assignmentRepository);
+        Set<Assignment> result = user.getAllUserAssignments(assignmentRepository);
         result = FilterAssignmentManager.applyFilters(state, result, user);
         return result;
     }
-    private InlineKeyboardMarkup getInlineKeyboardAssignments(String userId, IncludeAssignmentState state,
+    private InlineKeyboardMarkup getInlineKeyboardAssignments(String userId, GetAssignmentsState state,
                                                               Set<Assignment> assignments) {
         try {
             List<InlineKeyboardBuilder.Pair> namesForAssignments = new ArrayList<>();
@@ -186,15 +194,16 @@ public class IncludeAssignmentOperation extends Operation {
                 userId, state, new InlineKeyboardBuilder.Pair(TO_FILTER_VISIBLE, TO_FILTER)
         );
     }
-    private boolean checkEmptyAssignments(IdPair id, IncludeAssignmentState state, Set<Assignment> assignments,
+    private boolean checkEmptyAssignments(IdPair id, GetAssignmentsState state, Set<Assignment> assignments,
                                           String onSuccessMessage) {
         InlineKeyboardMarkup keyboardMarkup = getInlineKeyboardAssignments(id.getUserId(), state, assignments);
         if (keyboardMarkup != null) {
             setLastMessage(state, onSuccessMessage, keyboardMarkup);
             return false;
         } else {
-            state.setPosition(IncludeAssignmentState.Position.MAIN);
-            setLastMessage(state, "Не нашлось подходящих заданий!", getInlineKeyboardMarkup(id.getUserId(), state));
+            state.setPosition(GetAssignmentsState.Position.MAIN);
+            setLastMessage(state, "Не нашлось подходящих заданий!",
+                    getInlineKeyboardMarkup(id.getUserId(), state));
             return true;
         }
     }

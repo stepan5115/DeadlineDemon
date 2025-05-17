@@ -59,11 +59,13 @@ public class LogInOperation extends Operation {
                 }
                 else if (message.equals(PASSWORD_COMMAND)) {
                     state.setPosition(AuthState.Position.ADD_PASSWORD);
-                    setLastMessage(state, "Введите пароль", null);
+                    setLastMessage(state, "Введите пароль",
+                            InlineKeyboardBuilder.getSimpleBreak(id.getUserId(), state));
                 }
                 else if (message.equals(USERNAME_COMMAND)) {
                     state.setPosition(AuthState.Position.ADD_USERNAME);
-                    setLastMessage(state, "Введите имя", null);
+                    setLastMessage(state, "Введите имя",
+                            InlineKeyboardBuilder.getSimpleBreak(id.getUserId(), state));
                 }
                 else if (message.equals(InlineKeyboardBuilder.COMPLETE_COMMAND))
                     processedLogIn(state);
@@ -82,12 +84,15 @@ public class LogInOperation extends Operation {
             case AuthState.Position.ADD_USERNAME -> {
                 state.setPosition(AuthState.Position.CHOICE);
                 StringBuilder stringBuilder = new StringBuilder();
-                if (InputValidator.isValid(message)) {
+                if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
+                    stringBuilder.append("Изменение отменено\n");
+                }
+                else if (InputValidator.isValid(message, false)) {
                     stringBuilder.append("Хорошо, запомню\n");
                     state.setUsername(message);
                 } else {
                     stringBuilder.append(String.format("Запрещенные символы: \"%s\"\n",
-                            InputValidator.RULES_DESCRIPTION));
+                            InputValidator.RULES_DESCRIPTION_TITLE_PASSWORD));
                 }
                 stringBuilder.append(getParameterValues(state));
                 setLastMessage(state, stringBuilder.toString(),
@@ -96,13 +101,16 @@ public class LogInOperation extends Operation {
             case AuthState.Position.ADD_PASSWORD -> {
                 state.setPosition(AuthState.Position.CHOICE);
                 StringBuilder stringBuilder = new StringBuilder();
-                if (InputValidator.isValid(message)) {
+                if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
+                    stringBuilder.append("Изменение отменено\n");
+                }
+                else if (InputValidator.isValid(message, false)) {
                     stringBuilder.append("Хорошо, запомню\n");
                     state.setPassword(message);
                     deleteLastUserMessage();
                 } else {
                     stringBuilder.append(String.format("Запрещенные символы: \"%s\"\n",
-                            InputValidator.RULES_DESCRIPTION));
+                            InputValidator.RULES_DESCRIPTION_TITLE_PASSWORD));
                 }
                 stringBuilder.append(getParameterValues(state));
                 setLastMessage(state, stringBuilder.toString(),

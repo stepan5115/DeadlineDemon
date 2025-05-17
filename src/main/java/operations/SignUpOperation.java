@@ -84,12 +84,12 @@ public class SignUpOperation extends Operation {
             case AuthState.Position.ADD_USERNAME -> {
                 state.setPosition(AuthState.Position.CHOICE);
                 StringBuilder stringBuilder = new StringBuilder();
-                if (InputValidator.isValid(message)) {
+                if (InputValidator.isValid(message, false)) {
                     stringBuilder.append("Хорошо, запомню\n");
                     state.setUsername(message);
                 } else {
                     stringBuilder.append(String.format("Запрещенные символы: \"%s\"\n",
-                            InputValidator.RULES_DESCRIPTION));
+                            InputValidator.RULES_DESCRIPTION_TITLE_PASSWORD));
                 }
                 stringBuilder.append(getParameterValues(state));
                 setLastMessage(state, stringBuilder.toString(),
@@ -98,13 +98,13 @@ public class SignUpOperation extends Operation {
             case AuthState.Position.ADD_PASSWORD -> {
                 state.setPosition(AuthState.Position.CHOICE);
                 StringBuilder stringBuilder = new StringBuilder();
-                if (InputValidator.isValid(message)) {
+                if (InputValidator.isValid(message, false)) {
                     stringBuilder.append("Хорошо, запомню\n");
                     state.setPassword(message);
                     deleteLastUserMessage();
                 } else {
                     stringBuilder.append(String.format("Запрещенные символы: \"%s\"\n",
-                            InputValidator.RULES_DESCRIPTION));
+                            InputValidator.RULES_DESCRIPTION_TITLE_PASSWORD));
                 }
                 stringBuilder.append(getParameterValues(state));
                 setLastMessage(state, stringBuilder.toString(),

@@ -41,14 +41,20 @@ public class FilterAssignmentState extends State {
     private LocalDateTime deadlineFilter = null;
     @Getter
     @Setter
+    private Boolean isCompleteFilter = null;
+    @Getter
+    @Setter
     boolean global = false; //generate buttons of user entities or all in system
+    @Getter
+    @Setter
+    boolean addCompleteFilter = false;
+    @Getter
+    @Setter
+    boolean isCreate = false;
     public void setPositionFilter(PositionFilter positionFilter) {
         pageNumber = 0;
         this.positionFilter = positionFilter;
     }
-    @Getter
-    @Setter
-    private String assignmentName = "";
     public enum PositionFilter {
         MAIN,
         FILTER_TITLE,
@@ -61,6 +67,7 @@ public class FilterAssignmentState extends State {
         FILTER_SUBJECTS_ADD,
         FILTER_DEADLINE,
         FILTER_DEADLINE_ADD,
+        FILTER_IS_COMPLETE,
         COMPLETE
     }
 }

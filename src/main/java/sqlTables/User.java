@@ -130,14 +130,24 @@ public class User {
     public Set<Assignment> getAssignments(AssignmentRepository assignmentRepository) {
         Set<Assignment> assignments = new HashSet<>();
         for (Assignment assignment : assignmentRepository.findAll())
-            if ((!completedAssignments.contains(assignment.getId())) &&
-                    (!notificationExcludedSubjects.contains(assignment.getSubject().getId()))) {
+            if (!completedAssignments.contains(assignment.getId())) {
                 for (String assignmentGroup : assignment.getTargetGroups())
                     if (groups.contains(assignmentGroup)) {
                         assignments.add(assignment);
                         break;
                     }
             }
+        return assignments;
+    }
+    public Set<Assignment> getAllUserAssignments(AssignmentRepository assignmentRepository) {
+        Set<Assignment> assignments = new HashSet<>();
+        for (Assignment assignment : assignmentRepository.findAll()) {
+            for (String assignmentGroup : assignment.getTargetGroups())
+                if (groups.contains(assignmentGroup)) {
+                    assignments.add(assignment);
+                    break;
+                }
+        }
         return assignments;
     }
     public Set<Subject> getExcludedSubjects(SubjectRepository subjectRepository) {

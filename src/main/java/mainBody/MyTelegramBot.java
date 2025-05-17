@@ -1,6 +1,7 @@
 package mainBody;
 
 import lombok.Getter;
+import operations.GetAssignmentsOperation;
 import operations.IncludeAssignmentOperation;
 import operations.OperationManager;
 import org.springframework.stereotype.Component;
@@ -46,37 +47,37 @@ public class MyTelegramBot extends TelegramLongPollingBot implements AuthorizedU
     @Getter
     private final ConcurrentHashMap<IdPair, AuthState> signUpUserStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> enterGroupUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, EnterGroupState> enterGroupStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> exitGroupUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, ExitGroupState> exitGroupStates = new ConcurrentHashMap<>();
     @Getter
     private final ConcurrentLinkedQueue<IdPair> enterTokenUsers = new ConcurrentLinkedQueue<>();
     @Getter
     private final ConcurrentLinkedQueue<IdPair> deleteTokenUsers = new ConcurrentLinkedQueue<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> createGroupUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, CreateGroupState> createGroupStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> deleteGroupUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, DeleteGroupState> deleteGroupStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentHashMap<IdPair, TitDesGroDeaSubState> createAssignmentUsers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<IdPair, CreateAssignmentState> createAssignmentStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> deleteAssignmentUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, DeleteAssignmentState> deleteAssignmentStates = new ConcurrentHashMap<>();
     @Getter
     private final ConcurrentLinkedQueue<IdPair> createSubjectUsers = new ConcurrentLinkedQueue<>();
     @Getter
     private final ConcurrentLinkedQueue<IdPair> deleteSubjectUsers = new ConcurrentLinkedQueue<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> setIntervalUsers = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, SetIntervalState> setIntervalStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentHashMap<IdPair, AssignmentInfoState> getAssignmentInfo = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<IdPair, GetAssignmentsState> getAssignmentsStates = new ConcurrentHashMap<>();
     @Getter
     private final ConcurrentHashMap<IdPair, ExcludeAssignmentState> excludeAssignmentStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentHashMap<IdPair, IncludeAssignmentState> includeAssignmentState = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<IdPair, IncludeAssignmentState> includeAssignmentStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentHashMap<IdPair, ExcludeSubjectState> excludeSubjectState = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<IdPair, ExcludeSubjectState> excludeSubjectStates = new ConcurrentHashMap<>();
     @Getter
-    private final ConcurrentLinkedQueue<IdPair> includeSubject = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<IdPair, IncludeSubjectState> includeSubjectStates = new ConcurrentHashMap<>();
 
     public MyTelegramBot(UserRepository userRepository,
                          SubjectRepository subjectRepository,

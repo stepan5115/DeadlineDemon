@@ -81,9 +81,6 @@ public class ExcludeAssignmentOperation extends Operation {
                     if (!checkEmptyAssignments(id, state, assignments, "Выберите задание из списка для пометки выполненным"))
                         state.setPosition(ExcludeAssignmentState.Position.EXCLUDE_MODE);
                 }
-                else if (basePaginationCheck(state, message))
-                    setLastMessage(state, "Здесь вы можете помечать предметы как выполненные, выберите" +
-                            "одну из предложенных опций", getInlineKeyboardMarkup(id.getUserId(), state));
                 else if (message.equals(InlineKeyboardBuilder.BREAK_COMMAND)) {
                     setLastMessage(state, "Операция выполнения задания была прервана", null);
                     map.remove(id);
@@ -111,6 +108,10 @@ public class ExcludeAssignmentOperation extends Operation {
                     return;
                 }
                 Set<Assignment> assignments = getIncludedAssignmentsAccordFilters(state, assignmentRepository, user);
+                if (basePaginationCheck(state, message)) {
+                    checkEmptyAssignments(id, state, assignments,
+                            "Выберите задание из списка для пометки выполненным");
+                }
                 if (assignments != null) {
                     Optional<Assignment> assignment = assignments.stream().filter(it -> it.getId().toString()
                             .equals(message)).findFirst();
@@ -153,7 +154,7 @@ public class ExcludeAssignmentOperation extends Operation {
                                                                  AssignmentRepository assignmentRepository,
                                                                  User user) {
         Set<Assignment> result = user.getAssignments(assignmentRepository);
-        result = FilterAssignmentManager.applyFilters(state, result);
+        result = FilterAssignmentManager.applyFilters(state, result, user);
         return result;
     }
     private InlineKeyboardMarkup getInlineKeyboardAssignments(String userId, ExcludeAssignmentState state,
